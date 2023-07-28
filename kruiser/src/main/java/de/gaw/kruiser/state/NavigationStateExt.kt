@@ -10,13 +10,19 @@ import de.gaw.kruiser.destination.Destination
 
 fun NavigationState.push(destination: Destination) = mutate { add(destination) }
 fun NavigationState.pop() = mutate { removeLastOrNull() }
-fun NavigationState.isEmpty() = stack.value.isEmpty()
+fun NavigationState.isEmpty() = currentStack.isEmpty()
 val NavigationState.currentLastEvent get() = lastEvent.value
 val NavigationState.currentStack get() = stack.value
 val NavigationState.currentDestination get() = currentStack.lastOrNull()
 
 @Composable
+fun NavigationState.rememberIsEmpty(): State<Boolean> {
+    val stack by stack.collectAsState()
+    return remember(this.stack) { derivedStateOf { stack.isEmpty() } }
+}
+
+@Composable
 fun NavigationState.rememberCurrentDestination(): State<Destination?> {
     val stack by stack.collectAsState()
-    return remember(stack) { derivedStateOf { stack.lastOrNull() } }
+    return remember(this.stack) { derivedStateOf { stack.lastOrNull() } }
 }

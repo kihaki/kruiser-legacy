@@ -9,7 +9,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.Navigation
 import de.gaw.kruiser.android.navigationOwnerViewModel
+import de.gaw.kruiser.sample.samples.DashboardDestination
 import de.gaw.kruiser.sample.theme.KruiserTheme
+import de.gaw.kruiser.state.currentStack
+import de.gaw.kruiser.state.push
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +24,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navigationViewModel = navigationOwnerViewModel()
+                    val navigationViewModel = navigationOwnerViewModel().apply {
+                        if (state.currentStack.isEmpty()) state.push(DashboardDestination)
+                    }
                     Navigation(
                         state = navigationViewModel.state,
                         serviceProvider = navigationViewModel.serviceProvider,

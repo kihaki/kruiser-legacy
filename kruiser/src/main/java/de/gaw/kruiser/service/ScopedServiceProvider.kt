@@ -14,7 +14,7 @@ interface ScopedServiceProvider {
     }
 
     interface ServiceFactory<T : Any> {
-        fun create(): T
+        fun create(state: () -> NavigationState): T
     }
 
     /**
@@ -32,7 +32,7 @@ interface ScopedServiceProvider {
 }
 
 class DefaultScopedServiceProvider(
-    private val state: NavigationState,
+    val state: () -> NavigationState,
 ) : ScopedServiceProvider {
     private var scopes = mapOf<ServiceFactory<*>, Set<ServiceScope>>()
     private var instances = mapOf<ServiceFactory<*>, Any>()
@@ -63,7 +63,7 @@ class DefaultScopedServiceProvider(
             .toMutableMap()
             .apply {
                 @Suppress("UNCHECKED_CAST")
-                instance = getOrPut(factory, factory::create) as T
+                instance = getOrPut(factory) { factory.create(state) } as T
             }
 
         return instance
@@ -72,7 +72,7 @@ class DefaultScopedServiceProvider(
     override fun clearDeadServices() {
         // 1. Adjust *inner scopes set* to not include dead scopes (empty sets will be left for dead services!)
         scopes = scopes.mapValues { (_, scopes) ->
-            val liveScopes = scopes.filter { scope -> scope.isAlive(state) }.toSet()
+            val liveScopes = scopes.filter { scope -> scope.isAlive(state()) }.toSet()
             liveScopes
         }
 

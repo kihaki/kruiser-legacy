@@ -11,6 +11,8 @@ import androidx.compose.animation.with
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -26,6 +28,7 @@ import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.isEmpty
 import de.gaw.kruiser.state.pop
 import de.gaw.kruiser.state.rememberCurrentDestination
+import de.gaw.kruiser.state.rememberIsEmpty
 
 @Composable
 fun Navigation(
@@ -33,8 +36,10 @@ fun Navigation(
     serviceProvider: ScopedServiceProvider,
     modifier: Modifier = Modifier,
 ) {
+    val isEmpty by state.rememberIsEmpty()
+
     BackHandler(
-        enabled = !state.isEmpty(),
+        enabled = isEmpty,
         onBack = state::pop,
     )
 
