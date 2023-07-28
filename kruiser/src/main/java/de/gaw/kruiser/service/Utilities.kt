@@ -6,7 +6,6 @@ import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceScope
 import de.gaw.kruiser.service.scope.DestinationScope
-import de.gaw.kruiser.state.NavigationState
 import kotlin.reflect.KClass
 
 
@@ -35,8 +34,9 @@ private class DefaultServiceFactory<T : Any>(
 ) : ServiceFactory<T> {
 
     override fun hashCode(): Int = clazz.hashCode()
+
     override fun equals(other: Any?): Boolean =
         (other as? DefaultServiceFactory<*>)?.clazz == this.clazz
 
-    override fun create(state: () -> NavigationState): T = factory()
+    override fun ScopedServiceProvider.ServiceContext.create(): T = factory()
 }

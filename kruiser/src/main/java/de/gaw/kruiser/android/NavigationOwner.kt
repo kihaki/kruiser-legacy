@@ -29,5 +29,5 @@ interface NavigationOwner {
 
 class NavigationOwnerViewModel : NavigationOwner, ViewModel() {
     override val state = DefaultNavigationState()
-    override val serviceProvider = DefaultScopedServiceProvider(::state)
+    override val serviceProvider = DefaultScopedServiceProvider(state)
 }

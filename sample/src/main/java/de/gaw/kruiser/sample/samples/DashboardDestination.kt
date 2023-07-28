@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.screen.ScreenModel
+import de.gaw.kruiser.service.ScopedServiceProvider
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.service
 import de.gaw.kruiser.state.NavigationState
@@ -42,7 +43,7 @@ object DashboardDestination : Destination {
 }
 
 private class DashboardScreenModel(
-    private val navigationState: () -> NavigationState,
+    private val navigationState: NavigationState,
 ) : ScreenModel {
 
     val menuItems = listOf(
@@ -50,11 +51,11 @@ private class DashboardScreenModel(
     )
 
     private fun openPushAndPopSample() {
-        navigationState().push(PushAndPopDestination(index = 0))
+        navigationState.push(PushAndPopDestination(index = 0))
     }
 }
 
 private object DashboardScreenModelFactory : ServiceFactory<DashboardScreenModel> {
-    override fun create(state: () -> NavigationState): DashboardScreenModel =
-        DashboardScreenModel(state)
+    override fun ScopedServiceProvider.ServiceContext.create(): DashboardScreenModel =
+        DashboardScreenModel(navigationState)
 }

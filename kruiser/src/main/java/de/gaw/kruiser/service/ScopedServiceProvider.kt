@@ -1,5 +1,6 @@
 package de.gaw.kruiser.service
 
+import de.gaw.kruiser.service.ScopedServiceProvider.ServiceContext
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceScope
 import de.gaw.kruiser.state.NavigationState
@@ -14,7 +15,11 @@ interface ScopedServiceProvider {
     }
 
     interface ServiceFactory<T : Any> {
-        fun create(state: () -> NavigationState): T
+        fun ServiceContext.create(): T
+    }
+
+    interface ServiceContext {
+        val navigationState: NavigationState
     }
 
     /**
@@ -32,10 +37,14 @@ interface ScopedServiceProvider {
 }
 
 class DefaultScopedServiceProvider(
-    val state: () -> NavigationState,
+    val state: NavigationState,
 ) : ScopedServiceProvider {
     private var scopes = mapOf<ServiceFactory<*>, Set<ServiceScope>>()
     private var instances = mapOf<ServiceFactory<*>, Any>()
+
+    data class DefaultServiceContext(
+        override val navigationState: NavigationState
+    ): ServiceContext
 
     override fun <T : Any> scopedService(
         scope: ServiceScope,
@@ -63,7 +72,7 @@ class DefaultScopedServiceProvider(
             .toMutableMap()
             .apply {
                 @Suppress("UNCHECKED_CAST")
-                instance = getOrPut(factory) { factory.create(state) } as T
+                instance = getOrPut(factory) { with(factory) { DefaultServiceContext(state).create() } } as T
             }
 
         return instance
@@ -72,7 +81,7 @@ class DefaultScopedServiceProvider(
     override fun clearDeadServices() {
         // 1. Adjust *inner scopes set* to not include dead scopes (empty sets will be left for dead services!)
         scopes = scopes.mapValues { (_, scopes) ->
-            val liveScopes = scopes.filter { scope -> scope.isAlive(state()) }.toSet()
+            val liveScopes = scopes.filter { scope -> scope.isAlive(state) }.toSet()
             liveScopes
         }
 

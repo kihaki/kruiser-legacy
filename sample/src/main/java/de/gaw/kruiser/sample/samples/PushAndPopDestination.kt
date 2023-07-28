@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.screen.ScreenModel
+import de.gaw.kruiser.service.ScopedServiceProvider.ServiceContext
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.service
 import de.gaw.kruiser.state.NavigationState
@@ -63,16 +64,16 @@ data class PushAndPopDestination(
 
 private class PushAndPopScreenModel(
     private val index: Int,
-    private val navigationState: () -> NavigationState,
+    private val navigationState: NavigationState,
 ) : ScreenModel {
     fun onNext() {
-        navigationState().push(PushAndPopDestination(index + 1))
+        navigationState.push(PushAndPopDestination(index + 1))
     }
 }
 
 private data class PushAndPopScreenModelFactory(
     val index: Int,
 ) : ServiceFactory<PushAndPopScreenModel> {
-    override fun create(state: () -> NavigationState): PushAndPopScreenModel =
-        PushAndPopScreenModel(index, state)
+    override fun ServiceContext.create(): PushAndPopScreenModel =
+        PushAndPopScreenModel(index, navigationState)
 }
