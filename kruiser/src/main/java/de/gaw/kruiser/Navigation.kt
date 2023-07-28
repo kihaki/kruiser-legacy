@@ -39,7 +39,7 @@ fun Navigation(
     val isEmpty by state.rememberIsEmpty()
 
     BackHandler(
-        enabled = isEmpty,
+        enabled = !isEmpty,
         onBack = state::pop,
     )
 
