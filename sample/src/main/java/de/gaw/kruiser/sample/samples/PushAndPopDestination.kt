@@ -15,8 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.sample.transition.VerticalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.screen.ScreenModel
+import de.gaw.kruiser.screen.ScreenTransition
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceContext
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.service
@@ -26,7 +28,9 @@ import kotlin.random.Random
 
 data class PushAndPopDestination(
     val index: Int,
-) : Destination {
+) : Destination,
+    ScreenTransition by VerticalCardStackTransition() {
+
     override fun build() = object : Screen {
         override val destination: Destination get() = this@PushAndPopDestination
 
