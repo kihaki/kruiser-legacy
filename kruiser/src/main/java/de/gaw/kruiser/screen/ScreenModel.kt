@@ -14,8 +14,12 @@ interface ScreenModel : Closeable {
 }
 
 private val screenCoroutinesScopeRegistry = mutableMapOf<ScreenModel, CoroutineScope>()
-private fun ScreenModel.closeCoroutineScope() = screenCoroutinesScopeRegistry.remove(this)?.cancel()
+private fun ScreenModel.closeCoroutineScope() =
+    screenCoroutinesScopeRegistry
+        .remove(this)
+        ?.cancel()
 
-val ScreenModel.scope: CoroutineScope get() = screenCoroutinesScopeRegistry.getOrPut(this) {
-    CoroutineScope(SupervisorJob())
-}
+val ScreenModel.scope: CoroutineScope
+    get() = screenCoroutinesScopeRegistry.getOrPut(this) {
+        CoroutineScope(SupervisorJob())
+    }
