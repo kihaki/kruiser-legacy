@@ -9,7 +9,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,14 +46,7 @@ private fun PushAndPop(
     onPushCustom: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = rememberSaveable(saver = colorSaver()) {
-        Color(
-            Random.nextFloat() * .5f + .5f,
-            Random.nextFloat() * .5f + .5f,
-            Random.nextFloat() * .5f + .5f,
-            1f,
-        )
-    }
+    val backgroundColor = rememberSaveable(saver = colorSaver()) { Color.randomSoft() }
 
     Surface(
         modifier = modifier,
@@ -77,6 +69,13 @@ private fun PushAndPop(
         }
     }
 }
+
+private fun Color.Companion.randomSoft() = Color(
+    Random.nextFloat() * .5f + .5f,
+    Random.nextFloat() * .5f + .5f,
+    Random.nextFloat() * .5f + .5f,
+    1f,
+)
 
 @Preview
 @Composable
