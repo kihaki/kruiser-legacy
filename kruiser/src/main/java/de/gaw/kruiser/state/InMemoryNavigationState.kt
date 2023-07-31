@@ -8,7 +8,7 @@ import de.gaw.kruiser.state.NavigationState.Event.Replace
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-class DefaultNavigationState(
+class InMemoryNavigationState(
     initialStack: List<Destination> = emptyList(),
 ) : NavigationState {
     override val stack = MutableStateFlow(initialStack)
