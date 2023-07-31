@@ -8,8 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import de.gaw.kruiser.destination.Destination
 
-fun NavigationState.push(destination: Destination) = mutate { add(destination) }
-fun NavigationState.pop() = mutate { removeLastOrNull() }
+fun NavigationState.push(destination: Destination) = mutate { this + destination }
+fun NavigationState.pop() = mutate { dropLast(1) }
+fun NavigationState.popUntil(block: (Destination) -> Boolean) = mutate { dropLastWhile { !block(it) } }
 fun NavigationState.isEmpty() = currentStack.isEmpty()
 val NavigationState.currentLastEvent get() = lastEvent.value
 val NavigationState.currentStack get() = stack.value

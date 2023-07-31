@@ -10,5 +10,5 @@ interface NavigationState {
 
     val stack: StateFlow<List<Destination>>
     val lastEvent: StateFlow<Event>
-    fun mutate(block: MutableList<Destination>.() -> Unit)
+    fun mutate(block: List<Destination>.() -> List<Destination>)
 }

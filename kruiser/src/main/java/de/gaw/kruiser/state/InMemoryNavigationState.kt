@@ -14,29 +14,26 @@ class InMemoryNavigationState(
     override val stack = MutableStateFlow(initialStack)
     override var lastEvent = MutableStateFlow(Idle)
 
-    override fun mutate(block: MutableList<Destination>.() -> Unit) = stack.update { currentStack ->
-        currentStack
-            .toMutableList()
-            .let { mutableStack ->
-                val listBeforeSize = mutableStack.size
-                val beforeTopDestination = mutableStack.lastOrNull()
+    override fun mutate(block: List<Destination>.() -> List<Destination>) =
+        stack.update { currentStack ->
+            val listBeforeSize = currentStack.size
+            val beforeTopDestination = currentStack.lastOrNull()
 
-                block(mutableStack)
+            val updatedStack = block(currentStack)
 
-                val listAfterSize = mutableStack.size
-                val afterTopDestination = mutableStack.lastOrNull()
+            val listAfterSize = updatedStack.size
+            val afterTopDestination = updatedStack.lastOrNull()
 
-                lastEvent.update {
-                    when {
-                        listBeforeSize < listAfterSize -> Push
-                        listBeforeSize > listAfterSize -> Pop
-                        beforeTopDestination != afterTopDestination -> Replace
-                        else -> Idle
-                    }
+            lastEvent.update {
+                when {
+                    listBeforeSize < listAfterSize -> Push
+                    listBeforeSize > listAfterSize -> Pop
+                    beforeTopDestination != afterTopDestination -> Replace
+                    else -> Idle
                 }
-
-                mutableStack
             }
-    }
+
+            updatedStack
+        }
 }
 

@@ -35,6 +35,7 @@ data class PushAndPopScreen(
             title = "Screen $index",
             onPushDefault = model::onPushDefault,
             onPushCustom = model::onPushCustom,
+            onGoToFirst = model::onGoToFirst,
         )
     }
 }
@@ -44,6 +45,7 @@ private fun PushAndPop(
     title: String,
     onPushDefault: () -> Unit,
     onPushCustom: () -> Unit,
+    onGoToFirst: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor = rememberSaveable(saver = colorSaver()) { Color.randomSoft() }
@@ -66,6 +68,10 @@ private fun PushAndPop(
             ElevatedButton(onClick = onPushCustom) {
                 Text("Push with custom animation")
             }
+            Spacer(modifier = Modifier.size(24.dp))
+            ElevatedButton(onClick = onGoToFirst) {
+                Text("Go back to first screen")
+            }
         }
     }
 }
@@ -85,5 +91,6 @@ private fun PushAndPopScreenPreview() = KruiserPreviewTheme {
         title = "Screen 1",
         onPushDefault = {},
         onPushCustom = {},
+        onGoToFirst = {},
     )
 }

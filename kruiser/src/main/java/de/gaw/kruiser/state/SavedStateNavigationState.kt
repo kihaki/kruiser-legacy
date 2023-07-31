@@ -13,17 +13,16 @@ class SavedStateNavigationState(
     override val stack = savedStateHandle.getStateFlow(navStateKey, initialStack)
     override var lastEvent = savedStateHandle.getStateFlow(eventStateKey, initialEvent)
 
-    override fun mutate(block: MutableList<Destination>.() -> Unit) {
+    override fun mutate(block: List<Destination>.() -> List<Destination>) {
         savedStateHandle[navStateKey] = stack.value
-            .toMutableList()
-            .let { mutableStack ->
-                val listBeforeSize = mutableStack.size
-                val beforeTopDestination = mutableStack.lastOrNull()
+            .let { currentStack ->
+                val listBeforeSize = currentStack.size
+                val beforeTopDestination = currentStack.lastOrNull()
 
-                block(mutableStack)
+                val updatedStack = block(currentStack)
 
-                val listAfterSize = mutableStack.size
-                val afterTopDestination = mutableStack.lastOrNull()
+                val listAfterSize = updatedStack.size
+                val afterTopDestination = updatedStack.lastOrNull()
 
                 savedStateHandle[eventStateKey] = when {
                     listBeforeSize < listAfterSize -> NavigationState.Event.Push
@@ -32,7 +31,7 @@ class SavedStateNavigationState(
                     else -> NavigationState.Event.Idle
                 }
 
-                mutableStack
+                updatedStack
             }
     }
 }
