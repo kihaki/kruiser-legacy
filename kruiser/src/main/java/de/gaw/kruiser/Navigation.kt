@@ -3,7 +3,6 @@ package de.gaw.kruiser
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -19,8 +18,8 @@ import de.gaw.kruiser.state.NavigationState.Event.Replace
 import de.gaw.kruiser.state.currentLastEvent
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.pop
-import de.gaw.kruiser.state.rememberCurrentDestination
-import de.gaw.kruiser.state.rememberIsEmpty
+import de.gaw.kruiser.state.collectCurrentDestination
+import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.transition.HorizontalCardStackTransition
 
 @Composable
@@ -29,7 +28,7 @@ fun Navigation(
     serviceProvider: ScopedServiceProvider,
     modifier: Modifier = Modifier,
 ) {
-    val isEmpty by state.rememberIsEmpty()
+    val isEmpty by state.collectIsEmpty()
 
     BackHandler(
         enabled = !isEmpty,
@@ -51,7 +50,7 @@ private fun ScreenTransition(
     modifier: Modifier = Modifier,
     defaultTransition: ScreenTransition = remember { HorizontalCardStackTransition() },
 ) {
-    val currentDestination by state.rememberCurrentDestination()
+    val currentDestination by state.collectCurrentDestination()
     AnimatedContent(
         modifier = modifier,
         targetState = currentDestination,

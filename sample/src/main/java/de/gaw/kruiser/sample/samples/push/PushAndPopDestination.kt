@@ -1,6 +1,7 @@
 package de.gaw.kruiser.sample.samples.push
 
 import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.destinationgroup.WizardDestination
 import de.gaw.kruiser.sample.transition.VerticalCardStackTransition
 import de.gaw.kruiser.screen.ScreenTransition
 
@@ -10,7 +11,8 @@ interface PushAndPopDestination : Destination {
 
 data class PushAndPopDestinationDefault(
     override val index: Int,
-) : PushAndPopDestination {
+) : PushAndPopDestination,
+    WizardDestination {
 
     override fun build() = PushAndPopScreen(
         index = index,

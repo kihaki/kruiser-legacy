@@ -7,6 +7,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.state.NavigationState.Event
 
 fun NavigationState.push(destination: Destination) = mutate { this + destination }
 fun NavigationState.pop() = mutate { dropLast(1) }
@@ -19,13 +20,16 @@ val NavigationState.currentStack get() = stack.value
 val NavigationState.currentDestination get() = currentStack.lastOrNull()
 
 @Composable
-fun NavigationState.rememberIsEmpty(): State<Boolean> {
+fun NavigationState.collectIsEmpty(): State<Boolean> {
     val stack by stack.collectAsState()
     return remember(this.stack) { derivedStateOf { stack.isEmpty() } }
 }
 
 @Composable
-fun NavigationState.rememberCurrentDestination(): State<Destination?> {
+fun NavigationState.collectCurrentDestination(): State<Destination?> {
     val stack by stack.collectAsState()
     return remember(this.stack) { derivedStateOf { stack.lastOrNull() } }
 }
+
+@Composable
+fun NavigationState.collectCurrentEvent(): State<Event> = lastEvent.collectAsState()

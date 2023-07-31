@@ -1,9 +1,11 @@
 package de.gaw.kruiser.sample.samples.push
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
@@ -16,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.destinationgroup.WizardDestination
 import de.gaw.kruiser.sample.saver.colorSaver
 import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
 import de.gaw.kruiser.screen.Screen
@@ -30,14 +33,25 @@ data class PushAndPopScreen(
     @Composable
     override fun Content() {
         val model = service(PushAndPopScreenModelFactory(index))
-        PushAndPop(
-            modifier = Modifier.fillMaxSize(),
-            title = "Screen $index",
-            onPushDefault = model::onPushDefault,
-            onPushCustom = model::onPushCustom,
-            onGoToFirst = model::onGoToFirst,
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .wizardControlsPadding(),
+        ) {
+            PushAndPop(
+                title = "Screen $index",
+                onPushDefault = model::onPushDefault,
+                onPushCustom = model::onPushCustom,
+                onGoToFirst = model::onGoToFirst,
+            )
+        }
     }
+}
+
+context(Screen)
+fun Modifier.wizardControlsPadding() = when (this@Screen.destination) {
+    is WizardDestination -> padding(bottom = 72.dp)
+    else -> this
 }
 
 @Composable
