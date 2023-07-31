@@ -9,7 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.sample.samples.push.PushAndPopDestinationVertical
+import de.gaw.kruiser.sample.samples.push.PushAndPopDestinationDefault
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
@@ -52,7 +52,7 @@ private class DashboardScreenModel(
     )
 
     private fun openPushAndPopSample() {
-        navigationState.push(PushAndPopDestinationVertical(index = 0))
+        navigationState.push(PushAndPopDestinationDefault(index = 0))
     }
 }
 

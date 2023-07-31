@@ -53,9 +53,7 @@ private fun ScreenTransition(
 ) {
     val currentDestination by state.rememberCurrentDestination()
     AnimatedContent(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(modifier),
+        modifier = modifier,
         targetState = currentDestination,
         transitionSpec = {
             val transitionSource = when (state.currentLastEvent) {

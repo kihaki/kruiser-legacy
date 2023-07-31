@@ -1,6 +1,5 @@
 package de.gaw.kruiser.sample.samples.push
 
-import android.util.Log
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
 import de.gaw.kruiser.state.NavigationState
@@ -20,9 +19,7 @@ internal class PushAndPopScreenModel(
     }
 
     fun onGoToFirst() {
-        navigationState.popUntil {
-            Log.v("NavigationPopping", "Checking $it")
-            (it as? PushAndPopDestination)?.index == 0 }
+        navigationState.popUntil { (it as? PushAndPopDestination)?.index == 0 }
     }
 }
 
