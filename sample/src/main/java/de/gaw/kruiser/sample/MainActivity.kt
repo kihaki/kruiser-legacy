@@ -8,13 +8,11 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,22 +24,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import de.gaw.kruiser.Navigation
 import de.gaw.kruiser.android.navigationOwnerViewModel
 import de.gaw.kruiser.destinationgroup.WizardDestination
 import de.gaw.kruiser.sample.samples.DashboardDestination
 import de.gaw.kruiser.sample.theme.KruiserTheme
-import de.gaw.kruiser.screen.ScreenTransition
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.NavigationState.Event.Idle
 import de.gaw.kruiser.state.NavigationState.Event.Pop
 import de.gaw.kruiser.state.NavigationState.Event.Push
 import de.gaw.kruiser.state.NavigationState.Event.Replace
-import de.gaw.kruiser.state.currentStack
-import de.gaw.kruiser.state.push
 import de.gaw.kruiser.state.collectCurrentDestination
 import de.gaw.kruiser.state.collectCurrentEvent
+import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.pop
+import de.gaw.kruiser.state.push
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,18 +55,37 @@ class MainActivity : ComponentActivity() {
                         if (state.currentStack.isEmpty()) state.push(DashboardDestination)
                     }
                     Box {
+                        val currentDestination by navigationViewModel.state.collectCurrentDestination()
+                        val isWizardDestination by remember { derivedStateOf { currentDestination is WizardDestination } }
+
                         Navigation(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize(),
                             state = navigationViewModel.state,
                             serviceProvider = navigationViewModel.serviceProvider,
                         )
 
                         val currentStack by navigationViewModel.state.stack.collectAsState()
-                        val currentDestination by navigationViewModel.state.collectCurrentDestination()
                         val currentLastEvent by navigationViewModel.state.collectCurrentEvent()
-                        val isWizardDestination by remember { derivedStateOf { currentDestination is WizardDestination } }
+                        val wizardControlsZIndex by remember {
+                            derivedStateOf {
+                                when(isWizardDestination) {
+                                    true -> 1f
+                                    false -> when(currentLastEvent) {
+                                        Idle,
+                                        Push,
+                                        Replace,
+                                        -> -1f
+                                        Pop
+                                        -> 1f
+                                    }
+                                }
+                            }
+                        }
                         AnimatedVisibility(
-                            modifier = Modifier.align(Alignment.BottomCenter),
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .zIndex(wizardControlsZIndex),
                             enter = slideInHorizontally { it },
                             exit = slideOutHorizontally { it },
                             visible = isWizardDestination,
