@@ -1,5 +1,6 @@
 package de.gaw.kruiser.service
 
+import android.util.Log
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceContext
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceScope
@@ -43,8 +44,8 @@ class DefaultScopedServiceProvider(
     private var instances = mapOf<ServiceFactory<*>, Any>()
 
     data class DefaultServiceContext(
-        override val navigationState: NavigationState
-    ): ServiceContext
+        override val navigationState: NavigationState,
+    ) : ServiceContext
 
     override fun <T : Any> scopedService(
         scope: ServiceScope,
@@ -72,7 +73,13 @@ class DefaultScopedServiceProvider(
             .toMutableMap()
             .apply {
                 @Suppress("UNCHECKED_CAST")
-                instance = getOrPut(factory) { with(factory) { DefaultServiceContext(state).create() } } as T
+                instance = getOrPut(factory) {
+                    with(factory) {
+                        DefaultServiceContext(state).create().also {
+                            Log.v("Service", "Creating Service $it")
+                        }
+                    }
+                } as T
             }
 
         return instance
@@ -90,6 +97,7 @@ class DefaultScopedServiceProvider(
         scopes = scopes.filter { (factory, scopes) ->
             val serviceIsAlive = scopes.isNotEmpty()
             if (!serviceIsAlive) {
+                Log.v("Service", "Closing Service ${instances[factory]}")
                 // Notify the service of its demise
                 (instances[factory] as? Closeable)?.close()
                 // Remove it from the instances so the garbage collector can assassinate it in peace

@@ -1,99 +1,80 @@
 package de.gaw.kruiser
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.screen.ScreenTransition
-import de.gaw.kruiser.service.ScopedServiceProvider
+import androidx.compose.ui.zIndex
+import de.gaw.kruiser.android.LocalNavigationState
+import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.state.NavigationState
-import de.gaw.kruiser.state.NavigationState.Event.Idle
-import de.gaw.kruiser.state.NavigationState.Event.Pop
-import de.gaw.kruiser.state.NavigationState.Event.Push
-import de.gaw.kruiser.state.NavigationState.Event.Replace
-import de.gaw.kruiser.state.currentLastEvent
-import de.gaw.kruiser.state.currentStack
+import de.gaw.kruiser.state.collectCurrentStack
+import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.state.pop
-import de.gaw.kruiser.state.rememberCurrentDestination
-import de.gaw.kruiser.state.rememberIsEmpty
-import de.gaw.kruiser.transition.HorizontalCardStackTransition
+import de.gaw.kruiser.transition.LocalExitTransitionTracker
+import de.gaw.kruiser.transition.collectCurrentExitTransition
+import de.gaw.kruiser.transition.rememberExitTransitionTracker
 
 @Composable
-fun Navigation(
-    state: NavigationState,
-    serviceProvider: ScopedServiceProvider,
+fun AnimatedNavigation(
     modifier: Modifier = Modifier,
+    state: NavigationState = LocalNavigationState.current,
+    remoteUiComponents: @Composable () -> Unit = {},
 ) {
-    val isEmpty by state.rememberIsEmpty()
+    val isEmpty by state.collectIsEmpty()
 
     BackHandler(
         enabled = !isEmpty,
         onBack = state::pop,
     )
 
-    ScreenTransition(
-        modifier = modifier,
-        state = state,
-        serviceProvider = serviceProvider,
-    )
+    val stack by state.collectCurrentStack()
+    val exitTransitionTracker = rememberExitTransitionTracker(navigationState = state)
+    val exitTransition by exitTransitionTracker.collectCurrentExitTransition()
+
+    Box(modifier = modifier) {
+        CompositionLocalProvider(
+            LocalExitTransitionTracker provides exitTransitionTracker
+        ) {
+            stack.forEachIndexed { index, destination ->
+                DestinationContainer(
+                    destination = destination,
+                    zIndex = index.toFloat(),
+                    content = { screen -> screen.Content() },
+                )
+            }
+            exitTransition?.let { (destination, _) ->
+                DestinationContainer(
+                    destination = destination,
+                    zIndex = stack.size.toFloat(),
+                    content = { screen -> screen.Content() },
+                )
+            }
+            remoteUiComponents()
+        }
+    }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun ScreenTransition(
-    state: NavigationState,
-    serviceProvider: ScopedServiceProvider,
+private inline fun DestinationContainer(
+    destination: Destination,
+    zIndex: Float,
     modifier: Modifier = Modifier,
-    defaultTransition: ScreenTransition = remember { HorizontalCardStackTransition() },
+    content: @Composable (screen: Screen) -> Unit,
 ) {
-    val currentDestination by state.rememberCurrentDestination()
-    AnimatedContent(
-        modifier = modifier,
-        targetState = currentDestination,
-        transitionSpec = {
-            val transitionSource = when (state.currentLastEvent) {
-                Pop,
-                Replace,
-                -> initialState
-
-                Idle,
-                Push,
-                -> targetState
-            }
-
-            val transition = (transitionSource as? ScreenTransition)
-                ?.transition(this, state)
-                ?: defaultTransition.transition(this, state)
-
-            val stackSize = state.currentStack.size
-            transition.targetContentZIndex = when (state.currentLastEvent) {
-                Idle,
-                Push,
-                Replace,
-                -> stackSize
-
-                Pop,
-                -> stackSize - 1
-            }.toFloat()
-
-            transition
-        },
-        label = "navigation-slide-transition",
-    ) { destination ->
-        DisposableEffect(destination) {
-            onDispose {
-                // When this composable leaves the composition (= out-animation is done),
-                // check if any services need to die
-                serviceProvider.clearDeadServices()
-            }
+    Box(
+        modifier = Modifier
+            .zIndex(zIndex)
+            .then(modifier),
+    ) {
+        key(destination) {
+            val screen = remember(destination) { destination.build() }
+            content(screen)
         }
-
-        val screen = remember(destination) { destination?.build() }
-        screen?.Content()
     }
 }

@@ -14,7 +14,7 @@ import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
-import de.gaw.kruiser.service.service
+import de.gaw.kruiser.service.scopedService
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.push
 
@@ -24,7 +24,7 @@ object DashboardDestination : Destination {
 
         @Composable
         override fun Content() {
-            val model = service(DashboardScreenModelFactory)
+            val model = scopedService(DashboardScreenModelFactory)
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {

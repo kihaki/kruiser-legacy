@@ -3,24 +3,24 @@ package de.gaw.kruiser.sample.transition
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
 import de.gaw.kruiser.transition.EnterExitTransition
 import de.gaw.kruiser.screen.Screen
 
 @Composable
-fun Screen.VerticalCardStackTransition(
+fun Screen.HorizontalCardStackTransition(
     inSpec: FiniteAnimationSpec<IntOffset> = tween(350),
     outSpec: FiniteAnimationSpec<IntOffset> = tween(350),
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) = EnterExitTransition(
     inAnimation = {
-        slideInVertically(inSpec) { size: Int -> size }
+        slideInHorizontally(inSpec) { size: Int -> size }
     },
     outAnimation = {
-        slideOutVertically(outSpec) { size: Int -> size }
+        slideOutHorizontally(outSpec) { size: Int -> size }
     },
     content = content,
 )

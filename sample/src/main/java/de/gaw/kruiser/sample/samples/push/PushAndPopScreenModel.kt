@@ -1,9 +1,10 @@
 package de.gaw.kruiser.sample.samples.push
 
+import de.gaw.kruiser.sample.samples.bottomsheet.BottomSheetMenuDestination
+import de.gaw.kruiser.sample.samples.wizard.one.FormOneDestination
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
 import de.gaw.kruiser.state.NavigationState
-import de.gaw.kruiser.state.popUntil
 import de.gaw.kruiser.state.push
 
 internal class PushAndPopScreenModel(
@@ -14,12 +15,16 @@ internal class PushAndPopScreenModel(
         navigationState.push(PushAndPopDestinationDefault(index + 1))
     }
 
-    fun onPushCustom() {
-        navigationState.push(PushAndPopDestinationVertical(index + 1))
+    fun onShowBottomSheetDestination() {
+        navigationState.push(BottomSheetMenuDestination("Menu ${index + 1}"))
+    }
+
+    fun onPushForm() {
+        navigationState.push(FormOneDestination)
     }
 
     fun onGoToFirst() {
-        navigationState.popUntil { (it as? PushAndPopDestination)?.index == 0 }
+        navigationState.mutate { take(1) }
     }
 }
 
