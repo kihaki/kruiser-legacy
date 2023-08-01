@@ -57,6 +57,12 @@ class MainActivity : ComponentActivity() {
                         if (state.currentStack.isEmpty()) state.push(DashboardDestination)
                     }
                     Box {
+                        Navigation(
+                            modifier = Modifier.fillMaxSize(),
+                            state = navigationViewModel.state,
+                            serviceProvider = navigationViewModel.serviceProvider,
+                        )
+
                         val currentStack by navigationViewModel.state.stack.collectAsState()
                         val currentDestination by navigationViewModel.state.collectCurrentDestination()
                         val currentLastEvent by navigationViewModel.state.collectCurrentEvent()
@@ -88,12 +94,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-
-                        Navigation(
-                            modifier = Modifier.fillMaxSize(),
-                            state = navigationViewModel.state,
-                            serviceProvider = navigationViewModel.serviceProvider,
-                        )
                     }
                 }
             }
