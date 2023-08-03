@@ -1,6 +1,7 @@
 package de.gaw.kruiser.android
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
@@ -29,10 +30,18 @@ private class NavigatorOwnerViewModelFactory : AbstractSavedStateViewModelFactor
 }
 
 @Composable
-fun defaultNavigationState() = navigationOwnerViewModel().state
+fun defaultNavigationState(): NavigationState = navigationOwnerViewModel().state
+
+val LocalNavigationState = staticCompositionLocalOf<NavigationState> {
+    error("No NavigationState provided.")
+}
 
 @Composable
-fun defaultServiceProvider() = navigationOwnerViewModel().serviceProvider
+fun defaultServiceProvider(): ScopedServiceProvider = navigationOwnerViewModel().serviceProvider
+
+val LocalScopedServiceProvider = staticCompositionLocalOf<ScopedServiceProvider> {
+    error("No ScopedServiceProvider provided.")
+}
 
 interface NavigationOwner {
     val state: NavigationState

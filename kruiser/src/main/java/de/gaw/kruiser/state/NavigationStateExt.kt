@@ -20,16 +20,21 @@ val NavigationState.currentStack get() = stack.value
 val NavigationState.currentDestination get() = currentStack.lastOrNull()
 
 @Composable
-fun NavigationState.collectIsEmpty(): State<Boolean> {
-    val stack by stack.collectAsState()
-    return remember(this.stack) { derivedStateOf { stack.isEmpty() } }
-}
+fun NavigationState.collectCurrentStack(): State<List<Destination>> =
+    stack.collectAsState()
+
+@Composable
+fun NavigationState.collectCurrentEvent(): State<Event> =
+    lastEvent.collectAsState()
 
 @Composable
 fun NavigationState.collectCurrentDestination(): State<Destination?> {
-    val stack by stack.collectAsState()
+    val stack by collectCurrentStack()
     return remember(this.stack) { derivedStateOf { stack.lastOrNull() } }
 }
 
 @Composable
-fun NavigationState.collectCurrentEvent(): State<Event> = lastEvent.collectAsState()
+fun NavigationState.collectIsEmpty(): State<Boolean> {
+    val stack by collectCurrentStack()
+    return remember(this.stack) { derivedStateOf { stack.isEmpty() } }
+}

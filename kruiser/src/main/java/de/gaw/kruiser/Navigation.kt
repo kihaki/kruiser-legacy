@@ -3,11 +3,18 @@ package de.gaw.kruiser
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import de.gaw.kruiser.android.LocalNavigationState
+import de.gaw.kruiser.renderstate.LocalDestinationRenderState
+import de.gaw.kruiser.renderstate.collectDestinationsToRenderInOrder
+import de.gaw.kruiser.renderstate.rememberDestinationRenderState
 import de.gaw.kruiser.screen.ScreenTransition
 import de.gaw.kruiser.service.ScopedServiceProvider
 import de.gaw.kruiser.state.NavigationState
@@ -15,15 +22,44 @@ import de.gaw.kruiser.state.NavigationState.Event.Idle
 import de.gaw.kruiser.state.NavigationState.Event.Pop
 import de.gaw.kruiser.state.NavigationState.Event.Push
 import de.gaw.kruiser.state.NavigationState.Event.Replace
+import de.gaw.kruiser.state.collectCurrentDestination
+import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.state.currentLastEvent
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.pop
-import de.gaw.kruiser.state.collectCurrentDestination
-import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.transition.HorizontalCardStackTransition
 
 @Composable
 fun Navigation(
+    modifier: Modifier = Modifier,
+    state: NavigationState = LocalNavigationState.current,
+) {
+    val isEmpty by state.collectIsEmpty()
+
+    BackHandler(
+        enabled = !isEmpty,
+        onBack = state::pop,
+    )
+
+    val renderState = rememberDestinationRenderState(navigationState = state)
+
+    Box(modifier = modifier) {
+        CompositionLocalProvider(
+            LocalDestinationRenderState provides renderState,
+        ) {
+            val visibleDestinations by renderState.collectDestinationsToRenderInOrder()
+            visibleDestinations.forEach { destination ->
+                key(destination) {
+                    val screen = remember(destination) { destination.build() }
+                    screen.Content()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NavigationExternalTransitions(
     state: NavigationState,
     serviceProvider: ScopedServiceProvider,
     modifier: Modifier = Modifier,
@@ -91,7 +127,6 @@ private fun ScreenTransition(
                 serviceProvider.clearDeadServices()
             }
         }
-
         val screen = remember(destination) { destination?.build() }
         screen?.Content()
     }

@@ -1,11 +1,9 @@
 package de.gaw.kruiser.sample.samples.push
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
@@ -18,40 +16,46 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.destinationgroup.WizardDestination
 import de.gaw.kruiser.sample.saver.colorSaver
 import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
+import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
+import de.gaw.kruiser.sample.transition.VerticalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.service
 import kotlin.random.Random
 
-data class PushAndPopScreen(
+data class PushAndPopScreenVertical(
     val index: Int,
     override val destination: Destination,
 ) : Screen {
 
     @Composable
-    override fun Content() {
+    override fun Content() = VerticalCardStackTransition {
         val model = service(PushAndPopScreenModelFactory(index))
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .wizardControlsPadding(),
-        ) {
-            PushAndPop(
-                title = "Screen $index",
-                onPushDefault = model::onPushDefault,
-                onPushCustom = model::onPushCustom,
-                onGoToFirst = model::onGoToFirst,
-            )
-        }
+        PushAndPop(
+            title = "Screen $index",
+            onPushDefault = model::onPushDefault,
+            onPushCustom = model::onPushCustom,
+            onGoToFirst = model::onGoToFirst,
+        )
     }
 }
 
-context(Screen)
-fun Modifier.wizardControlsPadding() = when (this@Screen.destination) {
-    is WizardDestination -> padding(bottom = 72.dp)
-    else -> this
+data class PushAndPopScreenHorizontal(
+    val index: Int,
+    override val destination: Destination,
+) : Screen {
+
+    @Composable
+    override fun Content() = HorizontalCardStackTransition {
+        val model = service(PushAndPopScreenModelFactory(index))
+        PushAndPop(
+            title = "Screen $index",
+            onPushDefault = model::onPushDefault,
+            onPushCustom = model::onPushCustom,
+            onGoToFirst = model::onGoToFirst,
+        )
+    }
 }
 
 @Composable

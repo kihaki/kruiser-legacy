@@ -14,7 +14,7 @@ data class PushAndPopDestinationDefault(
 ) : PushAndPopDestination,
     WizardDestination {
 
-    override fun build() = PushAndPopScreen(
+    override fun build() = PushAndPopScreenHorizontal(
         index = index,
         destination = this,
     )
@@ -25,7 +25,7 @@ data class PushAndPopDestinationVertical(
 ) : PushAndPopDestination,
     ScreenTransition by VerticalCardStackTransition() {
 
-    override fun build() = PushAndPopScreen(
+    override fun build() = PushAndPopScreenVertical(
         index = index,
         destination = this,
     )
