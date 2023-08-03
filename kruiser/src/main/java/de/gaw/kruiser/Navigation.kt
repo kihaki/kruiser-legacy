@@ -1,5 +1,6 @@
 package de.gaw.kruiser
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -48,11 +50,17 @@ fun Navigation(
             LocalDestinationRenderState provides renderState,
         ) {
             val visibleDestinations by renderState.collectDestinationsToRenderInOrder()
-            visibleDestinations.forEach { destination ->
+            visibleDestinations.forEachIndexed { index, destination ->
                 key(destination) {
+                    SideEffect {
+                        Log.v("AnimationThing", "$index Rendering $destination")
+                    }
                     val screen = remember(destination) { destination.build() }
                     screen.Content()
                 }
+            }
+            SideEffect {
+                Log.v("AnimationThing", "===")
             }
         }
     }

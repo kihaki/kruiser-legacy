@@ -1,5 +1,6 @@
 package de.gaw.kruiser.renderstate
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.EnterTransition
@@ -38,15 +39,15 @@ fun Screen.EntryExitTransition(
 
     var isVisible by remember { mutableStateOf(false) }
     LaunchedEffect(isOnStack) {
+        Log.v(
+            "AnimationThing",
+            "$destination isVisible: $isOnStack at ${System.currentTimeMillis()} at ${zIndex.toInt()}"
+        )
         isVisible = isOnStack  // TODO: Tweak
     }
 
-    val enterTransition by remember(navState) {
-        derivedStateOf { inAnimation(navState) }
-    }
-    val exitTransition by remember(navState) {
-        derivedStateOf { outAnimation(navState) }
-    }
+    val enterTransition = remember(navState) { inAnimation(navState) }
+    val exitTransition = remember(navState) { outAnimation(navState) }
 
     AnimatedVisibility(
         modifier = Modifier
@@ -57,6 +58,10 @@ fun Screen.EntryExitTransition(
         content = {
             DisposableEffect(Unit) {
                 onDispose {
+                    Log.v(
+                        "AnimationThing",
+                        "Disposing $destination at ${System.currentTimeMillis()} at ${zIndex.toInt()}"
+                    )
                     // When this composable leaves the composition (= out-animation is done),
                     // check if any services need to die
                     serviceProvider.clearDeadServices()
