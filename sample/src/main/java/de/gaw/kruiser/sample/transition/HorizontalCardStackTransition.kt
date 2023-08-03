@@ -23,26 +23,28 @@ fun Screen.HorizontalCardStackTransition(
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) = EntryExitTransition(
     inAnimation = {
-        when (currentLastEvent) {
-            Idle,
-            Push,
-            Replace,
-            -> slideInHorizontally(inSpec) { size: Int -> size }
-
-            Pop,
-            -> None
-        }
+        slideInHorizontally(inSpec) { size: Int -> size }
+//        when (currentLastEvent) {
+//            Idle,
+//            Push,
+//            Replace,
+//            -> slideInHorizontally(inSpec) { size: Int -> size }
+//
+//            Pop,
+//            -> None
+//        }
     },
     outAnimation = {
-        when (currentLastEvent) {
-            Idle,
-            Push,
-            Replace,
-            -> slideOutHorizontally(inSpec) { -1 }
-
-            Pop,
-            -> slideOutHorizontally(outSpec) { size: Int -> size }
-        }
+        slideOutHorizontally(outSpec) { size: Int -> size }
+//        when (currentLastEvent) {
+//            Idle,
+//            Push,
+//            Replace,
+//            -> slideOutHorizontally(inSpec) { -1 }
+//
+//            Pop,
+//            -> slideOutHorizontally(outSpec) { size: Int -> size }
+//        }
     },
     content = content,
 )

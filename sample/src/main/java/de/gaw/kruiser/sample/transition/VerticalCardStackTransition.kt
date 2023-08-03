@@ -69,26 +69,28 @@ fun Screen.VerticalCardStackTransition(
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) = EntryExitTransition(
     inAnimation = {
-        when (currentLastEvent) {
-            Idle,
-            Push,
-            Replace,
-            -> slideInVertically(inSpec) { size: Int -> size }
-
-            Pop,
-            -> None
-        }
+        slideInVertically(inSpec) { size: Int -> size }
+//        when (currentLastEvent) {
+//            Idle,
+//            Push,
+//            Replace,
+//            -> slideInVertically(inSpec) { size: Int -> size }
+//
+//            Pop,
+//            -> None
+//        }
     },
     outAnimation = {
-        when (currentLastEvent) {
-            Idle,
-            Push,
-            Replace,
-            -> slideOutVertically(inSpec) { -1 }
-
-            Pop,
-            -> slideOutVertically(outSpec) { size: Int -> size }
-        }
+        slideOutVertically(outSpec) { size: Int -> size }
+//        when (currentLastEvent) {
+//            Idle,
+//            Push,
+//            Replace,
+//            -> slideOutVertically(inSpec) { -1 }
+//
+//            Pop,
+//            -> slideOutVertically(outSpec) { size: Int -> size }
+//        }
     },
     content = content,
 )
