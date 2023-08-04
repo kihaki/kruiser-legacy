@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.renderstate.LocalDestinationRenderState
-import de.gaw.kruiser.renderstate.collectDestinationsToRenderInOrder
+import de.gaw.kruiser.renderstate.collectDestinationsToRender
 import de.gaw.kruiser.renderstate.rememberDestinationRenderState
 import de.gaw.kruiser.screen.ScreenTransition
 import de.gaw.kruiser.service.ScopedServiceProvider
@@ -49,8 +49,8 @@ fun Navigation(
         CompositionLocalProvider(
             LocalDestinationRenderState provides renderState,
         ) {
-            val visibleDestinations by renderState.collectDestinationsToRenderInOrder()
-            visibleDestinations.forEachIndexed { index, destination ->
+            val destinationsToRender by renderState.collectDestinationsToRender()
+            destinationsToRender.forEachIndexed { index, destination ->
                 key(destination) {
                     SideEffect {
                         Log.v("AnimationThing", "$index Rendering $destination")
