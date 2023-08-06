@@ -65,36 +65,40 @@ class AnimatedNavigationState(
     init {
         scope.launch {
             sourceNavigationState.stack.collectLatest { newDestinations ->
-                stack.update { currentDestinations ->
-                    when {
-                        currentDestinations.size > newDestinations.size -> {
-                            val destinationsToRemove = currentDestinations
-                                .drop(newDestinations.size)
+                val currentDestinations = stack.value
+                when {
+                    currentDestinations.size > newDestinations.size -> {
+                        val exitingDestination = currentDestinations.last()
+                        val newDestinationsWithTransition = newDestinations.map { destination ->
+                            destination.withTransition(initialState = true)
+                        }
+                        stack.update {
+                            newDestinationsWithTransition + exitingDestination
+                        }
+                        playExitTransition(
+                            destinationToRemove = currentDestinations.last(),
+                        )
+                        stack.update {
+                            newDestinationsWithTransition
+                        }
+                    }
 
-                            animateOutRemovedDestinations(
-                                destinationsToRemove = destinationsToRemove,
-                            )
-
-                            newDestinations.map { destination ->
+                    currentDestinations.size < newDestinations.size -> stack.update {
+                        newDestinations
+                            .take(currentDestinations.size)
+                            .map { destination ->
                                 destination.withTransition(initialState = true)
-                            }
-                        }
-
-                        currentDestinations.size < newDestinations.size -> {
-                            newDestinations
-                                .take(currentDestinations.size)
-                                .map { destination ->
-                                    destination.withTransition(initialState = true)
-                                } + newDestinations
-                                .drop(currentDestinations.size)
-                                .map { destination ->
-                                    destination.withTransition(initialState = false).apply {
-                                        transitionState.targetState = true
-                                    }
+                            } + newDestinations
+                            .drop(currentDestinations.size)
+                            .map { destination ->
+                                destination.withTransition(initialState = false).apply {
+                                    transitionState.targetState = true
                                 }
-                        }
+                            }
+                    }
 
-                        else -> newDestinations.map { destination ->
+                    else -> stack.update {
+                        newDestinations.map { destination ->
                             destination.withTransition(initialState = true)
                         }
                     }
@@ -103,22 +107,19 @@ class AnimatedNavigationState(
         }
     }
 
-    private suspend fun animateOutRemovedDestinations(
-        destinationsToRemove: List<DestinationTransition>,
-    ) {
-        destinationsToRemove
-            .asReversed()
-            .forEach { (_, transition) ->
-                combine(
-                    snapshotFlow { transition.targetState }
-                        .onStart { emit(transition.targetState) },
-                    snapshotFlow { transition.isIdle }
-                        .onStart { emit(transition.isIdle) }
-                ) { isVisible, isIdle -> isVisible to isIdle }
-                    .filter { (isVisible, isIdle) -> !isVisible && isIdle }
-                    .onStart { transition.targetState = false }
-                    .first() // Wait until the out animations have run
-            }
+
+    private suspend fun playExitTransition(
+        destinationToRemove: DestinationTransition,
+    ) = destinationToRemove.let { (_, transition) ->
+        combine(
+            snapshotFlow { transition.targetState }
+                .onStart { emit(transition.targetState) },
+            snapshotFlow { transition.isIdle }
+                .onStart { emit(transition.isIdle) }
+        ) { isVisible, isIdle -> isVisible to isIdle }
+            .filter { (isVisible, isIdle) -> !isVisible && isIdle }
+            .onStart { transition.targetState = false }
+            .first() // Wait until the out animations have run
     }
 
 }
