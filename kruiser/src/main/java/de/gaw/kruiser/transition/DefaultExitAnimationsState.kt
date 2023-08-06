@@ -20,14 +20,14 @@ fun rememberExitAnimationsRenderState(
 ): ExitAnimationsState {
     val scope = rememberCoroutineScope()
     return remember(navigationState, scope) {
-        DefaultExitAnimationsRenderState(
+        DefaultExitAnimationsState(
             scope = scope,
             navState = navigationState,
         )
     }
 }
 
-class DefaultExitAnimationsRenderState(
+class DefaultExitAnimationsState(
     scope: CoroutineScope,
     private val navState: NavigationState,
 ) : ExitAnimationsState {
