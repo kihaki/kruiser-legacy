@@ -11,12 +11,13 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.android.LocalNavigationState
-import de.gaw.kruiser.transition.LocalExitAnimationsState
-import de.gaw.kruiser.transition.collectOnScreenDestinations
-import de.gaw.kruiser.transition.rememberExitAnimationsRenderState
+import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.state.pop
+import de.gaw.kruiser.transition.LocalExitAnimationsState
+import de.gaw.kruiser.transition.collectOnScreenDestinations
+import de.gaw.kruiser.transition.rememberExitAnimationsRenderState
 
 @Composable
 fun Navigation(
@@ -37,18 +38,22 @@ fun Navigation(
             LocalExitAnimationsState provides renderState,
         ) {
             val destinationsToRender by renderState.collectOnScreenDestinations()
-            destinationsToRender.forEachIndexed { index, destination ->
-                key(destination) {
-                    SideEffect {
-                        Log.v("AnimationThing", "$index Rendering $destination")
+            destinationsToRender
+                .filterInvisible()
+                .forEachIndexed { index, destination ->
+                    key(destination) {
+                        SideEffect {
+                            Log.v("AnimationThing", "$index Rendering $destination")
+                        }
+                        val screen = remember(destination) { destination.build() }
+                        screen.Content()
                     }
-                    val screen = remember(destination) { destination.build() }
-                    screen.Content()
                 }
-            }
             SideEffect {
                 Log.v("AnimationThing", "===")
             }
         }
     }
 }
+
+fun List<Destination>.filterInvisible(): List<Destination> = takeLast(2)

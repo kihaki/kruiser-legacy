@@ -7,7 +7,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
-import de.gaw.kruiser.transition.EntryExitTransition
+import de.gaw.kruiser.transition.EnterExitTransition
 import de.gaw.kruiser.screen.Screen
 
 @Composable
@@ -15,7 +15,7 @@ fun Screen.HorizontalCardStackTransition(
     inSpec: FiniteAnimationSpec<IntOffset> = tween(350),
     outSpec: FiniteAnimationSpec<IntOffset> = tween(350),
     content: @Composable AnimatedVisibilityScope.() -> Unit,
-) = EntryExitTransition(
+) = EnterExitTransition(
     inAnimation = {
         slideInHorizontally(inSpec) { size: Int -> size }
 //        when (currentLastEvent) {

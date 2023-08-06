@@ -15,7 +15,8 @@ internal class PushAndPopScreenModel(
     }
 
     fun onPushCustom() {
-        navigationState.push(PushAndPopDestinationVertical(index + 1))
+//        navigationState.push(PushAndPopDestinationVertical(index + 1))
+        navigationState.push(BottomSheetMenuDestination("Menu ${index + 1}"))
     }
 
     fun onGoToFirst() {

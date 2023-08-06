@@ -24,6 +24,7 @@ import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.service
 import kotlin.random.Random
 
+
 data class PushAndPopScreenVertical(
     val index: Int,
     override val destination: Destination,

@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.filter
  * Entry/Exit Animation that can be used inside of a [Screen] to provide animations.
  */
 @Composable
-fun Screen.EntryExitTransition(
+fun Screen.EnterExitTransition(
     inAnimation: NavigationState.() -> EnterTransition,
     outAnimation: NavigationState.() -> ExitTransition,
     navigationState: NavigationState = LocalNavigationState.current,
@@ -58,7 +58,7 @@ fun Screen.EntryExitTransition(
 }
 
 @Composable
-private fun Screen.rememberScreenTransitionState(
+fun Screen.rememberScreenTransitionState(
     navigationState: NavigationState,
     exitAnimationsState: ExitAnimationsState,
 ): MutableTransitionState<Boolean> {
