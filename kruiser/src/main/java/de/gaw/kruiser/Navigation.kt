@@ -17,7 +17,7 @@ import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.state.pop
 import de.gaw.kruiser.transition.LocalExitAnimationsState
 import de.gaw.kruiser.transition.collectOnScreenDestinations
-import de.gaw.kruiser.transition.rememberExitAnimationsRenderState
+import de.gaw.kruiser.transition.rememberExitAnimationsState
 
 @Composable
 fun Navigation(
@@ -31,7 +31,7 @@ fun Navigation(
         onBack = state::pop,
     )
 
-    val renderState = rememberExitAnimationsRenderState(navigationState = state)
+    val renderState = rememberExitAnimationsState(navigationState = state)
 
     Box(modifier = modifier) {
         CompositionLocalProvider(

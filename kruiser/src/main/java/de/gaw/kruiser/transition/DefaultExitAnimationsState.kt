@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun rememberExitAnimationsRenderState(
+fun rememberExitAnimationsState(
     navigationState: NavigationState = LocalNavigationState.current,
 ): ExitAnimationsState {
     val scope = rememberCoroutineScope()
