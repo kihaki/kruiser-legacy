@@ -15,12 +15,12 @@ import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.state.pop
-import de.gaw.kruiser.transition.LocalExitAnimationsState
-import de.gaw.kruiser.transition.collectOnScreenDestinations
-import de.gaw.kruiser.transition.rememberExitAnimationsState
+import de.gaw.kruiser.transition.LocalAnimatedNavigationState
+import de.gaw.kruiser.transition.collectStack
+import de.gaw.kruiser.transition.rememberAnimatedNavigationState
 
 @Composable
-fun Navigation(
+fun AnimatedNavigation(
     modifier: Modifier = Modifier,
     state: NavigationState = LocalNavigationState.current,
 ) {
@@ -31,28 +31,45 @@ fun Navigation(
         onBack = state::pop,
     )
 
-    val renderState = rememberExitAnimationsState(navigationState = state)
+    val animatedNavigationState = rememberAnimatedNavigationState(navigationState = state)
+    val navigationStack by animatedNavigationState.collectStack()
 
     Box(modifier = modifier) {
         CompositionLocalProvider(
-            LocalExitAnimationsState provides renderState,
+            LocalAnimatedNavigationState provides animatedNavigationState
         ) {
-            val destinationsToRender by renderState.collectOnScreenDestinations()
-            destinationsToRender
-                .filterInvisible()
-                .forEachIndexed { index, destination ->
-                    key(destination) {
-                        SideEffect {
-                            Log.v("AnimationThing", "$index Rendering $destination")
-                        }
-                        val screen = remember(destination) { destination.build() }
-                        screen.Content()
+            navigationStack.forEachIndexed { index, (destination, _) ->
+                key(destination) {
+                    SideEffect {
+                        Log.v("AnimationThing", "$index Rendering $destination")
                     }
+                    val screen = remember(destination) { destination.build() }
+                    screen.Content()
                 }
-            SideEffect {
-                Log.v("AnimationThing", "===")
             }
         }
+        SideEffect {
+            Log.v("AnimationThing", "===")
+        }
+//        CompositionLocalProvider(
+//            LocalExitAnimationsState provides renderState,
+//        ) {
+//            val destinationsToRender by renderState.collectOnScreenDestinations()
+//            destinationsToRender
+//                .filterInvisible()
+//                .forEachIndexed { index, destination ->
+//                    key(destination) {
+//                        SideEffect {
+//                            Log.v("AnimationThing", "$index Rendering $destination")
+//                        }
+//                        val screen = remember(destination) { destination.build() }
+//                        screen.Content()
+//                    }
+//                }
+//            SideEffect {
+//                Log.v("AnimationThing", "===")
+//            }
+//        }
     }
 }
 

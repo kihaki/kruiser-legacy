@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.Navigation
+import de.gaw.kruiser.AnimatedNavigation
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.android.navigationOwnerViewModel
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                         LocalNavigationState provides navigationViewModel.state,
                         LocalScopedServiceProvider provides navigationViewModel.serviceProvider,
                     ) {
-                        Navigation(
+                        AnimatedNavigation(
                             modifier = Modifier.fillMaxSize(),
                         )
 //                        Box {

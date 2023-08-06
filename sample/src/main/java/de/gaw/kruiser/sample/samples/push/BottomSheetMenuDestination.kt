@@ -24,22 +24,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.ClearDeadServicesDisposableEffect
 import de.gaw.kruiser.service.ScopedServiceProvider
-import de.gaw.kruiser.state.NavigationState
-import de.gaw.kruiser.transition.ExitAnimationsState
-import de.gaw.kruiser.transition.LocalExitAnimationsState
-import de.gaw.kruiser.transition.rememberScreenTransitionState
+import de.gaw.kruiser.transition.AnimatedNavigationState
+import de.gaw.kruiser.transition.LocalAnimatedNavigationState
+import de.gaw.kruiser.transition.collectTransitionState
 
 data class BottomSheetMenuDestination(
     val title: String,
@@ -66,15 +65,11 @@ data class BottomSheetMenuDestination(
 fun Screen.BottomSheetTransition(
     inSpec: FiniteAnimationSpec<IntOffset> = tween(350),
     outSpec: FiniteAnimationSpec<IntOffset> = tween(350),
-    navigationState: NavigationState = LocalNavigationState.current,
-    exitAnimationsState: ExitAnimationsState = LocalExitAnimationsState.current,
+    navigationState: AnimatedNavigationState = LocalAnimatedNavigationState.current,
     scopedServiceProvider: ScopedServiceProvider = LocalScopedServiceProvider.current,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
-    val screenTransitionState = rememberScreenTransitionState(
-        navigationState = navigationState,
-        exitAnimationsState = exitAnimationsState,
-    )
+    val screenTransitionState by navigationState.collectTransitionState(destination = destination)
 
     val backgroundEnterTransition = remember(navigationState) {
         fadeIn(tween(350))
