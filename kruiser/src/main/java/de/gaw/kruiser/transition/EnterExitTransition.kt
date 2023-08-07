@@ -17,9 +17,9 @@ import de.gaw.kruiser.service.ScopedServiceProvider
  */
 @Composable
 fun Screen.EnterExitTransition(
-    inAnimation: AnimatedNavigationState.() -> EnterTransition,
-    outAnimation: AnimatedNavigationState.() -> ExitTransition,
-    navigationState: AnimatedNavigationState = LocalAnimatedNavigationState.current,
+    inAnimation: ExitTransitionTracker.() -> EnterTransition,
+    outAnimation: ExitTransitionTracker.() -> ExitTransition,
+    navigationState: ExitTransitionTracker = LocalExitTransitionTracker.current,
     scopedServiceProvider: ScopedServiceProvider = LocalScopedServiceProvider.current,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {

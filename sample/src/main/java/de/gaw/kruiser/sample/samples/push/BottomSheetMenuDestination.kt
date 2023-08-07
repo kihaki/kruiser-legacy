@@ -1,6 +1,5 @@
 package de.gaw.kruiser.sample.samples.push
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -29,9 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.android.LocalScopedServiceProvider
@@ -39,8 +36,8 @@ import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.ClearDeadServicesDisposableEffect
 import de.gaw.kruiser.service.ScopedServiceProvider
-import de.gaw.kruiser.transition.AnimatedNavigationState
-import de.gaw.kruiser.transition.LocalAnimatedNavigationState
+import de.gaw.kruiser.transition.ExitTransitionTracker
+import de.gaw.kruiser.transition.LocalExitTransitionTracker
 import de.gaw.kruiser.transition.collectTransitionState
 
 data class BottomSheetMenuDestination(
@@ -68,7 +65,7 @@ data class BottomSheetMenuDestination(
 fun Screen.BottomSheetTransition(
     inSpec: FiniteAnimationSpec<IntOffset> = tween(350),
     outSpec: FiniteAnimationSpec<IntOffset> = tween(350),
-    navigationState: AnimatedNavigationState = LocalAnimatedNavigationState.current,
+    navigationState: ExitTransitionTracker = LocalExitTransitionTracker.current,
     scopedServiceProvider: ScopedServiceProvider = LocalScopedServiceProvider.current,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
