@@ -1,5 +1,6 @@
 package de.gaw.kruiser.transition
 
+import android.util.Log
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -13,13 +14,13 @@ import androidx.compose.runtime.snapshotFlow
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.currentStack
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -39,15 +40,22 @@ fun rememberAnimatedNavigationState(
 
 @Composable
 fun AnimatedNavigationState.collectStack(): State<List<DestinationTransition>> =
-    stack.collectAsState()
+    animatedDestinations.collectAsState()
 
 @Composable
 fun AnimatedNavigationState.collectTransitionState(destination: Destination): State<MutableTransitionState<Boolean>> {
     val stack by collectStack()
     return remember {
         derivedStateOf {
-            stack.firstOrNull { (currentDestination, _) -> currentDestination == destination }
-                ?.transitionState ?: MutableTransitionState(initialState = false)
+            val transitionState = stack
+                .firstOrNull { (currentDestination, _) -> currentDestination == destination }
+                ?.transitionState
+                ?: MutableTransitionState(initialState = false)
+            Log.v(
+                "RemoveAnimation",
+                "Transition state for $destination: ${transitionState.targetState}, ${transitionState.isIdle}"
+            )
+            transitionState
         }
     }
 }
@@ -56,7 +64,7 @@ class AnimatedNavigationState(
     scope: CoroutineScope,
     private val sourceNavigationState: NavigationState,
 ) {
-    val stack = MutableStateFlow(
+    val animatedDestinations = MutableStateFlow(
         sourceNavigationState.currentStack.map { destination ->
             destination.withTransition(initialState = true)
         },
@@ -65,39 +73,49 @@ class AnimatedNavigationState(
     init {
         scope.launch {
             sourceNavigationState.stack.collectLatest { newDestinations ->
-                val currentDestinations = stack.value
-                when {
-                    currentDestinations.size > newDestinations.size -> {
-                        val exitingDestination = currentDestinations.last()
-                        val newDestinationsWithTransition = newDestinations.map { destination ->
-                            destination.withTransition(initialState = true)
-                        }
-                        stack.update {
-                            newDestinationsWithTransition + exitingDestination
-                        }
-                        playExitTransition(
-                            destinationToRemove = currentDestinations.last(),
-                        )
-                        stack.update {
-                            newDestinationsWithTransition
-                        }
-                    }
-
-                    currentDestinations.size < newDestinations.size -> stack.update {
-                        newDestinations
-                            .take(currentDestinations.size)
-                            .map { destination ->
-                                destination.withTransition(initialState = true)
-                            } + newDestinations
-                            .drop(currentDestinations.size)
-                            .map { destination ->
-                                destination.withTransition(initialState = false).apply {
-                                    transitionState.targetState = true
-                                }
+                try {
+                    val currentDestinations = animatedDestinations.value
+                    when {
+                        currentDestinations.size > newDestinations.size -> {
+                            val exitingDestination = currentDestinations.last().apply {
+                                transitionState.targetState = false
                             }
-                    }
+                            val visibleDestinations = newDestinations.map { destination ->
+                                destination.withTransition(initialState = true)
+                            }
+                            animatedDestinations.update {
+                                visibleDestinations + exitingDestination
+                            }
+                            awaitExitTransition(
+                                destinationToRemove = exitingDestination,
+                            )
+                            animatedDestinations.update {
+                                visibleDestinations
+                            }
+                        }
 
-                    else -> stack.update {
+                        currentDestinations.size < newDestinations.size -> animatedDestinations.update {
+                            newDestinations
+                                .take(currentDestinations.size)
+                                .map { destination ->
+                                    destination.withTransition(initialState = true)
+                                } + newDestinations
+                                .drop(currentDestinations.size)
+                                .map { destination ->
+                                    destination.withTransition(initialState = false).apply {
+                                        transitionState.targetState = true
+                                    }
+                                }
+                        }
+
+                        else -> animatedDestinations.update {
+                            newDestinations.map { destination ->
+                                destination.withTransition(initialState = true)
+                            }
+                        }
+                    }
+                } catch (cancellation: CancellationException) {
+                    animatedDestinations.update {
                         newDestinations.map { destination ->
                             destination.withTransition(initialState = true)
                         }
@@ -108,18 +126,20 @@ class AnimatedNavigationState(
     }
 
 
-    private suspend fun playExitTransition(
+    private suspend fun awaitExitTransition(
         destinationToRemove: DestinationTransition,
-    ) = destinationToRemove.let { (_, transition) ->
+    ) = destinationToRemove.let { (destination, transition) ->
+        Log.v("RemoveAnimation", "Removing start: $destination")
         combine(
-            snapshotFlow { transition.targetState }
-                .onStart { emit(transition.targetState) },
+            snapshotFlow { transition.targetState },
             snapshotFlow { transition.isIdle }
-                .onStart { emit(transition.isIdle) }
         ) { isVisible, isIdle -> isVisible to isIdle }
             .filter { (isVisible, isIdle) -> !isVisible && isIdle }
-            .onStart { transition.targetState = false }
+//            .onStart { transition.targetState = false }
             .first() // Wait until the out animations have run
+            .also {
+                Log.v("RemoveAnimation", "Removing done: $destination")
+            }
     }
 
 }

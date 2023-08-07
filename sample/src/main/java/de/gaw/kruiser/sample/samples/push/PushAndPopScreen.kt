@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.persistent.PersistentUiSlot
 import de.gaw.kruiser.sample.saver.colorSaver
 import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
 import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
@@ -50,12 +52,18 @@ data class PushAndPopScreenHorizontal(
     @Composable
     override fun Content() = HorizontalCardStackTransition {
         val model = service(PushAndPopScreenModelFactory(index))
-        PushAndPop(
-            title = "Screen $index",
-            onPushDefault = model::onPushDefault,
-            onPushCustom = model::onPushCustom,
-            onGoToFirst = model::onGoToFirst,
-        )
+        Column {
+            PushAndPop(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                title = "Screen $index",
+                onPushDefault = model::onPushDefault,
+                onPushCustom = model::onPushCustom,
+                onGoToFirst = model::onGoToFirst,
+            )
+            PersistentUiSlot()
+        }
     }
 }
 

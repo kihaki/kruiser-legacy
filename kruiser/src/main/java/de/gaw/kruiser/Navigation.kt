@@ -10,7 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import de.gaw.kruiser.android.LocalNavigationState
+import de.gaw.kruiser.persistent.PersistentUi
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.state.pop
@@ -38,12 +40,11 @@ fun AnimatedNavigation(
             LocalAnimatedNavigationState provides animatedNavigationState
         ) {
             navigationStack
-                .filterInvisible()
                 .forEachIndexed { index, (destination, transition) ->
                     key(destination) {
                         SideEffect {
                             Log.v(
-                                "AnimationThing",
+                                "RemoveAnimationRender",
                                 "$index Rendering $destination -> isVisible: ${transition.targetState}"
                             )
                         }
@@ -51,9 +52,10 @@ fun AnimatedNavigation(
                         screen.Content()
                     }
                 }
+            PersistentUi()
         }
         SideEffect {
-            Log.v("AnimationThing", "===")
+            Log.v("RemoveAnimationRender", "===")
         }
     }
 }

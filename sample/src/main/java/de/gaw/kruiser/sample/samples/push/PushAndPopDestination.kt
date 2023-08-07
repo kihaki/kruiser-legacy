@@ -10,8 +10,7 @@ interface PushAndPopDestination : Destination {
 
 data class PushAndPopDestinationDefault(
     override val index: Int,
-) : PushAndPopDestination,
-    WizardDestination {
+) : PushAndPopDestination {
 
     override fun build() = PushAndPopScreenHorizontal(
         index = index,
