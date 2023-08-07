@@ -39,18 +39,18 @@ fun AnimatedNavigation(
         onBack = state::pop,
     )
 
-    val animatedNavigationState = rememberExitTransitionTracker(navigationState = state)
     val stack by state.collectCurrentStack()
-    val exitAnimationTransition by animatedNavigationState.collectCurrentExitTransition()
+    val exitTransitionTracker = rememberExitTransitionTracker(navigationState = state)
+    val exitTransition by exitTransitionTracker.collectCurrentExitTransition()
 
     Box(modifier = modifier) {
         CompositionLocalProvider(
-            LocalExitTransitionTracker provides animatedNavigationState
+            LocalExitTransitionTracker provides exitTransitionTracker
         ) {
             stack.forEach { destination ->
                 destination.Render()
             }
-            exitAnimationTransition?.let { (destination, _) ->
+            exitTransition?.let { (destination, _) ->
                 destination.Render()
             }
             PersistentUi()
