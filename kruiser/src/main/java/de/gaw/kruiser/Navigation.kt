@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.persistent.PersistentUi
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectCurrentStack
 import de.gaw.kruiser.state.collectIsEmpty
@@ -31,6 +30,7 @@ fun Destination.Render() {
 fun AnimatedNavigation(
     modifier: Modifier = Modifier,
     state: NavigationState = LocalNavigationState.current,
+    remoteUi: @Composable () -> Unit = {},
 ) {
     val isEmpty by state.collectIsEmpty()
 
@@ -53,7 +53,7 @@ fun AnimatedNavigation(
             exitTransition?.let { (destination, _) ->
                 destination.Render()
             }
-            PersistentUi()
+            remoteUi()
         }
     }
 }

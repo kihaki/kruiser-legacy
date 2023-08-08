@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.persistent.PersistentUiSlot
 import de.gaw.kruiser.sample.saver.colorSaver
 import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
 import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
@@ -62,7 +61,7 @@ data class PushAndPopScreenHorizontal(
                 onPushCustom = model::onPushCustom,
                 onGoToFirst = model::onGoToFirst,
             )
-            PersistentUiSlot()
+            WizardControlsPlaceholder()
         }
     }
 }
