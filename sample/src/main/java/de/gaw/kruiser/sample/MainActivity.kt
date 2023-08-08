@@ -37,9 +37,10 @@ class MainActivity : ComponentActivity() {
                     ) {
                         AnimatedNavigation(
                             modifier = Modifier.fillMaxSize(),
-                        ) {
-                            WizardControls()
-                        }
+                            remoteUiComponents = {
+                                WizardControls()
+                            }
+                        )
                     }
                 }
             }

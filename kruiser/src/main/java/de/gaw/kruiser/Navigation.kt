@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.state.NavigationState
@@ -30,7 +31,7 @@ fun Destination.Render() {
 fun AnimatedNavigation(
     modifier: Modifier = Modifier,
     state: NavigationState = LocalNavigationState.current,
-    remoteUi: @Composable () -> Unit = {},
+    remoteUiComponents: @Composable () -> Unit = {},
 ) {
     val isEmpty by state.collectIsEmpty()
 
@@ -47,13 +48,17 @@ fun AnimatedNavigation(
         CompositionLocalProvider(
             LocalExitTransitionTracker provides exitTransitionTracker
         ) {
-            stack.forEach { destination ->
-                destination.Render()
+            stack.forEachIndexed { index, destination ->
+                Box(modifier = Modifier.zIndex(index.toFloat())) {
+                    destination.Render()
+                }
             }
             exitTransition?.let { (destination, _) ->
-                destination.Render()
+                Box(modifier = Modifier.zIndex(stack.size.toFloat())) {
+                    destination.Render()
+                }
             }
-            remoteUi()
+            remoteUiComponents()
         }
     }
 }

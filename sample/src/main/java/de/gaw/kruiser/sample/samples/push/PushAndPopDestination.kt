@@ -1,8 +1,6 @@
 package de.gaw.kruiser.sample.samples.push
 
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.destinationgroup.WizardDestination
-import de.gaw.kruiser.sample.transition.VerticalCardStackTransition
 
 interface PushAndPopDestination : Destination {
     val index: Int

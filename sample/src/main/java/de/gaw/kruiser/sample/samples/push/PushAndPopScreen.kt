@@ -46,7 +46,7 @@ data class PushAndPopScreenVertical(
 data class PushAndPopScreenHorizontal(
     val index: Int,
     override val destination: Destination,
-) : Screen {
+) : WizardScreen {
 
     @Composable
     override fun Content() = HorizontalCardStackTransition {
