@@ -45,6 +45,8 @@ fun AnimatedNavigation(
     val exitTransition by exitTransitionTracker.collectCurrentExitTransition()
 
     Box(modifier = modifier) {
+//        val stateHolder = rememberSaveableStateHolder()
+//        stateHolder.SaveableStateProvider(destination) {
         CompositionLocalProvider(
             LocalExitTransitionTracker provides exitTransitionTracker
         ) {
