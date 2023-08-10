@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import de.gaw.kruiser.android.LocalNavigationState
-import de.gaw.kruiser.destination.Render
+import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectCurrentStack
 import de.gaw.kruiser.state.collectIsEmpty
@@ -35,22 +38,43 @@ fun AnimatedNavigation(
     val exitTransition by exitTransitionTracker.collectCurrentExitTransition()
 
     Box(modifier = modifier) {
-//        val stateHolder = rememberSaveableStateHolder()
-//        stateHolder.SaveableStateProvider(destination) {
         CompositionLocalProvider(
             LocalExitTransitionTracker provides exitTransitionTracker
         ) {
             stack.forEachIndexed { index, destination ->
-                Box(modifier = Modifier.zIndex(index.toFloat())) {
-                    destination.Render()
-                }
+                DestinationContainer(
+                    destination = destination,
+                    zIndex = index.toFloat(),
+                    content = { screen -> screen.Content() },
+                )
             }
             exitTransition?.let { (destination, _) ->
-                Box(modifier = Modifier.zIndex(stack.size.toFloat())) {
-                    destination.Render()
-                }
+                DestinationContainer(
+                    destination = destination,
+                    zIndex = stack.size.toFloat(),
+                    content = { screen -> screen.Content() },
+                )
             }
             remoteUiComponents()
+        }
+    }
+}
+
+@Composable
+private inline fun DestinationContainer(
+    destination: Destination,
+    zIndex: Float,
+    modifier: Modifier = Modifier,
+    content: @Composable (screen: Screen) -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .zIndex(zIndex)
+            .then(modifier),
+    ) {
+        key(destination) {
+            val screen = remember(destination) { destination.build() }
+            content(screen)
         }
     }
 }
