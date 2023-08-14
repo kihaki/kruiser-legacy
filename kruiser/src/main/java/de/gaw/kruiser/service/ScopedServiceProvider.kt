@@ -76,7 +76,7 @@ class DefaultScopedServiceProvider(
                 instance = getOrPut(factory) {
                     with(factory) {
                         DefaultServiceContext(state).create().also {
-                            Log.v("Service", "Creating Service ${it}")
+                            Log.v("Service", "Creating Service $it")
                         }
                     }
                 } as T
