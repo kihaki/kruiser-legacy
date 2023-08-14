@@ -15,9 +15,9 @@ data class RemoteUiLayout(
 
 typealias RemoteUiKey = Any
 
-val LocalRemoteUiStore = compositionLocalOf { RemoteUiStore() }
+val LocalRemoteUiCoordinator = compositionLocalOf { RemoteUiCoordinator() }
 
-class RemoteUiStore {
+class RemoteUiCoordinator {
     val layouts = SnapshotStateMap<RemoteUiKey, RemoteUiLayout>()
 
     private fun update(key: RemoteUiKey, block: RemoteUiLayout.() -> RemoteUiLayout) {

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -56,7 +55,7 @@ fun RemoteUi(
     zIndex: Float = 0f,
     content: @Composable () -> Unit,
 ) {
-    val remoteUiStore = LocalRemoteUiStore.current
+    val remoteUiStore = LocalRemoteUiCoordinator.current
     val layout by remoteUiStore.collectLayout(key)
     if (layout.isVisible) {
         Box(
@@ -72,7 +71,7 @@ fun RemoteUi(
 
 @Composable
 private fun UpdateRemoteUiVisibilityEffect(key: RemoteUiKey) {
-    val remoteUiStore = LocalRemoteUiStore.current
+    val remoteUiStore = LocalRemoteUiCoordinator.current
     DisposableEffect(remoteUiStore, key) {
         remoteUiStore.updateVisibility(key, true)
         onDispose {
@@ -82,28 +81,28 @@ private fun UpdateRemoteUiVisibilityEffect(key: RemoteUiKey) {
 }
 
 @Composable
-private fun RemoteUiStore.collectLayout(key: RemoteUiKey) = remember(this, key) {
+private fun RemoteUiCoordinator.collectLayout(key: RemoteUiKey) = remember(this, key) {
     derivedStateOf { layouts[key] ?: RemoteUiLayout() }
 }
 
 private fun Offset.toIntOffset() = IntOffset(x.toInt(), y.toInt())
 
 private fun Modifier.applyRemoteUiSize(key: RemoteUiKey) = composed {
-    val remoteUiStore = LocalRemoteUiStore.current
+    val remoteUiStore = LocalRemoteUiCoordinator.current
     val layout by remoteUiStore.collectLayout(key)
     val remoteUiSize by remember { derivedStateOf { layout.size } }
     size(remoteUiSize)
 }
 
 private fun Modifier.applyRemoteUiOffset(key: RemoteUiKey) = composed {
-    val remoteUiStore = LocalRemoteUiStore.current
+    val remoteUiStore = LocalRemoteUiCoordinator.current
     val layout by remoteUiStore.collectLayout(key)
     val remoteUiPosition by remember { derivedStateOf { layout.position.toIntOffset() } }
     offset { remoteUiPosition }
 }
 
 private fun Modifier.updateRemoteUiSize(key: RemoteUiKey) = composed {
-    val remoteUiStore = LocalRemoteUiStore.current
+    val remoteUiStore = LocalRemoteUiCoordinator.current
     val density = LocalDensity.current
     onGloballyPositioned { layoutCoordinates ->
         val size = with(density) {
@@ -120,7 +119,7 @@ private fun Modifier.updateRemoteUiOffset(
     key: RemoteUiKey,
     updateIf: (stack: List<Destination>) -> Boolean,
 ) = composed {
-    val remoteUiStore = LocalRemoteUiStore.current
+    val remoteUiStore = LocalRemoteUiCoordinator.current
     val navigationState = LocalNavigationState.current
     val stack by navigationState.collectCurrentStack()
     val exitTransitionTracker = LocalExitTransitionTracker.current
