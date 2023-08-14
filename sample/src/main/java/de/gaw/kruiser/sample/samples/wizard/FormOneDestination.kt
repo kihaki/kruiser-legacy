@@ -168,7 +168,8 @@ object FormTwoDestination : FormDestination {
                             .padding(all = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        Text("Your selected name is ${sharedForm.name}, please enter your address:")
+                        val name by sharedForm.name.collectAsState()
+                        Text("Your selected name is $name, please enter your address:")
                         val address by formTwo.address.collectAsState()
                         OutlinedTextField(
                             value = address,
