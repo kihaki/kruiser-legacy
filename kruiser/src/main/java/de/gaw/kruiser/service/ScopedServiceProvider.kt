@@ -44,8 +44,8 @@ class DefaultScopedServiceProvider(
     private var instances = mapOf<ServiceFactory<*>, Any>()
 
     data class DefaultServiceContext(
-        override val navigationState: NavigationState
-    ): ServiceContext
+        override val navigationState: NavigationState,
+    ) : ServiceContext
 
     override fun <T : Any> scopedService(
         scope: ServiceScope,
@@ -73,7 +73,13 @@ class DefaultScopedServiceProvider(
             .toMutableMap()
             .apply {
                 @Suppress("UNCHECKED_CAST")
-                instance = getOrPut(factory) { with(factory) { DefaultServiceContext(state).create() } } as T
+                instance = getOrPut(factory) {
+                    with(factory) {
+                        DefaultServiceContext(state).create().also {
+                            Log.v("Service", "Creating Service ${it}")
+                        }
+                    }
+                } as T
             }
 
         return instance
