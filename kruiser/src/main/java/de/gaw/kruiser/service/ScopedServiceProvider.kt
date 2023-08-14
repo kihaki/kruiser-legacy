@@ -1,5 +1,6 @@
 package de.gaw.kruiser.service
 
+import android.util.Log
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceContext
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceScope
@@ -90,6 +91,7 @@ class DefaultScopedServiceProvider(
         scopes = scopes.filter { (factory, scopes) ->
             val serviceIsAlive = scopes.isNotEmpty()
             if (!serviceIsAlive) {
+                Log.v("Service", "Closing Service ${instances[factory]}")
                 // Notify the service of its demise
                 (instances[factory] as? Closeable)?.close()
                 // Remove it from the instances so the garbage collector can assassinate it in peace
