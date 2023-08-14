@@ -18,10 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.android.LocalNavigationState
@@ -56,36 +53,38 @@ object FormOneDestination : FormDestination {
 
         @Composable
         override fun Content() = HorizontalCardStackTransition {
-            val sharedForm = scopedService(
-                factory = SharedFormModelFactory,
-                scope = AllFormsScope,
-            )
-            val formOne = scopedService(factory = FormOneModelFactory(sharedForm))
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-            ) {
+            Surface {
+                val sharedForm = scopedService(
+                    factory = SharedFormModelFactory,
+                    scope = AllFormsScope,
+                )
+                val formOne = scopedService(factory = FormOneModelFactory(sharedForm))
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(all = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                        .fillMaxSize(),
                 ) {
-                    Text("Please Enter your name:")
-                    val name by sharedForm.name.collectAsState()
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { sharedForm.name.update { it } },
-                    )
-                    Text("Please Enter your nickname:")
-                    val nickname by formOne.nickname.collectAsState()
-                    OutlinedTextField(
-                        value = nickname,
-                        onValueChange = { formOne.nickname.update { it } },
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(all = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        Text("Please Enter your name:")
+                        val name by sharedForm.name.collectAsState()
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = { sharedForm.name.update { it } },
+                        )
+                        Text("Please Enter your nickname:")
+                        val nickname by formOne.nickname.collectAsState()
+                        OutlinedTextField(
+                            value = nickname,
+                            onValueChange = { formOne.nickname.update { it } },
+                        )
+                    }
+                    FormControlsPlaceholder()
                 }
-                FormControlsPlaceholder()
             }
         }
     }
@@ -152,30 +151,32 @@ object FormTwoDestination : FormDestination {
 
         @Composable
         override fun Content() = HorizontalCardStackTransition {
-            val sharedForm = scopedService(
-                factory = SharedFormModelFactory,
-                scope = AllFormsScope,
-            )
-            val formTwo = scopedService(factory = FormTwoModelFactory(sharedForm))
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-            ) {
+            Surface {
+                val sharedForm = scopedService(
+                    factory = SharedFormModelFactory,
+                    scope = AllFormsScope,
+                )
+                val formTwo = scopedService(factory = FormTwoModelFactory(sharedForm))
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(all = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                        .fillMaxSize(),
                 ) {
-                    Text("Your selected name is ${sharedForm.name}, please enter your address:")
-                    val address by formTwo.address.collectAsState()
-                    OutlinedTextField(
-                        value = address,
-                        onValueChange = { formTwo.address.update { it } },
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(all = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        Text("Your selected name is ${sharedForm.name}, please enter your address:")
+                        val address by formTwo.address.collectAsState()
+                        OutlinedTextField(
+                            value = address,
+                            onValueChange = { formTwo.address.update { it } },
+                        )
+                    }
+                    FormControlsPlaceholder()
                 }
-                FormControlsPlaceholder()
             }
         }
     }
