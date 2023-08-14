@@ -74,13 +74,13 @@ object FormOneDestination : FormDestination {
                         val name by sharedForm.name.collectAsState()
                         OutlinedTextField(
                             value = name,
-                            onValueChange = { sharedForm.name.update { it } },
+                            onValueChange = { text -> sharedForm.name.update { text } },
                         )
                         Text("Please Enter your nickname:")
                         val nickname by formOne.nickname.collectAsState()
                         OutlinedTextField(
                             value = nickname,
-                            onValueChange = { formOne.nickname.update { it } },
+                            onValueChange = { text -> formOne.nickname.update { text } },
                         )
                     }
                     FormControlsPlaceholder()
@@ -172,7 +172,7 @@ object FormTwoDestination : FormDestination {
                         val address by formTwo.address.collectAsState()
                         OutlinedTextField(
                             value = address,
-                            onValueChange = { formTwo.address.update { it } },
+                            onValueChange = { text -> formTwo.address.update { text } },
                         )
                     }
                     FormControlsPlaceholder()
