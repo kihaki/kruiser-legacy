@@ -18,27 +18,9 @@ fun Screen.HorizontalCardStackTransition(
 ) = EnterExitTransition(
     inAnimation = {
         slideInHorizontally(inSpec) { size: Int -> size }
-//        when (currentLastEvent) {
-//            Idle,
-//            Push,
-//            Replace,
-//            -> slideInHorizontally(inSpec) { size: Int -> size }
-//
-//            Pop,
-//            -> None
-//        }
     },
     outAnimation = {
         slideOutHorizontally(outSpec) { size: Int -> size }
-//        when (currentLastEvent) {
-//            Idle,
-//            Push,
-//            Replace,
-//            -> slideOutHorizontally(inSpec) { -1 }
-//
-//            Pop,
-//            -> slideOutHorizontally(outSpec) { size: Int -> size }
-//        }
     },
     content = content,
 )

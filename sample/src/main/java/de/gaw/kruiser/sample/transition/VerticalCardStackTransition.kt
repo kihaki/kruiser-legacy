@@ -18,27 +18,9 @@ fun Screen.VerticalCardStackTransition(
 ) = EnterExitTransition(
     inAnimation = {
         slideInVertically(inSpec) { size: Int -> size }
-//        when (currentLastEvent) {
-//            Idle,
-//            Push,
-//            Replace,
-//            -> slideInVertically(inSpec) { size: Int -> size }
-//
-//            Pop,
-//            -> None
-//        }
     },
     outAnimation = {
         slideOutVertically(outSpec) { size: Int -> size }
-//        when (currentLastEvent) {
-//            Idle,
-//            Push,
-//            Replace,
-//            -> slideOutVertically(inSpec) { -1 }
-//
-//            Pop,
-//            -> slideOutVertically(outSpec) { size: Int -> size }
-//        }
     },
     content = content,
 )
