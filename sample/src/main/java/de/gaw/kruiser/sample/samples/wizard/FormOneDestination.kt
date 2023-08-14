@@ -257,14 +257,17 @@ object SharedFormModelFactory : ServiceFactory<SharedFormModel> {
     override fun ServiceContext.create(): SharedFormModel = SharedFormModel()
 }
 
+@OptIn(FlowPreview::class)
 class SharedFormModel : ScreenModel {
     val name = MutableStateFlow("")
 
     init {
         scope.launch {
-            name.collectLatest {
-                Log.v("Form", "Form Shared: Name changed to $it")
-            }
+            name
+                .debounce(500.milliseconds)
+                .collectLatest {
+                    Log.v("Form", "Form Shared: Name changed to $it")
+                }
         }
     }
 }
