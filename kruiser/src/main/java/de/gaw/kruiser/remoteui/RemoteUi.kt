@@ -30,7 +30,7 @@ import de.gaw.kruiser.transition.collectCurrentExitTransition
  * position as this placeholder.
  */
 @Composable
-fun Screen.RemoteUiPlaceholder(
+fun RemoteUiPlaceholder(
     key: RemoteUiKey,
     isRemoteUiPositionSource: (stack: List<Destination>) -> Boolean,
 ) {
@@ -114,7 +114,6 @@ private fun Modifier.updateRemoteUiSize(key: RemoteUiKey) = composed {
     }
 }
 
-context(Screen)
 private fun Modifier.updateRemoteUiOffset(
     key: RemoteUiKey,
     updateIf: (stack: List<Destination>) -> Boolean,

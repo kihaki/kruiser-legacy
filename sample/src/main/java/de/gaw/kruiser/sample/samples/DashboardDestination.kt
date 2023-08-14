@@ -8,14 +8,13 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.zIndex
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.sample.samples.push.PushAndPopDestinationDefault
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
-import de.gaw.kruiser.service.service
+import de.gaw.kruiser.service.scopedService
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.push
 
@@ -25,7 +24,7 @@ object DashboardDestination : Destination {
 
         @Composable
         override fun Content() {
-            val model = service(DashboardScreenModelFactory)
+            val model = scopedService(DashboardScreenModelFactory)
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {

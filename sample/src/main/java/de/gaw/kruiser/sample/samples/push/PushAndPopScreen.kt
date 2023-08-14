@@ -22,7 +22,7 @@ import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
 import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.sample.transition.VerticalCardStackTransition
 import de.gaw.kruiser.screen.Screen
-import de.gaw.kruiser.service.service
+import de.gaw.kruiser.service.scopedService
 import kotlin.random.Random
 
 
@@ -33,7 +33,7 @@ data class PushAndPopScreenVertical(
 
     @Composable
     override fun Content() = VerticalCardStackTransition {
-        val model = service(PushAndPopScreenModelFactory(index))
+        val model = scopedService(PushAndPopScreenModelFactory(index))
         PushAndPop(
             title = "Screen $index",
             onPushDefault = model::onPushDefault,
@@ -50,7 +50,7 @@ data class PushAndPopScreenHorizontal(
 
     @Composable
     override fun Content() = HorizontalCardStackTransition {
-        val model = service(PushAndPopScreenModelFactory(index))
+        val model = scopedService(PushAndPopScreenModelFactory(index))
         Column {
             PushAndPop(
                 modifier = Modifier

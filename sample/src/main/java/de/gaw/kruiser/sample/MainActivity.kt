@@ -14,6 +14,7 @@ import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.android.navigationOwnerViewModel
 import de.gaw.kruiser.sample.samples.DashboardDestination
 import de.gaw.kruiser.sample.samples.push.WizardControls
+import de.gaw.kruiser.sample.samples.wizard.FormControls
 import de.gaw.kruiser.sample.theme.KruiserTheme
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.push
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize(),
                             remoteUiComponents = {
                                 WizardControls()
+                                FormControls()
                             }
                         )
                     }
