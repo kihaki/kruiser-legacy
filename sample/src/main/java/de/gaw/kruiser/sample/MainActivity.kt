@@ -13,7 +13,6 @@ import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.android.navigationOwnerViewModel
 import de.gaw.kruiser.sample.samples.DashboardDestination
-import de.gaw.kruiser.sample.samples.push.WizardControls
 import de.gaw.kruiser.sample.samples.wizard.FormControls
 import de.gaw.kruiser.sample.theme.KruiserTheme
 import de.gaw.kruiser.state.currentStack
@@ -39,7 +38,6 @@ class MainActivity : ComponentActivity() {
                         AnimatedNavigation(
                             modifier = Modifier.fillMaxSize(),
                             remoteUiComponents = {
-                                WizardControls()
                                 FormControls()
                             }
                         )

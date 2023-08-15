@@ -15,13 +15,3 @@ data class PushAndPopDestinationDefault(
         destination = this,
     )
 }
-
-data class PushAndPopDestinationVertical(
-    override val index: Int,
-) : PushAndPopDestination {
-
-    override fun build() = PushAndPopScreenVertical(
-        index = index,
-        destination = this,
-    )
-}

@@ -1,11 +1,10 @@
 package de.gaw.kruiser.sample.samples.push
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,49 +19,27 @@ import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.sample.saver.colorSaver
 import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
 import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
-import de.gaw.kruiser.sample.transition.VerticalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.scopedService
 import kotlin.random.Random
 
-
-data class PushAndPopScreenVertical(
+data class PushAndPopScreenHorizontal(
     val index: Int,
     override val destination: Destination,
 ) : Screen {
 
     @Composable
-    override fun Content() = VerticalCardStackTransition {
-        val model = scopedService(PushAndPopScreenModelFactory(index))
-        PushAndPop(
-            title = "Screen $index",
-            onPushDefault = model::onPushDefault,
-            onPushCustom = model::onPushCustom,
-            onGoToFirst = model::onGoToFirst,
-        )
-    }
-}
-
-data class PushAndPopScreenHorizontal(
-    val index: Int,
-    override val destination: Destination,
-) : WizardScreen {
-
-    @Composable
     override fun Content() = HorizontalCardStackTransition {
         val model = scopedService(PushAndPopScreenModelFactory(index))
-        Column {
-            PushAndPop(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                title = "Screen $index",
-                onPushDefault = model::onPushDefault,
-                onPushCustom = model::onPushCustom,
-                onGoToFirst = model::onGoToFirst,
-            )
-            WizardControlsPlaceholder()
-        }
+        PushAndPop(
+            modifier = Modifier
+                .fillMaxWidth(),
+            title = "Screen $index",
+            onPushDefault = model::onPushDefault,
+            onShowBottomSheet = model::onShowBottomSheetDestination,
+            onShowForm = model::onPushForm,
+            onGoToFirst = model::onGoToFirst,
+        )
     }
 }
 
@@ -70,7 +47,8 @@ data class PushAndPopScreenHorizontal(
 private fun PushAndPop(
     title: String,
     onPushDefault: () -> Unit,
-    onPushCustom: () -> Unit,
+    onShowBottomSheet: () -> Unit,
+    onShowForm: () -> Unit,
     onGoToFirst: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -80,23 +58,29 @@ private fun PushAndPop(
         modifier = modifier,
         color = backgroundColor,
     ) {
-        Column(
+        Box(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            contentAlignment = Alignment.Center,
         ) {
-            Text(title)
-            Spacer(modifier = Modifier.size(24.dp))
-            ElevatedButton(onClick = onPushDefault) {
-                Text("Push with default animation")
-            }
-            Spacer(modifier = Modifier.size(24.dp))
-            ElevatedButton(onClick = onPushCustom) {
-                Text("Push with custom animation")
-            }
-            Spacer(modifier = Modifier.size(24.dp))
-            ElevatedButton(onClick = onGoToFirst) {
-                Text("Go back to first screen")
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Text(title)
+                ElevatedButton(onClick = onPushDefault) {
+                    Text("Push another Screen")
+                }
+                ElevatedButton(onClick = onShowForm) {
+                    Text("Open multi page form example")
+                }
+                ElevatedButton(onClick = onShowBottomSheet) {
+                    Text("Show Bottom Sheet")
+                }
+                ElevatedButton(onClick = onGoToFirst) {
+                    Text("Go back to first screen")
+                }
             }
         }
     }
@@ -116,7 +100,8 @@ private fun PushAndPopScreenPreview() = KruiserPreviewTheme {
         modifier = Modifier.fillMaxSize(),
         title = "Screen 1",
         onPushDefault = {},
-        onPushCustom = {},
+        onShowBottomSheet = {},
+        onShowForm = {},
         onGoToFirst = {},
     )
 }

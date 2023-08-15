@@ -1,4 +1,4 @@
-package de.gaw.kruiser.sample.samples.push
+package de.gaw.kruiser.sample.samples.bottomsheet
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -40,6 +40,9 @@ import de.gaw.kruiser.transition.ExitTransitionTracker
 import de.gaw.kruiser.transition.LocalExitTransitionTracker
 import de.gaw.kruiser.transition.collectTransitionState
 
+/**
+ * Show cases screen internal animations by showing this screen as a bottom sheet
+ */
 data class BottomSheetMenuDestination(
     val title: String,
 ) : Destination {

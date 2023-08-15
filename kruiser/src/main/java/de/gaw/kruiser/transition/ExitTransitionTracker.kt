@@ -14,6 +14,7 @@ import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.state.NavigationState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
@@ -29,7 +30,7 @@ fun rememberExitTransitionTracker(
     navigationState: NavigationState,
     scope: CoroutineScope = rememberCoroutineScope(),
 ) = remember(scope, navigationState) {
-    ExitTransitionTracker(
+    DefaultExitTransitionTracker(
         navigationState = navigationState,
         scope = scope,
     )
@@ -57,11 +58,21 @@ fun ExitTransitionTracker.collectTransitionState(destination: Destination): Stat
     }
 }
 
-class ExitTransitionTracker(
+interface ExitTransitionTracker {
+    val exitTransition: StateFlow<DestinationTransition?>
+}
+
+class PreviewExitTransitionTracker(
+    current: DestinationTransition? = null,
+) : ExitTransitionTracker {
+    override val exitTransition: StateFlow<DestinationTransition?> = MutableStateFlow(current)
+}
+
+class DefaultExitTransitionTracker(
     scope: CoroutineScope,
     private val navigationState: NavigationState,
-) {
-    val exitTransition = MutableStateFlow<DestinationTransition?>(null)
+) : ExitTransitionTracker{
+    override val exitTransition = MutableStateFlow<DestinationTransition?>(null)
 
     private var previousStackSize: Int = 0
     private var previousTopDestination: Destination? = null

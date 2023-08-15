@@ -2,66 +2,71 @@ package de.gaw.kruiser.remoteui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.screen.Screen
+import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectCurrentStack
-import de.gaw.kruiser.transition.LocalExitTransitionTracker
-import de.gaw.kruiser.transition.collectCurrentExitTransition
+import de.gaw.kruiser.toIntOffset
+
+@Composable
+inline fun <reified T: Destination> RemoteUi(
+    key: RemoteUiKey,
+    noinline content: @Composable () -> Unit,
+) = RemoteUi(
+    key = key,
+    zIndexCalculation = attachToTopDestinationType<T>(),
+    content = content,
+)
 
 /**
- * Should be added to where the remote ui should render to act as a placeholder.
- * This placeholder will render at the same size as the matching [RemoteUi].
- * The matching [RemoteUi] will render somewhere else at the same
- * position as this placeholder.
+ * Will attach the zIndex to the zIndex of the top most [Destination] that is of type [T].
+ * This works well as a no-brainer default value.
  */
-@Composable
-fun RemoteUiPlaceholder(
-    key: RemoteUiKey,
-    isRemoteUiPositionSource: (stack: List<Destination>) -> Boolean,
-) {
-    Box(
-        modifier = Modifier
-            .applyRemoteUiSize(key)
-            .updateRemoteUiOffset(key, isRemoteUiPositionSource)
-    ) {
-        UpdateRemoteUiVisibilityEffect(key)
-    }
+inline fun <reified T: Destination> attachToTopDestinationType() : RemoteUiContext.() -> Float = {
+    stack.map { it.build() }.indexOfLast { it is T }.toFloat()
 }
 
 /**
  * Will render the remote ui.
- * This will render at the same position as the matching [RemoteUiPlaceholder].
- * The matching [RemoteUiPlaceholder] will render somewhere else at the same
+ * This will render at the same position as the matching [RemoteUiLayout].
+ * The matching [RemoteUiLayout] will render somewhere else at the same
  * size as this placeholder.
  */
 @Composable
 fun RemoteUi(
     key: RemoteUiKey,
-    zIndex: Float = 0f,
+    zIndexCalculation: RemoteUiContext.() -> Float,
     content: @Composable () -> Unit,
 ) {
-    val remoteUiStore = LocalRemoteUiCoordinator.current
-    val layout by remoteUiStore.collectLayout(key)
-    if (layout.isVisible) {
+    val remoteUiCoordinator: RemoteUiCoordinator = LocalRemoteUiCoordinator.current
+    val navigationState: NavigationState = LocalNavigationState.current
+
+    val remoteUiContext by rememberRemoteUiContext(navigationState = navigationState)
+
+    // Calculate zIndex of the RemoteUi so that it's correctly layered into the Navigation Stack
+    val zIndex by remember {
+        derivedStateOf { remoteUiContext.zIndexCalculation() }
+    }
+
+    // Get the position and visibility of the placeholder layout 
+    // so we know where to position the actual layout
+    val placeHolder by remoteUiCoordinator.collectLayout(key)
+    if (placeHolder.isVisible) {
         Box(
             modifier = Modifier
-                .applyRemoteUiOffset(key)
-                .updateRemoteUiSize(key)
+                .applyRemoteUiOffset(key) // apply the placeholders position
+                .updateRemoteUiSize(key) // update the placeholders size
                 .zIndex(zIndex),
         ) {
             content()
@@ -69,40 +74,47 @@ fun RemoteUi(
     }
 }
 
+/**
+ * Context for RemoteUi, for calculating the zIndex for example.
+ */
+data class RemoteUiContext(
+    val navigationState: NavigationState,
+    val stack: List<Destination>,
+)
+
 @Composable
-private fun UpdateRemoteUiVisibilityEffect(key: RemoteUiKey) {
-    val remoteUiStore = LocalRemoteUiCoordinator.current
-    DisposableEffect(remoteUiStore, key) {
-        remoteUiStore.updateVisibility(key, true)
-        onDispose {
-            remoteUiStore.updateVisibility(key, false)
+private fun rememberRemoteUiContext(
+    navigationState: NavigationState = LocalNavigationState.current,
+) : State<RemoteUiContext> {
+    val stack by navigationState.collectCurrentStack()
+
+    return remember(navigationState) {
+        derivedStateOf {
+            RemoteUiContext(
+                navigationState = navigationState,
+                stack = stack,
+            )
         }
     }
 }
 
-@Composable
-private fun RemoteUiCoordinator.collectLayout(key: RemoteUiKey) = remember(this, key) {
-    derivedStateOf { layouts[key] ?: RemoteUiLayout() }
-}
-
-private fun Offset.toIntOffset() = IntOffset(x.toInt(), y.toInt())
-
-private fun Modifier.applyRemoteUiSize(key: RemoteUiKey) = composed {
-    val remoteUiStore = LocalRemoteUiCoordinator.current
-    val layout by remoteUiStore.collectLayout(key)
-    val remoteUiSize by remember { derivedStateOf { layout.size } }
-    size(remoteUiSize)
-}
-
+/**
+ * Applies the offset of the placeholder to this composable.
+ * Used to position the actual RemoteUi at the position of the current placeholder.
+ */
 private fun Modifier.applyRemoteUiOffset(key: RemoteUiKey) = composed {
-    val remoteUiStore = LocalRemoteUiCoordinator.current
-    val layout by remoteUiStore.collectLayout(key)
+    val remoteUiCoordinator = LocalRemoteUiCoordinator.current
+    val layout by remoteUiCoordinator.collectLayout(key)
     val remoteUiPosition by remember { derivedStateOf { layout.position.toIntOffset() } }
     offset { remoteUiPosition }
 }
 
+/**
+ * Updates the RemoteUiLayout to be synced with the size of this composable.
+ * Used to size the placeholders according to the size of the RemoteUi.
+ */
 private fun Modifier.updateRemoteUiSize(key: RemoteUiKey) = composed {
-    val remoteUiStore = LocalRemoteUiCoordinator.current
+    val remoteUiCoordinator = LocalRemoteUiCoordinator.current
     val density = LocalDensity.current
     onGloballyPositioned { layoutCoordinates ->
         val size = with(density) {
@@ -110,31 +122,6 @@ private fun Modifier.updateRemoteUiSize(key: RemoteUiKey) = composed {
                 DpSize(width.toDp(), height.toDp())
             }
         }
-        remoteUiStore.updateSize(key, size)
-    }
-}
-
-private fun Modifier.updateRemoteUiOffset(
-    key: RemoteUiKey,
-    updateIf: (stack: List<Destination>) -> Boolean,
-) = composed {
-    val remoteUiStore = LocalRemoteUiCoordinator.current
-    val navigationState = LocalNavigationState.current
-    val stack by navigationState.collectCurrentStack()
-    val exitTransitionTracker = LocalExitTransitionTracker.current
-    val exitTransition by exitTransitionTracker.collectCurrentExitTransition()
-    val exitingDestination by remember(exitTransitionTracker) {
-        derivedStateOf { exitTransition?.destination }
-    }
-    val isSource by remember {
-        derivedStateOf { updateIf((stack + exitingDestination).filterNotNull()) }
-    }
-
-    if (isSource) {
-        onGloballyPositioned { coordinates ->
-            remoteUiStore.updatePosition(key, coordinates.localToRoot(Offset.Zero))
-        }
-    } else {
-        this
+        remoteUiCoordinator.updateSize(key, size)
     }
 }

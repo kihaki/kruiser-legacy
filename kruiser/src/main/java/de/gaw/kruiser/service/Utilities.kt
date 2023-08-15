@@ -1,6 +1,7 @@
 package de.gaw.kruiser.service
 
 import androidx.compose.runtime.Composable
+import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.android.defaultServiceProvider
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
@@ -12,8 +13,19 @@ import kotlin.reflect.KClass
 @Composable
 inline fun <reified T : Any> Screen.scopedService(
     factory: ServiceFactory<T>,
-    scope: ServiceScope = DestinationScope(destination),
-    serviceProvider: ScopedServiceProvider = defaultServiceProvider(),
+    serviceProvider: ScopedServiceProvider = LocalScopedServiceProvider.current,
+) = scopedService(
+    scope = DestinationScope(destination),
+    factory = factory,
+    serviceProvider = serviceProvider,
+)
+
+
+@Composable
+inline fun <reified T : Any> scopedService(
+    factory: ServiceFactory<T>,
+    scope: ServiceScope,
+    serviceProvider: ScopedServiceProvider = LocalScopedServiceProvider.current,
 ) = serviceProvider.scopedService(scope = scope, factory = factory)
 
 @Composable
