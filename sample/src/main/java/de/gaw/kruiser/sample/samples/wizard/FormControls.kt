@@ -40,7 +40,9 @@ fun FormControls() = RemoteUi<FormDestination>(
 ) {
     val navigationState = LocalNavigationState.current
     val stack by navigationState.collectCurrentStack()
-    val canGoBack by remember(navigationState) { derivedStateOf { stack.size >= 3 } }
+    val canGoBack by remember(navigationState) {
+        derivedStateOf { stack.dropWhile { it !is FormDestination }.size > 1 }
+    }
     Surface {
         Box(
             modifier = Modifier
