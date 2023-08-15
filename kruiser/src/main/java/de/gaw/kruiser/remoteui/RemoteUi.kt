@@ -1,12 +1,15 @@
 package de.gaw.kruiser.remoteui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -34,7 +37,7 @@ inline fun <reified T: Destination> RemoteUi(
  * This works well as a no-brainer default value.
  */
 inline fun <reified T: Destination> attachToTopDestinationType() : RemoteUiContext.() -> Float = {
-    stack.map { it.build() }.indexOfLast { it is T }.toFloat()
+    stack.indexOfLast { it is T }.toFloat()
 }
 
 /**
@@ -55,8 +58,9 @@ fun RemoteUi(
     val remoteUiContext by rememberRemoteUiContext(navigationState = navigationState)
 
     // Calculate zIndex of the RemoteUi so that it's correctly layered into the Navigation Stack
+    val currentZIndexCalculation by rememberUpdatedState(zIndexCalculation)
     val zIndex by remember {
-        derivedStateOf { remoteUiContext.zIndexCalculation() }
+        derivedStateOf { remoteUiContext.currentZIndexCalculation() }
     }
 
     // Get the position and visibility of the placeholder layout 

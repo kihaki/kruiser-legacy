@@ -3,10 +3,12 @@ package de.gaw.kruiser.sample.samples.wizard
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -14,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.android.LocalNavigationState
@@ -39,29 +42,36 @@ fun FormControls() = RemoteUi<FormDestination>(
     val stack by navigationState.collectCurrentStack()
     val canGoBack by remember(navigationState) { derivedStateOf { stack.size >= 3 } }
     Surface {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            AnimatedVisibility(
-                visible = canGoBack,
+
+            Row(
                 modifier = Modifier
-                    .weight(1f),
+                    .wrapContentSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                ElevatedButton(onClick = navigationState::pop) {
-                    Text("Previous")
+                AnimatedVisibility(
+                    visible = canGoBack,
+                    modifier = Modifier
+                        .weight(1f),
+                ) {
+                    ElevatedButton(onClick = navigationState::pop) {
+                        Text("Previous")
+                    }
                 }
-            }
-            ElevatedButton(
-                modifier = Modifier
-                    .weight(1f)
-                    .animateContentSize(),
-                onClick = { navigationState.push(FormTwoDestination) }
-            ) {
-                Text("Next")
+                ElevatedButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .animateContentSize(),
+                    onClick = { navigationState.push(FormTwoDestination) }
+                ) {
+                    Text("Next")
+                }
             }
         }
     }
