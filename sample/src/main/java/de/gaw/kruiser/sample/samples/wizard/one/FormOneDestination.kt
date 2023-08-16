@@ -18,11 +18,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormScope
 import de.gaw.kruiser.sample.samples.wizard.FormControlsPlaceholder
 import de.gaw.kruiser.sample.samples.wizard.FormDestination
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormModel
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormModelFactory
+import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormScope
 import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.scopedService
@@ -52,15 +52,16 @@ object FormOneDestination : FormDestination {
 private fun FormOne(
     model: FormOneModel,
 ) {
-    Surface {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        Surface(
+            modifier = Modifier.weight(1f),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
                     .padding(all = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
@@ -77,8 +78,8 @@ private fun FormOne(
                     onValueChange = { text -> model.nickname.update { text } },
                 )
             }
-            FormControlsPlaceholder()
         }
+        FormControlsPlaceholder()
     }
 }
 

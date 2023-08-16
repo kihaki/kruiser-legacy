@@ -1,9 +1,11 @@
 package de.gaw.kruiser.remoteui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,12 +28,12 @@ import de.gaw.kruiser.transition.collectCurrentExitTransition
 @Composable
 fun RemoteUiPlaceholder(
     key: RemoteUiKey,
-    isRemoteUiPositionSource: (stack: List<Destination>) -> Boolean,
+    isPositionSource: (stack: List<Destination>) -> Boolean,
 ) {
     Box(
         modifier = Modifier
             .applyRemoteUiSize(key)
-            .updateRemoteUiOffset(key, isRemoteUiPositionSource)
+            .updateRemoteUiOffset(key, isPositionSource)
     ) {
         UpdateRemoteUiVisibilityEffect(key)
     }
@@ -59,6 +61,9 @@ private fun Modifier.applyRemoteUiSize(key: RemoteUiKey) = composed {
     val remoteUiCoordinator = LocalRemoteUiCoordinator.current
     val remoteUiLayout by remoteUiCoordinator.collectLayout(key)
     val size by remember { derivedStateOf { remoteUiLayout.size } }
+    SideEffect {
+        Log.v("RemoteUiSize", "Size: $size")
+    }
     size(size)
 }
 
@@ -72,8 +77,10 @@ private fun Modifier.updateRemoteUiOffset(
     updateIf: (stack: List<Destination>) -> Boolean,
 ) = composed {
     val remoteUiCoordinator = LocalRemoteUiCoordinator.current
+
     val navigationState = LocalNavigationState.current
     val stack by navigationState.collectCurrentStack()
+
     val exitTransitionTracker = LocalExitTransitionTracker.current
     val exitTransition by exitTransitionTracker.collectCurrentExitTransition()
     val exitingDestination by remember(exitTransitionTracker) {

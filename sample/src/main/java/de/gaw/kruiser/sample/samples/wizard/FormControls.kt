@@ -50,7 +50,6 @@ fun FormControls() = RemoteUi<FormDestination>(
                 .wrapContentHeight()
                 .padding(horizontal = 24.dp, vertical = 16.dp),
         ) {
-
             Row(
                 modifier = Modifier
                     .wrapContentSize(),
@@ -85,6 +84,9 @@ fun FormControls() = RemoteUi<FormDestination>(
  */
 @Composable
 fun FormControlsPlaceholder() =
-    RemoteUiPlaceholder(key = KEY_FORM_CONTROLS) { stack: List<Destination> ->
-        stack.previousDestination() !is FormDestination
-    }
+    RemoteUiPlaceholder(
+        key = KEY_FORM_CONTROLS,
+        isPositionSource =  { stack: List<Destination> ->
+            stack.previousDestination() !is FormDestination
+        }
+    )

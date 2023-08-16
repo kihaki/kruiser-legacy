@@ -54,15 +54,16 @@ object FormTwoDestination : FormDestination {
 private fun FormTwo(
     model: FormTwoModel,
 ) {
-    Surface {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        Surface(
+            modifier = Modifier.weight(1f),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
                     .padding(all = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
@@ -79,8 +80,8 @@ private fun FormTwo(
                     onValueChange = { text -> model.address.update { text } },
                 )
             }
-            FormControlsPlaceholder()
         }
+        FormControlsPlaceholder()
     }
 }
 
