@@ -10,6 +10,10 @@ import androidx.compose.ui.unit.IntOffset
 import de.gaw.kruiser.transition.EnterExitTransition
 import de.gaw.kruiser.screen.Screen
 
+/**
+ * Transition where the Screen animates in from the right and out towards the right,
+ * like adding cards on a card stack.
+ */
 @Composable
 fun Screen.HorizontalCardStackTransition(
     inSpec: FiniteAnimationSpec<IntOffset> = tween(350),
