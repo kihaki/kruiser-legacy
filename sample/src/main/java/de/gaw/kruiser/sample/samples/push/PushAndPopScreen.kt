@@ -1,5 +1,6 @@
 package de.gaw.kruiser.sample.samples.push
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,8 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,12 +24,14 @@ import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
 import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.scopedService
+import java.util.UUID
 import kotlin.random.Random
 
 data class PushAndPopScreenHorizontal(
     val index: Int,
     override val destination: Destination,
 ) : Screen {
+    override val isTranslucent: Boolean get() = false
 
     @Composable
     override fun Content() = HorizontalCardStackTransition {
@@ -53,6 +58,14 @@ private fun PushAndPop(
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor = rememberSaveable(saver = colorSaver()) { Color.randomSoft() }
+    val randomString = rememberSaveable(key = "value") {
+        UUID.randomUUID().toString()
+    }
+    val randomNonSavedString = remember { UUID.randomUUID().toString() }
+    SideEffect {
+        Log.v("StateRestoring", "$title -> $randomString")
+        Log.v("StateRestoring", "$title -> non saved: $randomNonSavedString")
+    }
 
     Surface(
         modifier = modifier,

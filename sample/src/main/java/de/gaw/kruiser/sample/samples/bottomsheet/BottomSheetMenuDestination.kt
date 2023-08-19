@@ -1,5 +1,6 @@
 package de.gaw.kruiser.sample.samples.bottomsheet
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -13,32 +14,41 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.ClearDeadServicesDisposableEffect
 import de.gaw.kruiser.service.ScopedServiceProvider
+import de.gaw.kruiser.state.NavigationState
+import de.gaw.kruiser.state.pop
 import de.gaw.kruiser.transition.ExitTransitionTracker
 import de.gaw.kruiser.transition.LocalExitTransitionTracker
 import de.gaw.kruiser.transition.collectTransitionState
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Show cases screen internal animations by showing this screen as a bottom sheet
@@ -48,21 +58,54 @@ data class BottomSheetMenuDestination(
 ) : Destination {
     override fun build(): Screen = object : Screen {
         override val destination: Destination = this@BottomSheetMenuDestination
+        override val isTranslucent: Boolean = true
 
         @Composable
-        override fun Content() = BottomSheetTransition {
-            Card {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    CompositionLocalProvider(
-                        LocalTextStyle provides MaterialTheme.typography.headlineMedium
-                    ) {
-                        Text(text = title)
-                    }
+        override fun Content() = ModalBottomSheetContainer {
+            Column(modifier = Modifier.padding(16.dp)) {
+                CompositionLocalProvider(
+                    LocalTextStyle provides MaterialTheme.typography.headlineMedium
+                ) {
+                    Text(text = title)
                 }
             }
         }
     }
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Screen.ModalBottomSheetContainer(
+    modifier: Modifier = Modifier,
+    navigationState: NavigationState = LocalNavigationState.current,
+    exitTransitionTracker: ExitTransitionTracker = LocalExitTransitionTracker.current,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        modifier = modifier,
+        sheetState = sheetState,
+        onDismissRequest = { navigationState.pop() },
+        content = content,
+    )
+
+    val screenTransitionState by exitTransitionTracker.collectTransitionState(destination = destination)
+    LaunchedEffect(sheetState) {
+        snapshotFlow { screenTransitionState }
+            .collectLatest { transition ->
+                Log.v("SheetTransitionTarget", "TransitionTarget ${transition.targetState}")
+                when (transition.targetState) {
+                    true -> sheetState.show()
+                    false -> sheetState.hide()
+                }
+            }
+    }
+
+    ClearDeadServicesDisposableEffect()
+}
+
 
 @Composable
 fun Screen.BottomSheetTransition(

@@ -1,6 +1,7 @@
 package de.gaw.kruiser.sample
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import de.gaw.kruiser.state.push
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.v("StateRestoring", "Bundle: $savedInstanceState")
         setContent {
             KruiserTheme {
                 // A surface container using the 'background' color from the theme

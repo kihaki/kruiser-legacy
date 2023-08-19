@@ -21,6 +21,7 @@ import de.gaw.kruiser.state.push
 object DashboardDestination : Destination {
     override fun build() = object : Screen {
         override val destination: Destination get() = this@DashboardDestination
+        override val isTranslucent: Boolean get() = false
 
         @Composable
         override fun Content() {
