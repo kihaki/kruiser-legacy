@@ -1,6 +1,5 @@
 package de.gaw.kruiser.remoteui
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
@@ -42,8 +41,6 @@ private class DefaultRemoteUiCoordinator : RemoteUiCoordinator {
 
     private fun update(key: RemoteUiKey, block: RemoteUiLayout.() -> RemoteUiLayout) {
         layouts[key] = (layouts[key] ?: RemoteUiLayout()).block()
-        val current = layouts[key]
-        Log.v("RemoteUi", "$key -> $current")
     }
 
     override fun updatePosition(key: RemoteUiKey, offset: Offset) =

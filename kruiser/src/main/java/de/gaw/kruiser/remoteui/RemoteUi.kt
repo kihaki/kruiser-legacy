@@ -1,7 +1,7 @@
 package de.gaw.kruiser.remoteui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.zIndex
@@ -116,7 +116,7 @@ private fun Modifier.applyRemoteUiOffset(key: RemoteUiKey) = composed {
     val remoteUiCoordinator = LocalRemoteUiCoordinator.current
     val layout by remoteUiCoordinator.collectLayout(key)
     val remoteUiPosition by remember { derivedStateOf { layout.position.toIntOffset() } }
-    offset { remoteUiPosition }
+    absoluteOffset { remoteUiPosition }
 }
 
 /**
@@ -126,12 +126,12 @@ private fun Modifier.applyRemoteUiOffset(key: RemoteUiKey) = composed {
 private fun Modifier.updateRemoteUiSize(key: RemoteUiKey) = composed {
     val remoteUiCoordinator = LocalRemoteUiCoordinator.current
     val density = LocalDensity.current
-    onGloballyPositioned { layoutCoordinates ->
-        val size = with(density) {
-            with(layoutCoordinates.size) {
+    onSizeChanged { size ->
+        val dpSize = with(density) {
+            with(size) {
                 DpSize(width.toDp(), height.toDp())
             }
         }
-        remoteUiCoordinator.updateSize(key, size)
+        remoteUiCoordinator.updateSize(key, dpSize)
     }
 }
