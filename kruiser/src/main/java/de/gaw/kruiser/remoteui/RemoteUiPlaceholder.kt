@@ -1,11 +1,9 @@
 package de.gaw.kruiser.remoteui
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -61,9 +59,6 @@ private fun Modifier.applyRemoteUiSize(key: RemoteUiKey) = composed {
     val remoteUiCoordinator = LocalRemoteUiCoordinator.current
     val remoteUiLayout by remoteUiCoordinator.collectLayout(key)
     val size by remember { derivedStateOf { remoteUiLayout.size } }
-    SideEffect {
-        Log.v("RemoteUiSize", "Size: $size")
-    }
     size(size)
 }
 

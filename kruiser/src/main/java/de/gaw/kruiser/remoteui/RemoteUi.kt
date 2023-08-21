@@ -19,6 +19,9 @@ import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectCurrentStack
 import de.gaw.kruiser.toIntOffset
+import de.gaw.kruiser.transition.ExitTransitionTracker
+import de.gaw.kruiser.transition.LocalExitTransitionTracker
+import de.gaw.kruiser.transition.collectCurrentExitTransition
 
 @Composable
 inline fun <reified T: Destination> RemoteUi(
@@ -87,14 +90,19 @@ data class RemoteUiContext(
 @Composable
 private fun rememberRemoteUiContext(
     navigationState: NavigationState = LocalNavigationState.current,
+    exitTransitionTracker: ExitTransitionTracker = LocalExitTransitionTracker.current,
 ) : State<RemoteUiContext> {
     val stack by navigationState.collectCurrentStack()
+    val exitTransition by exitTransitionTracker.collectCurrentExitTransition()
+    val animatedStack by remember {
+        derivedStateOf { (stack + exitTransition?.destination).filterNotNull() }
+    }
 
     return remember(navigationState) {
         derivedStateOf {
             RemoteUiContext(
                 navigationState = navigationState,
-                stack = stack,
+                stack = animatedStack,
             )
         }
     }
