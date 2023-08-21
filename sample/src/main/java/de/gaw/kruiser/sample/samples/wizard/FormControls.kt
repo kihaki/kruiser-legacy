@@ -1,5 +1,6 @@
 package de.gaw.kruiser.sample.samples.wizard
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
@@ -87,6 +88,8 @@ fun FormControlsPlaceholder() =
     RemoteUiPlaceholder(
         key = KEY_FORM_CONTROLS,
         applyPositionIf =  { stack: List<Destination> ->
+            val previousDestination = stack.previousDestination()
+            Log.v("RemoteUi", "Previous Destination: $previousDestination")
             stack.previousDestination() !is FormDestination
         }
     )
