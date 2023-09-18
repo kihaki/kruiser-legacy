@@ -4,7 +4,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import de.gaw.kruiser.android.LocalNavigationState
@@ -28,8 +30,13 @@ fun Screen.EnterExitTransition(
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
     val stack by navigationState.collectCurrentStack()
+    val isFirstOnStack by remember { derivedStateOf { stack.size == 1 && stack.firstOrNull() == destination } }
+    val initialState = remember {
+        MutableTransitionState(initialState = isFirstOnStack)
+            .apply { targetState = true }
+    }
     val screenTransitionState by exitTransitionTracker.collectTransitionState(
-        isFirstOnStack = stack.size == 1 && stack.firstOrNull() == destination,
+        initialState = initialState,
         destination = destination,
     )
 

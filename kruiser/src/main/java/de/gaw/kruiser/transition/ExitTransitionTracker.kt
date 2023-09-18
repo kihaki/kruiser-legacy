@@ -41,21 +41,26 @@ fun ExitTransitionTracker.collectCurrentExitTransition(): State<DestinationTrans
     exitTransition.collectAsState()
 
 @Composable
+private fun rememberDefaultInitialTransitionState(
+    startVisible: Boolean = false,
+) = remember {
+    MutableTransitionState(initialState = startVisible)
+        .apply { targetState = true }
+}
+
+@Composable
 fun ExitTransitionTracker.collectTransitionState(
-    isFirstOnStack: Boolean,
+    initialState: MutableTransitionState<Boolean> = rememberDefaultInitialTransitionState(),
     destination: Destination,
 ): State<MutableTransitionState<Boolean>> {
     val currentExitTransition by collectCurrentExitTransition()
-    val enterTransition = remember {
-        MutableTransitionState(initialState = isFirstOnStack)
-            .apply { targetState = true }
-    }
+
     return remember {
         derivedStateOf {
             val transitionState = currentExitTransition
                 ?.takeIf { it.destination == destination }
                 ?.transitionState
-                ?: enterTransition
+                ?: initialState
             transitionState
         }
     }
