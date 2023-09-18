@@ -1,14 +1,18 @@
 package de.gaw.kruiser.sample.transition
 
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.IntOffset
 import de.gaw.kruiser.transition.EnterExitTransition
 import de.gaw.kruiser.screen.Screen
+import de.gaw.kruiser.transition.LocalTransitionSettings
 
 /**
  * Transition where the Screen animates in from the right and out towards the right,
@@ -18,13 +22,21 @@ import de.gaw.kruiser.screen.Screen
 fun Screen.HorizontalCardStackTransition(
     inSpec: FiniteAnimationSpec<IntOffset> = tween(350),
     outSpec: FiniteAnimationSpec<IntOffset> = tween(350),
+    playInAnimation: Boolean = LocalTransitionSettings.current.playInAnimation,
+    playOutAnimation: Boolean = LocalTransitionSettings.current.playOutAnimation,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) = EnterExitTransition(
     inAnimation = {
-        slideInHorizontally(inSpec) { size: Int -> size }
+        when {
+            playInAnimation -> slideInHorizontally(inSpec) { size: Int -> size }
+            else -> EnterTransition.None
+        }
     },
     outAnimation = {
-        slideOutHorizontally(outSpec) { size: Int -> size }
+        when {
+            playOutAnimation -> slideOutHorizontally(outSpec) { size: Int -> size }
+            else -> ExitTransition.None
+        }
     },
     content = content,
 )

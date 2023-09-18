@@ -105,7 +105,7 @@ class DefaultExitTransitionTracker(
     }
 
     private fun updateCachedStack(stack: List<Destination>) {
-        previousTopDestination = stack.last()
+        previousTopDestination = stack.lastOrNull()
         previousStackSize = stack.size
     }
 

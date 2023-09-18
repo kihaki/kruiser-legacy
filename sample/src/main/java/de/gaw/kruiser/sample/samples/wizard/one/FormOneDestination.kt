@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.sample.samples.wizard.FormControlsPlaceholder
 import de.gaw.kruiser.sample.samples.wizard.FormDestination
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormModel
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormModelFactory
@@ -31,7 +30,7 @@ import de.gaw.kruiser.transition.LocalExitTransitionTracker
 import de.gaw.kruiser.transition.PreviewExitTransitionTracker
 import kotlinx.coroutines.flow.update
 
-object FormOneDestination : FormDestination {
+object FormOneDestination : Destination {
     override fun build(): Screen = object : Screen {
         override val destination: Destination
             get() = this@FormOneDestination
@@ -79,7 +78,6 @@ private fun FormOne(
                 )
             }
         }
-        FormControlsPlaceholder()
     }
 }
 

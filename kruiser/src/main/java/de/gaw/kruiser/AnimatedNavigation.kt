@@ -26,7 +26,6 @@ import de.gaw.kruiser.transition.rememberExitTransitionTracker
 fun AnimatedNavigation(
     modifier: Modifier = Modifier,
     state: NavigationState = LocalNavigationState.current,
-    remoteUiComponents: @Composable () -> Unit = {},
 ) {
     val isEmpty by state.collectIsEmpty()
 
@@ -52,6 +51,7 @@ fun AnimatedNavigation(
 
     Box(modifier = modifier) {
         CompositionLocalProvider(
+            LocalNavigationState provides state,
             LocalExitTransitionTracker provides exitTransitionTracker
         ) {
             val stateHolder: SaveableStateHolder = rememberSaveableStateHolder()
@@ -66,7 +66,6 @@ fun AnimatedNavigation(
                     }
                 }
             }
-            remoteUiComponents()
         }
     }
 }

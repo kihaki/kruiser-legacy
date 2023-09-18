@@ -2,7 +2,6 @@ package de.gaw.kruiser.service
 
 import androidx.compose.runtime.Composable
 import de.gaw.kruiser.android.LocalScopedServiceProvider
-import de.gaw.kruiser.android.defaultServiceProvider
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceScope
@@ -32,7 +31,7 @@ inline fun <reified T : Any> scopedService(
 @Deprecated("Careful! Don't use this yet, this will always return the first instance of the service if the service has parameters!")
 private inline fun <reified T : Any> Screen.scopedService(
     scope: ServiceScope = DestinationScope(destination),
-    serviceProvider: ScopedServiceProvider = defaultServiceProvider(),
+    serviceProvider: ScopedServiceProvider,
     noinline producer: () -> T,
 ) = scopedService(
     factory = DefaultServiceFactory(T::class, producer),

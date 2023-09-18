@@ -1,5 +1,6 @@
 package de.gaw.kruiser.sample.samples.push
 
+import de.gaw.kruiser.sample.samples.wizard.FormDestination
 import de.gaw.kruiser.sample.samples.wizard.one.FormOneDestination
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
@@ -15,7 +16,7 @@ internal class PushAndPopScreenModel(
     }
 
     fun onPushForm() {
-        navigationState.push(FormOneDestination)
+        navigationState.push(FormDestination)
     }
 
     fun onGoToFirst() {

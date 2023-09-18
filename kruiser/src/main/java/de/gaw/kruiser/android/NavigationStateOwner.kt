@@ -14,7 +14,8 @@ import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.SavedStateNavigationState
 
 @Composable
-fun navigationOwnerViewModel() = viewModel<NavigationOwnerViewModel>(
+fun navigationStateOwnerViewModel(key: String? = null) = viewModel<NavigationStateOwnerViewModel>(
+    key = key,
     viewModelStoreOwner = LocalContext.current as? ViewModelStoreOwner
         ?: error("Current context is not a viewModelStoreOwner."),
     factory = NavigatorOwnerViewModelFactory(),
@@ -26,34 +27,27 @@ private class NavigatorOwnerViewModelFactory : AbstractSavedStateViewModelFactor
         key: String,
         modelClass: Class<T>,
         handle: SavedStateHandle,
-    ): T = NavigationOwnerViewModel(handle) as T
+    ): T = NavigationStateOwnerViewModel(handle) as T
 }
-
-@Composable
-fun defaultNavigationState(): NavigationState = navigationOwnerViewModel().state
 
 val LocalNavigationState = staticCompositionLocalOf<NavigationState> {
     error("No NavigationState provided.")
 }
 
-@Composable
-fun defaultServiceProvider(): ScopedServiceProvider = navigationOwnerViewModel().serviceProvider
-
 val LocalScopedServiceProvider = staticCompositionLocalOf<ScopedServiceProvider> {
     error("No ScopedServiceProvider provided.")
 }
 
-interface NavigationOwner {
+interface NavigationStateOwner {
     val state: NavigationState
     val serviceProvider: ScopedServiceProvider
 }
 
-class NavigationOwnerViewModel(
+class NavigationStateOwnerViewModel(
     savedStateHandle: SavedStateHandle,
-) : NavigationOwner, ViewModel() {
+) : NavigationStateOwner, ViewModel() {
     override val state = SavedStateNavigationState(
         navStateKey = "navigation_state",
-        eventStateKey = "navigation_event",
         savedStateHandle = savedStateHandle,
     )
     override val serviceProvider = DefaultScopedServiceProvider(state)

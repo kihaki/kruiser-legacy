@@ -10,11 +10,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.AnimatedNavigation
-import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
-import de.gaw.kruiser.android.navigationOwnerViewModel
+import de.gaw.kruiser.android.navigationStateOwnerViewModel
 import de.gaw.kruiser.sample.samples.DashboardDestination
-import de.gaw.kruiser.sample.samples.wizard.FormControls
 import de.gaw.kruiser.sample.theme.KruiserTheme
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.push
@@ -30,18 +28,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navigationViewModel = navigationOwnerViewModel().apply {
+                    val navigationViewModel = navigationStateOwnerViewModel().apply {
                         if (state.currentStack.isEmpty()) state.push(DashboardDestination)
                     }
                     CompositionLocalProvider(
-                        LocalNavigationState provides navigationViewModel.state,
                         LocalScopedServiceProvider provides navigationViewModel.serviceProvider,
                     ) {
                         AnimatedNavigation(
+                            state = navigationViewModel.state,
                             modifier = Modifier.fillMaxSize(),
-                            remoteUiComponents = {
-                                FormControls()
-                            }
                         )
                     }
                 }

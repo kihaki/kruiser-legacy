@@ -1,8 +1,105 @@
 package de.gaw.kruiser.sample.samples.wizard
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import de.gaw.kruiser.AnimatedNavigation
+import de.gaw.kruiser.android.LocalNavigationState
+import de.gaw.kruiser.android.LocalScopedServiceProvider
+import de.gaw.kruiser.android.navigationStateOwnerViewModel
 import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.sample.samples.wizard.one.FormOneDestination
+import de.gaw.kruiser.sample.samples.wizard.two.FormTwoDestination
+import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
+import de.gaw.kruiser.screen.Screen
+import de.gaw.kruiser.state.collectCurrentStack
+import de.gaw.kruiser.state.currentStack
+import de.gaw.kruiser.state.pop
+import de.gaw.kruiser.state.push
+import de.gaw.kruiser.transition.LocalTransitionSettings
+import de.gaw.kruiser.transition.TransitionSettings
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Marker interface for all destinations belonging to the Form example.
  */
-interface FormDestination : Destination
+object FormDestination : Destination {
+    override fun build(): Screen = FormScreen(this)
+}
+
+private class FormScreen(override val destination: Destination) : Screen {
+    @Composable
+    override fun Content() = HorizontalCardStackTransition {
+        val parentState = LocalNavigationState.current
+        val navigationViewModel = navigationStateOwnerViewModel("form").apply {
+            if (state.currentStack.isEmpty()) state.push(FormOneDestination)
+        }
+        val navigationStack by navigationViewModel.state.collectCurrentStack()
+        LaunchedEffect(navigationViewModel.state) {
+            navigationViewModel.state.stack.collectLatest {
+                if(it.isEmpty()) parentState.pop()
+            }
+        }
+        CompositionLocalProvider(
+            LocalScopedServiceProvider provides navigationViewModel.serviceProvider,
+            LocalTransitionSettings provides TransitionSettings(playInAnimation = false),
+        ) {
+            Column {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(90.dp)
+                ) {
+
+                }
+                AnimatedNavigation(
+                    state = navigationViewModel.state,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                )
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(90.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        val isBackVisible by remember { derivedStateOf { navigationStack.isNotEmpty() } }
+                        AnimatedVisibility(visible = isBackVisible) {
+                            ElevatedButton(onClick = { navigationViewModel.state.pop() }) {
+                                Text("Back")
+                            }
+                            ElevatedButton(
+                                onClick = {
+                                    navigationViewModel.state.push(FormTwoDestination)
+                                }
+                            ) {
+                                Text("Next")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
