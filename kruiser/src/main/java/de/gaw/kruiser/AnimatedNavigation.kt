@@ -12,10 +12,12 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import de.gaw.kruiser.android.LocalNavigationState
+import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectCurrentStack
 import de.gaw.kruiser.state.collectIsEmpty
 import de.gaw.kruiser.state.pop
+import de.gaw.kruiser.transition.DestinationTransition
 import de.gaw.kruiser.transition.LocalExitTransitionTracker
 import de.gaw.kruiser.transition.collectCurrentExitTransition
 import de.gaw.kruiser.transition.rememberExitTransitionTracker
@@ -42,23 +44,10 @@ fun AnimatedNavigation(
         val screens = (stack + exitTransition?.destination)
             .filterNotNull()
             .map { destination -> destination.build() }
-
-        // Cull invisible screens
-        val isScreenExiting = exitTransition != null
-        val dropCount = when (isScreenExiting) {
-            true -> screens.size - 2 // Keep exiting and the one below
-            false -> screens.size - 1 // Keep only the top most screen
-        }.let { toDrop ->
-            // Keep translucent screens if there are any
-            val translucentCountToKeep = screens
-                .take(toDrop) // Take all screens that should be dropped
-                .takeLastWhile { screen -> screen.isTranslucent } // From those, take the translucent ones on top
-                .size + 1 // and take their count + 1 (since the screen below the lowest translucent one also has to be kept)
-            toDrop - translucentCountToKeep
-        }.coerceAtLeast(0)
-
-        screens.drop(dropCount) // Drop all invisible screens
+//            .cullInvisible(exitTransition = exitTransition) // Cull invisible screens
             .mapIndexed { index, screen -> index to screen }
+
+        screens
     }
 
     Box(modifier = modifier) {
@@ -80,4 +69,21 @@ fun AnimatedNavigation(
             remoteUiComponents()
         }
     }
+}
+
+private fun List<Screen>.cullInvisible(exitTransition: DestinationTransition?): List<Screen> {
+    // Cull invisible screens
+    val isScreenExiting = exitTransition != null
+    val dropCount = when (isScreenExiting) {
+        true -> size - 2 // Keep exiting and the one below
+        false -> size - 1 // Keep only the top most screen
+    }.let { toDrop ->
+        // Keep translucent screens if there are any
+//        val translucentCountToKeep = take(toDrop) // Take all screens that should be dropped
+//            .takeLastWhile { screen -> screen.isTranslucent } // From those, take the translucent ones on top
+//            .size + 1 // and take their count + 1 (since the screen below the lowest translucent one also has to be kept)
+        toDrop// - translucentCountToKeep
+    }.coerceAtLeast(0)
+
+    return drop(dropCount) // Drop all invisible screens
 }

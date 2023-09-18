@@ -31,7 +31,6 @@ data class PushAndPopScreenHorizontal(
     val index: Int,
     override val destination: Destination,
 ) : Screen {
-    override val isTranslucent: Boolean get() = false
 
     @Composable
     override fun Content() = HorizontalCardStackTransition {
@@ -41,7 +40,6 @@ data class PushAndPopScreenHorizontal(
                 .fillMaxWidth(),
             title = "Screen $index",
             onPushDefault = model::onPushDefault,
-            onShowBottomSheet = model::onShowBottomSheetDestination,
             onShowForm = model::onPushForm,
             onGoToFirst = model::onGoToFirst,
         )
@@ -52,7 +50,6 @@ data class PushAndPopScreenHorizontal(
 private fun PushAndPop(
     title: String,
     onPushDefault: () -> Unit,
-    onShowBottomSheet: () -> Unit,
     onShowForm: () -> Unit,
     onGoToFirst: () -> Unit,
     modifier: Modifier = Modifier,
@@ -88,9 +85,6 @@ private fun PushAndPop(
                 ElevatedButton(onClick = onShowForm) {
                     Text("Open multi page form example")
                 }
-                ElevatedButton(onClick = onShowBottomSheet) {
-                    Text("Show Bottom Sheet")
-                }
                 ElevatedButton(onClick = onGoToFirst) {
                     Text("Go back to first screen")
                 }
@@ -113,7 +107,6 @@ private fun PushAndPopScreenPreview() = KruiserPreviewTheme {
         modifier = Modifier.fillMaxSize(),
         title = "Screen 1",
         onPushDefault = {},
-        onShowBottomSheet = {},
         onShowForm = {},
         onGoToFirst = {},
     )

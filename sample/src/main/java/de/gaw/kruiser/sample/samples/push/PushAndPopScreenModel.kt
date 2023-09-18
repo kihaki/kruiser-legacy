@@ -1,6 +1,5 @@
 package de.gaw.kruiser.sample.samples.push
 
-import de.gaw.kruiser.sample.samples.bottomsheet.BottomSheetMenuDestination
 import de.gaw.kruiser.sample.samples.wizard.one.FormOneDestination
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
@@ -13,10 +12,6 @@ internal class PushAndPopScreenModel(
 ) : ScreenModel {
     fun onPushDefault() {
         navigationState.push(PushAndPopDestinationDefault(index + 1))
-    }
-
-    fun onShowBottomSheetDestination() {
-        navigationState.push(BottomSheetMenuDestination("Menu ${index + 1}"))
     }
 
     fun onPushForm() {

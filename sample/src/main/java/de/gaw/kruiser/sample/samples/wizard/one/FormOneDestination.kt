@@ -35,8 +35,6 @@ object FormOneDestination : FormDestination {
     override fun build(): Screen = object : Screen {
         override val destination: Destination
             get() = this@FormOneDestination
-        override val isTranslucent: Boolean
-            get() = false
 
         @Composable
         override fun Content() = HorizontalCardStackTransition {

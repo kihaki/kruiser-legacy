@@ -10,13 +10,6 @@ interface Screen {
      */
     val destination: Destination
 
-    /**
-     * If the [Screen] is declared as translucent, the [Screen] right below it on the stack
-     * will still be rendered, this is intended for partly transparent [Screen]s such as Dialog
-     * styled [Screen]s.
-     */
-    val isTranslucent: Boolean
-
     @Composable
     fun Content()
 }
