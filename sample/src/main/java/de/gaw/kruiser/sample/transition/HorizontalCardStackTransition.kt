@@ -8,11 +8,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.IntOffset
-import de.gaw.kruiser.transition.EnterExitTransition
 import de.gaw.kruiser.screen.Screen
-import de.gaw.kruiser.transition.LocalTransitionSettings
+import de.gaw.kruiser.transition.EnterExitTransition
 
 /**
  * Transition where the Screen animates in from the right and out towards the right,
@@ -22,19 +20,18 @@ import de.gaw.kruiser.transition.LocalTransitionSettings
 fun Screen.HorizontalCardStackTransition(
     inSpec: FiniteAnimationSpec<IntOffset> = tween(350),
     outSpec: FiniteAnimationSpec<IntOffset> = tween(350),
-    playInAnimation: Boolean = LocalTransitionSettings.current.playInAnimation,
-    playOutAnimation: Boolean = LocalTransitionSettings.current.playOutAnimation,
+    isEnabled: Boolean = true,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) = EnterExitTransition(
     inAnimation = {
         when {
-            playInAnimation -> slideInHorizontally(inSpec) { size: Int -> size }
+            isEnabled -> slideInHorizontally(inSpec) { size: Int -> size }
             else -> EnterTransition.None
         }
     },
     outAnimation = {
         when {
-            playOutAnimation -> slideOutHorizontally(outSpec) { size: Int -> size }
+            isEnabled -> slideOutHorizontally(outSpec) { size: Int -> size }
             else -> ExitTransition.None
         }
     },

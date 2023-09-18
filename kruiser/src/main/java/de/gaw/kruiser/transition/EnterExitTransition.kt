@@ -7,10 +7,13 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.ClearDeadServicesDisposableEffect
 import de.gaw.kruiser.service.ScopedServiceProvider
+import de.gaw.kruiser.state.NavigationState
+import de.gaw.kruiser.state.collectCurrentStack
 
 /**
  * Entry/Exit Animation that can be used inside of a [Screen] to provide animations.
@@ -19,14 +22,19 @@ import de.gaw.kruiser.service.ScopedServiceProvider
 fun Screen.EnterExitTransition(
     inAnimation: ExitTransitionTracker.() -> EnterTransition,
     outAnimation: ExitTransitionTracker.() -> ExitTransition,
-    navigationState: ExitTransitionTracker = LocalExitTransitionTracker.current,
+    navigationState: NavigationState = LocalNavigationState.current,
+    exitTransitionTracker: ExitTransitionTracker = LocalExitTransitionTracker.current,
     scopedServiceProvider: ScopedServiceProvider = LocalScopedServiceProvider.current,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
-    val screenTransitionState by navigationState.collectTransitionState(destination = destination)
+    val stack by navigationState.collectCurrentStack()
+    val screenTransitionState by exitTransitionTracker.collectTransitionState(
+        isFirstOnStack = stack.size == 1 && stack.firstOrNull() == destination,
+        destination = destination,
+    )
 
-    val enterTransition = remember(navigationState) { inAnimation(navigationState) }
-    val exitTransition = remember(navigationState) { outAnimation(navigationState) }
+    val enterTransition = remember(exitTransitionTracker) { inAnimation(exitTransitionTracker) }
+    val exitTransition = remember(exitTransitionTracker) { outAnimation(exitTransitionTracker) }
 
     AnimatedVisibility(
         visibleState = screenTransitionState,

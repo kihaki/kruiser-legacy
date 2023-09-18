@@ -1,7 +1,6 @@
 package de.gaw.kruiser.sample.samples.wizard
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,8 +31,6 @@ import de.gaw.kruiser.state.collectCurrentStack
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.pop
 import de.gaw.kruiser.state.push
-import de.gaw.kruiser.transition.LocalTransitionSettings
-import de.gaw.kruiser.transition.TransitionSettings
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -51,14 +48,15 @@ private class FormScreen(override val destination: Destination) : Screen {
             if (state.currentStack.isEmpty()) state.push(FormOneDestination)
         }
         val navigationStack by navigationViewModel.state.collectCurrentStack()
+
         LaunchedEffect(navigationViewModel.state) {
             navigationViewModel.state.stack.collectLatest {
-                if(it.isEmpty()) parentState.pop()
+                if (it.isEmpty()) parentState.pop()
             }
         }
+
         CompositionLocalProvider(
             LocalScopedServiceProvider provides navigationViewModel.serviceProvider,
-            LocalTransitionSettings provides TransitionSettings(playInAnimation = false),
         ) {
             Column {
                 Surface(
@@ -81,21 +79,24 @@ private class FormScreen(override val destination: Destination) : Screen {
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        val isBackVisible by remember { derivedStateOf { navigationStack.isNotEmpty() } }
-                        AnimatedVisibility(visible = isBackVisible) {
-                            ElevatedButton(onClick = { navigationViewModel.state.pop() }) {
+                        val isBackVisible by remember { derivedStateOf { navigationStack.size > 1 } }
+                        AnimatedVisibility(
+                            visible = isBackVisible,
+                        ) {
+                            ElevatedButton(
+                                onClick = { navigationViewModel.state.pop() }) {
                                 Text("Back")
                             }
-                            ElevatedButton(
-                                onClick = {
-                                    navigationViewModel.state.push(FormTwoDestination)
-                                }
-                            ) {
-                                Text("Next")
+                        }
+                        ElevatedButton(
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                navigationViewModel.state.push(FormTwoDestination)
                             }
+                        ) {
+                            Text("Next")
                         }
                     }
                 }

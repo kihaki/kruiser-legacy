@@ -41,10 +41,13 @@ fun ExitTransitionTracker.collectCurrentExitTransition(): State<DestinationTrans
     exitTransition.collectAsState()
 
 @Composable
-fun ExitTransitionTracker.collectTransitionState(destination: Destination): State<MutableTransitionState<Boolean>> {
+fun ExitTransitionTracker.collectTransitionState(
+    isFirstOnStack: Boolean,
+    destination: Destination,
+): State<MutableTransitionState<Boolean>> {
     val currentExitTransition by collectCurrentExitTransition()
-    val initialTransition = remember {
-        MutableTransitionState(initialState = false)
+    val enterTransition = remember {
+        MutableTransitionState(initialState = isFirstOnStack)
             .apply { targetState = true }
     }
     return remember {
@@ -52,7 +55,7 @@ fun ExitTransitionTracker.collectTransitionState(destination: Destination): Stat
             val transitionState = currentExitTransition
                 ?.takeIf { it.destination == destination }
                 ?.transitionState
-                ?: initialTransition
+                ?: enterTransition
             transitionState
         }
     }
@@ -71,7 +74,7 @@ class PreviewExitTransitionTracker(
 class DefaultExitTransitionTracker(
     scope: CoroutineScope,
     private val navigationState: NavigationState,
-) : ExitTransitionTracker{
+) : ExitTransitionTracker {
     override val exitTransition = MutableStateFlow<DestinationTransition?>(null)
 
     private var previousStackSize: Int = 0
