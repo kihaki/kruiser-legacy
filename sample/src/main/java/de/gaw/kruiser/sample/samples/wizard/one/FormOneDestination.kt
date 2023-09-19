@@ -26,8 +26,8 @@ import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.scopedService
 import de.gaw.kruiser.state.preview.PreviewNavigationState
-import de.gaw.kruiser.transition.LocalExitTransitionTracker
-import de.gaw.kruiser.transition.PreviewExitTransitionTracker
+import de.gaw.kruiser.ui.singletopstack.transition.LocalExitTransitionTracker
+import de.gaw.kruiser.ui.singletopstack.transition.PreviewExitTransitionTracker
 import kotlinx.coroutines.flow.update
 
 object FormOneDestination : Destination {

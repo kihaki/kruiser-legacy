@@ -1,4 +1,4 @@
-package de.gaw.kruiser.transition
+package de.gaw.kruiser.ui.singletopstack.transition
 
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.Composable

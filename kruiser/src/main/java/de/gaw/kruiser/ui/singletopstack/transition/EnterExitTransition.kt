@@ -1,4 +1,4 @@
-package de.gaw.kruiser.transition
+package de.gaw.kruiser.ui.singletopstack.transition
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -25,14 +25,16 @@ fun Screen.EnterExitTransition(
     inAnimation: ExitTransitionTracker.() -> EnterTransition,
     outAnimation: ExitTransitionTracker.() -> ExitTransition,
     navigationState: NavigationState = LocalNavigationState.current,
-    exitTransitionTracker: ExitTransitionTracker = LocalExitTransitionTracker.current,
     scopedServiceProvider: ScopedServiceProvider = LocalScopedServiceProvider.current,
+    exitTransitionTracker: ExitTransitionTracker = LocalExitTransitionTracker.current,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
     val stack by navigationState.collectCurrentStack()
-    val isFirstOnStack by remember { derivedStateOf { stack.size == 1 && stack.firstOrNull() == destination } }
+
+    val isOnlyScreenOnStack by remember { derivedStateOf { stack.size == 1 && stack.firstOrNull() == destination } }
+
     val initialState = remember {
-        MutableTransitionState(initialState = isFirstOnStack)
+        MutableTransitionState(initialState = isOnlyScreenOnStack)
             .apply { targetState = true }
     }
     val screenTransitionState by exitTransitionTracker.collectTransitionState(

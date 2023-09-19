@@ -9,7 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.AnimatedNavigation
+import de.gaw.kruiser.ui.singletopstack.AnimatedSingleTopStack
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.android.navigationStateOwnerViewModel
 import de.gaw.kruiser.sample.samples.DashboardDestination
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     CompositionLocalProvider(
                         LocalScopedServiceProvider provides navigationViewModel.serviceProvider,
                     ) {
-                        AnimatedNavigation(
+                        AnimatedSingleTopStack(
                             state = navigationViewModel.state,
                             modifier = Modifier.fillMaxSize(),
                         )

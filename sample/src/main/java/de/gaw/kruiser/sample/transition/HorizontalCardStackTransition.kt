@@ -10,7 +10,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
 import de.gaw.kruiser.screen.Screen
-import de.gaw.kruiser.transition.EnterExitTransition
+import de.gaw.kruiser.ui.singletopstack.transition.EnterExitTransition
 
 /**
  * Transition where the Screen animates in from the right and out towards the right,

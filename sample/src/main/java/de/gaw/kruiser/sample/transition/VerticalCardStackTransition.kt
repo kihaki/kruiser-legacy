@@ -7,7 +7,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
-import de.gaw.kruiser.transition.EnterExitTransition
+import de.gaw.kruiser.ui.singletopstack.transition.EnterExitTransition
 import de.gaw.kruiser.screen.Screen
 
 @Composable

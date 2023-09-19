@@ -20,7 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.gaw.kruiser.AnimatedNavigation
+import de.gaw.kruiser.ui.singletopstack.AnimatedSingleTopStack
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.android.navigationStateOwnerViewModel
@@ -70,7 +70,7 @@ private class FormScreen(override val destination: Destination) : Screen {
                 ) {
 
                 }
-                AnimatedNavigation(
+                AnimatedSingleTopStack(
                     state = navigationViewModel.state,
                     modifier = Modifier
                         .weight(1f)
