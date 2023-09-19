@@ -25,7 +25,7 @@ import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.scopedService
 import de.gaw.kruiser.state.preview.PreviewNavigationState
-import de.gaw.kruiser.ui.singletopstack.transition.LocalExitTransitionTracker
+import de.gaw.kruiser.ui.singletopstack.transition.LocalEntryExitTransitionTracker
 import de.gaw.kruiser.ui.singletopstack.transition.PreviewEntryExitTransitionTracker
 import kotlinx.coroutines.flow.update
 
@@ -85,7 +85,7 @@ private fun FormOne(
 private fun FormOnePreview() = MaterialTheme {
     CompositionLocalProvider(
         LocalNavigationState provides PreviewNavigationState(),
-        LocalExitTransitionTracker provides PreviewEntryExitTransitionTracker(),
+        LocalEntryExitTransitionTracker provides PreviewEntryExitTransitionTracker(),
     ) {
         FormOne(model = FormOneModel(SharedFormModel()))
     }

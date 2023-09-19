@@ -11,14 +11,14 @@ import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectCurrentStack
 import de.gaw.kruiser.ui.singletopstack.transition.EntryExitTransitionTracker
-import de.gaw.kruiser.ui.singletopstack.transition.LocalExitTransitionTracker
+import de.gaw.kruiser.ui.singletopstack.transition.LocalEntryExitTransitionTracker
 import de.gaw.kruiser.ui.singletopstack.transition.collectCurrentEntryTransition
 import de.gaw.kruiser.ui.singletopstack.transition.collectCurrentExitTransition
 
 @Composable
 fun rememberAnimatedSingleTopStackVisibleScreens(
     state: NavigationState = LocalNavigationState.current,
-    transitionTracker: EntryExitTransitionTracker = LocalExitTransitionTracker.current,
+    transitionTracker: EntryExitTransitionTracker = LocalEntryExitTransitionTracker.current,
 ): State<List<AnimatedSingleTopStackScreen>> {
     // Collect the current navigation stack
     val stack by state.collectCurrentStack()

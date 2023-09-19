@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.state.NavigationState
-import de.gaw.kruiser.ui.singletopstack.transition.LocalExitTransitionTracker
+import de.gaw.kruiser.ui.singletopstack.transition.LocalEntryExitTransitionTracker
 import de.gaw.kruiser.ui.singletopstack.transition.rememberEntryExitTransitionTracker
 import de.gaw.kruiser.ui.PopOnBackHandler
 
@@ -29,7 +29,7 @@ fun AnimatedSingleTopStack(
 
     CompositionLocalProvider(
         LocalNavigationState provides state,
-        LocalExitTransitionTracker provides transitionTracker
+        LocalEntryExitTransitionTracker provides transitionTracker
     ) {
         // Pop destinations off the stack on back press
         PopOnBackHandler()

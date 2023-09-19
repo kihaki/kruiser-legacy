@@ -20,15 +20,15 @@ fun Screen.EnterExitTransition(
     inAnimation: EntryExitTransitionTracker.() -> EnterTransition,
     outAnimation: EntryExitTransitionTracker.() -> ExitTransition,
     scopedServiceProvider: ScopedServiceProvider = LocalScopedServiceProvider.current,
-    exitTransitionTracker: EntryExitTransitionTracker = LocalExitTransitionTracker.current,
+    transitionTracker: EntryExitTransitionTracker = LocalEntryExitTransitionTracker.current,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
-    val screenTransitionState by exitTransitionTracker.collectTransitionState(
+    val screenTransitionState by transitionTracker.collectTransitionState(
         destination = destination,
     )
 
-    val enterTransition = remember(exitTransitionTracker) { inAnimation(exitTransitionTracker) }
-    val exitTransition = remember(exitTransitionTracker) { outAnimation(exitTransitionTracker) }
+    val enterTransition = remember(transitionTracker) { inAnimation(transitionTracker) }
+    val exitTransition = remember(transitionTracker) { outAnimation(transitionTracker) }
 
     AnimatedVisibility(
         visibleState = screenTransitionState,

@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-val LocalExitTransitionTracker =
+val LocalEntryExitTransitionTracker =
     compositionLocalOf<EntryExitTransitionTracker> { error("No ExitTransitionTracker provided.") }
 
 @Composable
