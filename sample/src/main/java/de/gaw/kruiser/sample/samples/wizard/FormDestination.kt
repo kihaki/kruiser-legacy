@@ -2,14 +2,17 @@ package de.gaw.kruiser.sample.samples.wizard
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ElevatedButton
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -19,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.gaw.kruiser.ui.singletopstack.AnimatedSingleTopStack
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.android.navigationStateOwnerViewModel
@@ -33,6 +35,7 @@ import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.pop
 import de.gaw.kruiser.state.popAll
 import de.gaw.kruiser.state.push
+import de.gaw.kruiser.ui.singletopstack.AnimatedSingleTopStack
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -80,16 +83,19 @@ private class FormScreen(override val destination: Destination) : Screen {
                         .height(90.dp)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxSize(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         val isBackVisible by remember { derivedStateOf { navigationStack.size > 1 } }
                         AnimatedVisibility(
                             visible = isBackVisible,
                         ) {
-                            ElevatedButton(
+                            TextButton(
                                 onClick = { navigationViewModel.state.pop() }) {
-                                Text("Back")
+                                Text("< Back")
                             }
                         }
                         val label by remember {
@@ -100,18 +106,19 @@ private class FormScreen(override val destination: Destination) : Screen {
                                 }
                             }
                         }
-                        Crossfade(
-                            modifier = Modifier.weight(1f),
-                            targetState = label,
-                            label = "next-button-label-anim",
-                        ) {
-                            ElevatedButton(
-                                onClick = {
-                                    when {
-                                        navigationStack.contains(FormTwoDestination) -> navigationViewModel.state.popAll()
-                                        else -> navigationViewModel.state.push(FormTwoDestination)
-                                    }
+                        FilledTonalButton(
+                            modifier = Modifier
+                                .weight(1f),
+                            onClick = {
+                                when {
+                                    navigationStack.contains(FormTwoDestination) -> navigationViewModel.state.popAll()
+                                    else -> navigationViewModel.state.push(FormTwoDestination)
                                 }
+                            }
+                        ) {
+                            Crossfade(
+                                targetState = label,
+                                label = "next-button-label-anim",
                             ) {
                                 Text(it)
                             }
