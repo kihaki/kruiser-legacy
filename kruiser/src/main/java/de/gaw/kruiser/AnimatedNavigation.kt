@@ -43,7 +43,7 @@ fun AnimatedNavigation(
         val screens = (stack + exitTransition?.destination)
             .filterNotNull()
             .map { destination -> destination.build() }
-//            .cullInvisible(exitTransition = exitTransition) // Cull invisible screens
+            .cullInvisible(exitTransition = exitTransition) // Cull invisible screens
             .mapIndexed { index, screen -> index to screen }
 
         screens
@@ -75,7 +75,7 @@ private fun List<Screen>.cullInvisible(exitTransition: DestinationTransition?): 
     val isScreenExiting = exitTransition != null
     val dropCount = when (isScreenExiting) {
         true -> size - 2 // Keep exiting and the one below
-        false -> size - 1 // Keep only the top most screen
+        false -> size - 2 // Keep exiting and the one below
     }.let { toDrop ->
         // Keep translucent screens if there are any
 //        val translucentCountToKeep = take(toDrop) // Take all screens that should be dropped
