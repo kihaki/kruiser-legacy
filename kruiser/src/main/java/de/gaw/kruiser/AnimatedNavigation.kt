@@ -56,11 +56,11 @@ fun AnimatedNavigation(
         ) {
             val stateHolder: SaveableStateHolder = rememberSaveableStateHolder()
             screensToRender.forEach { (index, screen) ->
-                key(screen.destination) {
+                key(screen.composeKey) {
                     // Render the screen at the appropriate zIndex of the stack
                     Box(modifier = Modifier.zIndex(index.toFloat())) {
                         // provide the screen with its own saved state
-                        stateHolder.SaveableStateProvider(key = screen.destination) {
+                        stateHolder.SaveableStateProvider(screen.savedStateKey) {
                             screen.Content()
                         }
                     }

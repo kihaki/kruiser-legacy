@@ -1,6 +1,8 @@
 package de.gaw.kruiser.sample.samples.wizard
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +32,7 @@ import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.state.collectCurrentStack
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.pop
+import de.gaw.kruiser.state.popAll
 import de.gaw.kruiser.state.push
 import kotlinx.coroutines.flow.collectLatest
 
@@ -41,6 +44,7 @@ object FormDestination : Destination {
 }
 
 private class FormScreen(override val destination: Destination) : Screen {
+    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     override fun Content() = HorizontalCardStackTransition {
         val parentState = LocalNavigationState.current
@@ -90,13 +94,29 @@ private class FormScreen(override val destination: Destination) : Screen {
                                 Text("Back")
                             }
                         }
-                        ElevatedButton(
-                            modifier = Modifier.weight(1f),
-                            onClick = {
-                                navigationViewModel.state.push(FormTwoDestination)
+                        val label by remember {
+                            derivedStateOf {
+                                when (navigationStack.contains(FormTwoDestination)) {
+                                    true -> "Complete"
+                                    false -> "Next"
+                                }
                             }
+                        }
+                        Crossfade(
+                            modifier = Modifier.weight(1f),
+                            targetState = label,
+                            label = "next-button-label-anim",
                         ) {
-                            Text("Next")
+                            ElevatedButton(
+                                onClick = {
+                                    when {
+                                        navigationStack.contains(FormTwoDestination) -> navigationViewModel.state.popAll()
+                                        else -> navigationViewModel.state.push(FormTwoDestination)
+                                    }
+                                }
+                            ) {
+                                Text(it)
+                            }
                         }
                     }
                 }

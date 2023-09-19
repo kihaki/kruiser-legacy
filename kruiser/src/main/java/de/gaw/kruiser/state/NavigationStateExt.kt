@@ -10,6 +10,7 @@ import de.gaw.kruiser.destination.Destination
 
 fun NavigationState.push(destination: Destination) = mutate { this + destination }
 fun NavigationState.pop() = mutate { dropLast(1) }
+fun NavigationState.popAll() = mutate { emptyList() }
 
 val NavigationState.currentStack get() = stack.value
 
