@@ -19,25 +19,27 @@ import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.push
 
 object DashboardDestination : Destination {
-    override fun build() = object : Screen {
-        override val destination: Destination get() = this@DashboardDestination
+    override fun build(): Screen = DashboardScreen()
+}
 
-        @Composable
-        override fun Content() {
-            val model = scopedService(DashboardScreenModelFactory)
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(model.menuItems) { (title, onClick) ->
-                    ListItem(
-                        modifier = Modifier.clickable(onClick = onClick),
-                        headlineContent = {
-                            Text(
-                                text = title,
-                            )
-                        },
-                    )
-                }
+private class DashboardScreen : Screen {
+    override val destination: Destination = DashboardDestination
+
+    @Composable
+    override fun Content() {
+        val model = scopedService(DashboardScreenModelFactory)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(model.menuItems) { (title, onClick) ->
+                ListItem(
+                    modifier = Modifier.clickable(onClick = onClick),
+                    headlineContent = {
+                        Text(
+                            text = title,
+                        )
+                    },
+                )
             }
         }
     }

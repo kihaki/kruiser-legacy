@@ -32,25 +32,41 @@ import de.gaw.kruiser.ui.singletopstack.transition.PreviewEntryExitTransitionTra
 import kotlinx.coroutines.flow.update
 
 object FormTwoDestination : Destination {
-    override fun build(): Screen = object : Screen {
-        override val destination: Destination
-            get() = this@FormTwoDestination
+    override fun build(): Screen = FormTwoScreen()
+}
 
-        @Composable
-        override fun Content() = HorizontalCardStackTransition {
-            val sharedForm = scopedService(
-                factory = SharedFormModelFactory,
-                scope = SharedFormScope,
-            )
-            val formModel = scopedService(factory = FormTwoModelFactory(sharedForm))
-            FormTwo(model = formModel)
-        }
+private class FormTwoScreen : Screen {
+    override val destination: Destination = FormTwoDestination
+
+    @Composable
+    override fun Content() = HorizontalCardStackTransition {
+        val sharedForm = scopedService(
+            factory = SharedFormModelFactory,
+            scope = SharedFormScope,
+        )
+        val formModel = scopedService(factory = FormTwoModelFactory(sharedForm))
+        FormTwo(model = formModel)
     }
 }
 
 @Composable
 private fun FormTwo(
     model: FormTwoModel,
+) {
+    val name by model.name.collectAsState()
+    val address by model.address.collectAsState()
+    FormTwo(
+        name = name,
+        address = address,
+        onAddressChange = { text -> model.address.update { text } },
+    )
+}
+
+@Composable
+private fun FormTwo(
+    name: String,
+    address: String,
+    onAddressChange: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -65,17 +81,15 @@ private fun FormTwo(
                     .padding(all = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                val name by model.name.collectAsState()
                 val displayedName by remember {
                     derivedStateOf {
                         name.takeIf { it.isNotBlank() } ?: "(none selected)"
                     }
                 }
                 Text("Your selected name is $displayedName, please enter your address:")
-                val address by model.address.collectAsState()
                 OutlinedTextField(
                     value = address,
-                    onValueChange = { text -> model.address.update { text } },
+                    onValueChange = onAddressChange,
                 )
             }
         }

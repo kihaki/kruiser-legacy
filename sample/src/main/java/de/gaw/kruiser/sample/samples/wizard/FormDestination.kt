@@ -2,7 +2,6 @@ package de.gaw.kruiser.sample.samples.wizard
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,7 +43,6 @@ object FormDestination : Destination {
 }
 
 private class FormScreen(override val destination: Destination) : Screen {
-    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     override fun Content() = HorizontalCardStackTransition {
         val parentState = LocalNavigationState.current

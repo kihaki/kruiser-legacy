@@ -30,25 +30,41 @@ import de.gaw.kruiser.ui.singletopstack.transition.PreviewEntryExitTransitionTra
 import kotlinx.coroutines.flow.update
 
 object FormOneDestination : Destination {
-    override fun build(): Screen = object : Screen {
-        override val destination: Destination
-            get() = this@FormOneDestination
+    override fun build(): Screen = FormOneScreen()
+}
 
-        @Composable
-        override fun Content() = HorizontalCardStackTransition {
-            val sharedForm = scopedService(
-                factory = SharedFormModelFactory,
-                scope = SharedFormScope,
-            )
-            val model = scopedService(factory = FormOneModelFactory(sharedForm))
-            FormOne(model = model)
-        }
+private class FormOneScreen : Screen {
+    override val destination: Destination = FormOneDestination
+
+    @Composable
+    override fun Content() = HorizontalCardStackTransition {
+        val sharedForm = scopedService(
+            factory = SharedFormModelFactory,
+            scope = SharedFormScope,
+        )
+        val model = scopedService(factory = FormOneModelFactory(sharedForm))
+        FormOne(model = model)
     }
 }
 
 @Composable
+private fun FormOne(model: FormOneModel) {
+    val name by model.name.collectAsState()
+    val nickname by model.nickname.collectAsState()
+    FormOne(
+        name = name,
+        onNameChange = { text -> model.name.update { text } },
+        nickname = nickname,
+        onNicknameChange = { text -> model.nickname.update { text } },
+    )
+}
+
+@Composable
 private fun FormOne(
-    model: FormOneModel,
+    name: String,
+    onNameChange: (String) -> Unit,
+    nickname: String,
+    onNicknameChange: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -64,16 +80,14 @@ private fun FormOne(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text("Please Enter your name:")
-                val name by model.name.collectAsState()
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { text -> model.name.update { text } },
+                    onValueChange = onNameChange,
                 )
                 Text("Please Enter your nickname:")
-                val nickname by model.nickname.collectAsState()
                 OutlinedTextField(
                     value = nickname,
-                    onValueChange = { text -> model.nickname.update { text } },
+                    onValueChange = onNicknameChange,
                 )
             }
         }
