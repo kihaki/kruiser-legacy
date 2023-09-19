@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.sample.samples.wizard.FormDestination
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormModel
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormModelFactory
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormScope
@@ -29,7 +28,7 @@ import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.scopedService
 import de.gaw.kruiser.state.preview.PreviewNavigationState
 import de.gaw.kruiser.ui.singletopstack.transition.LocalExitTransitionTracker
-import de.gaw.kruiser.ui.singletopstack.transition.PreviewExitTransitionTracker
+import de.gaw.kruiser.ui.singletopstack.transition.PreviewEntryExitTransitionTracker
 import kotlinx.coroutines.flow.update
 
 object FormTwoDestination : Destination {
@@ -88,7 +87,7 @@ private fun FormTwo(
 private fun FormTwoPreview() = MaterialTheme {
     CompositionLocalProvider(
         LocalNavigationState provides PreviewNavigationState(),
-        LocalExitTransitionTracker provides PreviewExitTransitionTracker(),
+        LocalExitTransitionTracker provides PreviewEntryExitTransitionTracker(),
     ) {
         FormTwo(model = FormTwoModel(SharedFormModel()))
     }
