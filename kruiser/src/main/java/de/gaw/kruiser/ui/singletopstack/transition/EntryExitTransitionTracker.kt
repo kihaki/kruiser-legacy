@@ -1,6 +1,5 @@
 package de.gaw.kruiser.ui.singletopstack.transition
 
-import android.util.Log
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -90,38 +89,17 @@ class DefaultEntryExitTransitionTracker(
         scope.launch {
             navigationState.stack.collectLatest { stack ->
                 try {
-                    val requiresExitAnimation = stack.size < previousStackSize
                     val requiresEntryAnimation = stack.size > previousStackSize
-                    if (requiresExitAnimation && previousTopDestination != null) {
-                        previousTopDestination?.let { exitCandidate ->
-                            exitCandidate
-                                .withTransition(initialState = true)
-                                .let { exitingDestination ->
-                                    exitTransition.update { exitingDestination }
-                                    with(exitingDestination.transitionState) {
-                                        targetState = false
-                                        awaitInvisible()
-                                    }
-                                }
-                        }
-                    } else if (requiresEntryAnimation) {
-                        stack.lastOrNull()?.let { entryCandidate ->
+                    val requiresExitAnimation = stack.size < previousStackSize
+                            && previousTopDestination != null
+
+                    when {
+                        requiresExitAnimation -> previousTopDestination?.animateExit()
+                        requiresEntryAnimation -> {
                             // For nested navigation it might be good not to animate the initial destination
                             // so we won't if that is requested
                             val startVisible = !animateInitialDestination && stack.size == 1
-                            entryCandidate
-                                .withTransition(initialState = startVisible)
-                                .let { enteringDestination ->
-                                    entryTransition.update { enteringDestination }
-                                    Log.v(
-                                        "KruiserTransitions",
-                                        "Entering Destination ${enteringDestination.destination}: ${enteringDestination.transitionState.currentState} -> ${enteringDestination.transitionState.targetState}"
-                                    )
-                                    with(enteringDestination.transitionState) {
-                                        targetState = true
-                                        awaitVisible()
-                                    }
-                                }
+                            stack.lastOrNull()?.animateEntry(initialState = startVisible)
                         }
                     }
                 } finally {
@@ -130,6 +108,24 @@ class DefaultEntryExitTransitionTracker(
                     entryTransition.update { null }
                 }
             }
+        }
+    }
+
+    private suspend fun Destination.animateEntry(initialState: Boolean) {
+        val enteringDestination = this.withTransition(initialState = initialState)
+        entryTransition.update { enteringDestination }
+        with(enteringDestination.transitionState) {
+            targetState = true
+            awaitVisible()
+        }
+    }
+
+    private suspend fun Destination.animateExit() {
+        val exitTransitionSpec = this.withTransition(initialState = true)
+        exitTransition.update { exitTransitionSpec }
+        with(exitTransitionSpec.transitionState) {
+            targetState = false
+            awaitInvisible()
         }
     }
 

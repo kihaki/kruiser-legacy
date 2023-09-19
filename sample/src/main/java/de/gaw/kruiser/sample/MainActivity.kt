@@ -4,18 +4,21 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.ui.singletopstack.AnimatedSingleTopStack
+import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.android.navigationStateOwnerViewModel
 import de.gaw.kruiser.sample.samples.DashboardDestination
 import de.gaw.kruiser.sample.theme.KruiserTheme
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.push
+import de.gaw.kruiser.ui.doublerailstack.AnimatedDoubleRailStack
+import de.gaw.kruiser.ui.singletopstack.AnimatedSingleTopStack
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,11 +36,20 @@ class MainActivity : ComponentActivity() {
                     }
                     CompositionLocalProvider(
                         LocalScopedServiceProvider provides navigationViewModel.serviceProvider,
+                        LocalNavigationState provides navigationViewModel.state,
                     ) {
-                        AnimatedSingleTopStack(
-                            state = navigationViewModel.state,
-                            modifier = Modifier.fillMaxSize(),
-                        )
+                        BoxWithConstraints {
+                            val isPortrait = maxWidth <= maxHeight
+                            when {
+                                isPortrait -> AnimatedSingleTopStack(
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+
+                                else -> AnimatedDoubleRailStack(
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            }
+                        }
                     }
                 }
             }
