@@ -7,14 +7,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.SaveableStateHolder
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import de.gaw.kruiser.android.LocalNavigationState
 import de.gaw.kruiser.android.LocalScopedServiceProvider
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.screen.WithScreenSavedState
 import de.gaw.kruiser.service.ScopedServiceProvider
 import de.gaw.kruiser.state.NavigationState
 import de.gaw.kruiser.state.collectCurrentStack
@@ -57,7 +59,8 @@ fun ScreenStack(
 
         Box(modifier = modifier) {
             // Keep track of running screen transition states
-            val transitionStateTracker = rememberEntryExitTransitionStateTracker(navigationState = state)
+            val transitionStateTracker =
+                rememberEntryExitTransitionStateTracker(navigationState = state)
             CompositionLocalProvider(
                 LocalEntryExitTransitionStateTracker provides transitionStateTracker
             ) {
@@ -76,17 +79,18 @@ fun ScreenStack(
                 // such as those that currently are deep down in the stack.
                 val visibleDestinations by rememberScreenStackVisibleDestinations()
 
+                val stateHolder: SaveableStateHolder = rememberSaveableStateHolder()
+
                 visibleDestinations.forEachIndexed { zIndex, destination ->
-                    Box(modifier = Modifier.zIndex(zIndex.toFloat())) {
+                    key(destination) {
                         val context by rememberScreenStackRenderContext(
                             destination = destination,
                             transitionStateTracker = transitionStateTracker,
                         )
-
-                        WithScreenSavedState(
-                            screen = context.screen,
-                        ) {
-                            context.drawScreen()
+                        stateHolder.SaveableStateProvider(context.screen.savedStateKey) {
+                            Box(modifier = Modifier.zIndex(zIndex.toFloat())) {
+                                context.drawScreen()
+                            }
                         }
                     }
                 }
