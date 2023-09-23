@@ -22,30 +22,30 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-val LocalEntryExitTransitionTracker =
-    compositionLocalOf<EntryExitTransitionTracker> { error("No EntryExitTransitionTracker provided.") }
+val LocalEntryExitTransitionStateTracker =
+    compositionLocalOf<EntryExitTransitionStateTracker> { error("No EntryExitTransitionTracker provided.") }
 
 @Composable
-fun rememberEntryExitTransitionTracker(
+fun rememberEntryExitTransitionStateTracker(
     navigationState: NavigationState,
     scope: CoroutineScope = rememberCoroutineScope(),
 ) = remember(scope, navigationState) {
-    DefaultEntryExitTransitionTracker(
+    DefaultEntryExitTransitionStateTracker(
         navigationState = navigationState,
         scope = scope,
     )
 }
 
 @Composable
-fun EntryExitTransitionTracker.collectCurrentExitTransition(): State<DestinationTransition?> =
+fun EntryExitTransitionStateTracker.collectCurrentExitTransition(): State<DestinationTransition?> =
     exitTransition.collectAsState()
 
 @Composable
-fun EntryExitTransitionTracker.collectCurrentEntryTransition(): State<DestinationTransition?> =
+fun EntryExitTransitionStateTracker.collectCurrentEntryTransition(): State<DestinationTransition?> =
     entryTransition.collectAsState()
 
 @Composable
-fun EntryExitTransitionTracker.collectTransitionState(
+fun EntryExitTransitionStateTracker.collectTransitionState(
     destination: Destination,
 ): State<MutableTransitionState<Boolean>> {
     val currentExitTransition by collectCurrentExitTransition()
@@ -62,23 +62,23 @@ fun EntryExitTransitionTracker.collectTransitionState(
     }
 }
 
-interface EntryExitTransitionTracker {
+interface EntryExitTransitionStateTracker {
     val exitTransition: StateFlow<DestinationTransition?>
     val entryTransition: StateFlow<DestinationTransition?>
 }
 
 class PreviewEntryExitTransitionTracker(
     current: DestinationTransition? = null,
-) : EntryExitTransitionTracker {
+) : EntryExitTransitionStateTracker {
     override val exitTransition: StateFlow<DestinationTransition?> = MutableStateFlow(current)
     override val entryTransition: StateFlow<DestinationTransition?> = MutableStateFlow(current)
 }
 
-class DefaultEntryExitTransitionTracker(
+class DefaultEntryExitTransitionStateTracker(
     scope: CoroutineScope,
     private val navigationState: NavigationState,
     private val animateInitialDestination: Boolean = false,
-) : EntryExitTransitionTracker {
+) : EntryExitTransitionStateTracker {
     override val exitTransition = MutableStateFlow<DestinationTransition?>(null)
     override val entryTransition = MutableStateFlow<DestinationTransition?>(null)
 

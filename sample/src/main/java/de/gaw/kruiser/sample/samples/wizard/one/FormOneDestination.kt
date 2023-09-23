@@ -21,11 +21,10 @@ import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormModel
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormModelFactory
 import de.gaw.kruiser.sample.samples.wizard.shared.SharedFormScope
-import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.scopedService
 import de.gaw.kruiser.state.preview.PreviewNavigationState
-import de.gaw.kruiser.ui.singletopstack.transition.LocalEntryExitTransitionTracker
+import de.gaw.kruiser.ui.singletopstack.transition.LocalEntryExitTransitionStateTracker
 import de.gaw.kruiser.ui.singletopstack.transition.PreviewEntryExitTransitionTracker
 import kotlinx.coroutines.flow.update
 
@@ -37,7 +36,7 @@ private class FormOneScreen : Screen {
     override val destination: Destination = FormOneDestination
 
     @Composable
-    override fun Content() = HorizontalCardStackTransition {
+    override fun Content() {
         val sharedForm = scopedService(
             factory = SharedFormModelFactory,
             scope = SharedFormScope,
@@ -99,7 +98,7 @@ private fun FormOne(
 private fun FormOnePreview() = MaterialTheme {
     CompositionLocalProvider(
         LocalNavigationState provides PreviewNavigationState(),
-        LocalEntryExitTransitionTracker provides PreviewEntryExitTransitionTracker(),
+        LocalEntryExitTransitionStateTracker provides PreviewEntryExitTransitionTracker(),
     ) {
         FormOne(model = FormOneModel(SharedFormModel()))
     }

@@ -1,7 +1,6 @@
 package de.gaw.kruiser.sample.samples.push
 
 import de.gaw.kruiser.sample.samples.wizard.FormDestination
-import de.gaw.kruiser.sample.samples.wizard.one.FormOneDestination
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
 import de.gaw.kruiser.state.NavigationState

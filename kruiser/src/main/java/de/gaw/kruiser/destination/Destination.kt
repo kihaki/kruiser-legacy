@@ -6,3 +6,4 @@ import java.io.Serializable
 interface Destination : Serializable {
     fun build(): Screen
 }
+

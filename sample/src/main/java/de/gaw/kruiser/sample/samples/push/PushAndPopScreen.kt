@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.sample.saver.colorSaver
 import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
-import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.service.scopedService
 import java.util.UUID
@@ -33,7 +32,7 @@ data class PushAndPopScreenHorizontal(
 ) : Screen {
 
     @Composable
-    override fun Content() = HorizontalCardStackTransition {
+    override fun Content() {
         val model = scopedService(PushAndPopScreenModelFactory(index))
         PushAndPop(
             modifier = Modifier

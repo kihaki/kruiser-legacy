@@ -18,7 +18,7 @@ import de.gaw.kruiser.sample.theme.KruiserTheme
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.push
 import de.gaw.kruiser.ui.doublerailstack.AnimatedDoubleRailStack
-import de.gaw.kruiser.ui.singletopstack.AnimatedSingleTopStack
+import de.gaw.kruiser.ui.singletopstack.ScreenStack
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                         BoxWithConstraints {
                             val isPortrait = maxWidth <= maxHeight
                             when {
-                                isPortrait -> AnimatedSingleTopStack(
+                                isPortrait -> ScreenStack(
                                     modifier = Modifier.fillMaxSize(),
                                 )
 

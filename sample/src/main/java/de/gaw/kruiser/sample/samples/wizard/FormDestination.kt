@@ -28,14 +28,13 @@ import de.gaw.kruiser.android.navigationStateOwnerViewModel
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.sample.samples.wizard.one.FormOneDestination
 import de.gaw.kruiser.sample.samples.wizard.two.FormTwoDestination
-import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.state.collectCurrentStack
 import de.gaw.kruiser.state.currentStack
 import de.gaw.kruiser.state.pop
 import de.gaw.kruiser.state.popAll
 import de.gaw.kruiser.state.push
-import de.gaw.kruiser.ui.singletopstack.AnimatedSingleTopStack
+import de.gaw.kruiser.ui.singletopstack.ScreenStack
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -47,7 +46,7 @@ object FormDestination : Destination {
 
 private class FormScreen(override val destination: Destination) : Screen {
     @Composable
-    override fun Content() = HorizontalCardStackTransition {
+    override fun Content() {
         val parentState = LocalNavigationState.current
         val navigationViewModel = navigationStateOwnerViewModel("form").apply {
             if (state.currentStack.isEmpty()) state.push(FormOneDestination)
@@ -71,7 +70,7 @@ private class FormScreen(override val destination: Destination) : Screen {
                 ) {
 
                 }
-                AnimatedSingleTopStack(
+                ScreenStack(
                     state = navigationViewModel.state,
                     modifier = Modifier
                         .weight(1f)

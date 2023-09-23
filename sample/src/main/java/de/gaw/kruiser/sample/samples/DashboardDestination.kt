@@ -13,7 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.sample.samples.push.PushAndPopDestinationDefault
 import de.gaw.kruiser.sample.theme.KruiserPreviewTheme
-import de.gaw.kruiser.sample.transition.HorizontalCardStackTransition
 import de.gaw.kruiser.screen.Screen
 import de.gaw.kruiser.screen.ScreenModel
 import de.gaw.kruiser.service.ScopedServiceProvider
@@ -31,7 +30,7 @@ private class DashboardScreen : Screen {
     override val destination: Destination = DashboardDestination
 
     @Composable
-    override fun Content() = HorizontalCardStackTransition {
+    override fun Content() {
         val model = scopedService(DashboardScreenModelFactory)
         Dashboard(
             model = model,

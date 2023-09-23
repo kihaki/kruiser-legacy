@@ -18,7 +18,8 @@ interface ProvidesComposeKey {
 interface Screen :
     ProvidesSavedStateKey,
     ProvidesComposeKey {
-    /**
+
+        /**
      * The [Destination] associated with this [Screen].
      */
     val destination: Destination

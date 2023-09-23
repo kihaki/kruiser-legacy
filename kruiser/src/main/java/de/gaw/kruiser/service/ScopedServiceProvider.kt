@@ -1,6 +1,7 @@
 package de.gaw.kruiser.service
 
 import android.util.Log
+import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceContext
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceFactory
 import de.gaw.kruiser.service.ScopedServiceProvider.ServiceScope
@@ -10,9 +11,9 @@ import java.io.Closeable
 interface ScopedServiceProvider {
     interface ServiceScope {
         /**
-         * Returns true if the service should be kept alive with this particular navigation state
+         * Returns true if the service should be kept alive with this particular list of destinations
          */
-        fun isAlive(state: NavigationState): Boolean
+        fun isAlive(destinations: List<Destination>): Boolean
     }
 
     interface ServiceFactory<T : Any> {
@@ -34,16 +35,16 @@ interface ScopedServiceProvider {
     /**
      * Checks the currently cached services and removes those that should not be alive.
      */
-    fun clearDeadServices()
+    fun clearDeadServices(destinations: List<Destination>)
 }
 
 class DefaultScopedServiceProvider(
-    val state: NavigationState,
+    private val state: NavigationState,
 ) : ScopedServiceProvider {
     private var scopes = mapOf<ServiceFactory<*>, Set<ServiceScope>>()
     private var instances = mapOf<ServiceFactory<*>, Any>()
 
-    data class DefaultServiceContext(
+    class DefaultServiceContext(
         override val navigationState: NavigationState,
     ) : ServiceContext
 
@@ -85,10 +86,10 @@ class DefaultScopedServiceProvider(
         return instance
     }
 
-    override fun clearDeadServices() {
+    override fun clearDeadServices(destinations: List<Destination>) {
         // 1. Adjust *inner scopes set* to not include dead scopes (empty sets will be left for dead services!)
         scopes = scopes.mapValues { (_, scopes) ->
-            val liveScopes = scopes.filter { scope -> scope.isAlive(state) }.toSet()
+            val liveScopes = scopes.filter { scope -> scope.isAlive(destinations) }.toSet()
             liveScopes
         }
 
