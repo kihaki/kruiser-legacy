@@ -82,6 +82,8 @@ dependencies {
     implementation(libs.ktor.client.logging.jvm)
     implementation(libs.coil.compose)
 
+    implementation(libs.kotlinx.collections.immutable)
+
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)
