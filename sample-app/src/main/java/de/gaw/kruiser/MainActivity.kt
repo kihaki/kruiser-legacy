@@ -81,7 +81,7 @@ private val httpClient = HttpClient(OkHttp) {
     }
 }
 var imagesCache = MutableStateFlow(listOf<String>())
-private const val UNSPLASH_ACCESS = BuildConfig.UNSPLASH_KEY
+private val UNSPLASH_ACCESS = BuildConfig.UNSPLASH_KEY
 fun addToCache() = MainScope().launch {
     val response =
         httpClient.get("https://api.unsplash.com/photos/random?client_id=$UNSPLASH_ACCESS&count=30")
