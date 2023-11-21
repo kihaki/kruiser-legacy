@@ -17,11 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.gaw.kruiser.backstack.Backstack
 import de.gaw.kruiser.backstack.Entries
 import de.gaw.kruiser.backstack.ui.animation.util.LocalAnimationSyncedEntries
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.viewmodel.destinationViewModelStoreOwner
 import kotlinx.coroutines.flow.collectLatest
 
 interface ScreenAnimationContext {
@@ -79,8 +81,14 @@ fun ScreenAnimation(
                 null -> Spacer(modifier = modifier.fillMaxSize())
                 else -> {
                     val (destination, index) = spec
+                    val viewModelStoreOwner = destinationViewModelStoreOwner(destination) {
+                        !entries.contains(destination) || index > entries.lastIndex
+                    }
+
                     val screen = remember { destination.build() }
-                    screen.Content()
+                    CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
+                        screen.Content()
+                    }
 
                     DisposableEffect(Unit) {
                         onDispose {

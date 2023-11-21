@@ -1,6 +1,7 @@
 package de.gaw.kruiser
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -33,6 +34,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import de.gaw.kruiser.backstack.push
@@ -61,6 +65,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.io.Serializable
+
 
 private val httpClient = HttpClient(OkHttp) {
     install(ContentNegotiation) {
@@ -208,6 +213,10 @@ data class UnsplashImage(val index: Int = 0, val url: String) : Destination, Ser
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() {
+            @Suppress("UNUSED_VARIABLE")
+            val viewModel = viewModel<UnsplashImageScreenViewModel>(
+                factory = UnsplashImageScreenViewModel.Factory(url = url)
+            )
             Surface {
                 LaunchedEffect(Unit) {
                     if (imagesCache.value.size < (index + 5)) {
@@ -226,5 +235,23 @@ data class UnsplashImage(val index: Int = 0, val url: String) : Destination, Ser
                 )
             }
         }
+    }
+}
+
+class UnsplashImageScreenViewModel(private val url: String) : ViewModel() {
+    data class Factory(private val url: String) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            @Suppress("UNCHECKED_CAST")
+            return UnsplashImageScreenViewModel(url = url) as T
+        }
+    }
+
+    init {
+        Log.v("UnsplashViewModel", "Init: $url")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.v("UnsplashViewModel", "Disposed: $url")
     }
 }

@@ -62,6 +62,9 @@ dependencies {
 
     implementation(libs.kotlinx.collections.immutable)
 
+    // Extract ViewModel support into a separate library module
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
