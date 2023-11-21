@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,12 +27,12 @@ import kotlinx.coroutines.flow.collectLatest
 
 interface ScreenAnimationContext {
     val backstack: Backstack
-    val animationSyncedEntries: Entries
+    val previousEntries: Entries
 }
 
 private data class ScreenAnimationContextImpl(
     override val backstack: Backstack,
-    override val animationSyncedEntries: Entries,
+    override val previousEntries: Entries,
 ) : ScreenAnimationContext
 
 typealias ScreenAnimationSpec = AnimatedContentTransitionScope<Pair<Destination, Int>?>.(ScreenAnimationContext) -> ContentTransform
@@ -46,18 +45,15 @@ fun ScreenAnimation(
 ) {
     val entries by backstack.collectEntries()
     val animationSyncedEntriesState = remember { mutableStateOf(entries) }
-    var animationSyncedEntries by animationSyncedEntriesState
-
-    fun updateAnimatedBackstack() {
-        animationSyncedEntries = entries
-    }
-
-    LaunchedEffect(backstack) {
-        backstack.entries.collectLatest {
-            if (it.size > animationSyncedEntries.size) {
-                updateAnimatedBackstack() // Update instantly on push
+    var previousEntries by remember { mutableStateOf(entries) }
+    LaunchedEffect(Unit) {
+        var cachedEntries = entries
+        backstack
+            .entries
+            .collectLatest {
+                previousEntries = cachedEntries
+                cachedEntries = it
             }
-        }
     }
 
     CompositionLocalProvider(LocalAnimationSyncedEntries provides animationSyncedEntriesState) {
@@ -71,7 +67,7 @@ fun ScreenAnimation(
                     this,
                     ScreenAnimationContextImpl(
                         backstack = backstack,
-                        animationSyncedEntries = animationSyncedEntries
+                        previousEntries = previousEntries
                     )
                 )
             },
@@ -89,14 +85,6 @@ fun ScreenAnimation(
                     CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                         screen.Content()
                     }
-
-                    DisposableEffect(Unit) {
-                        onDispose {
-                            if (!entries.contains(destination) || index > entries.lastIndex) {
-                                updateAnimatedBackstack() // Update delayed on pop
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -106,7 +94,7 @@ fun ScreenAnimation(
 val cardStackAnimationSpec: ScreenAnimationSpec = { context ->
     fun entries() = context.backstack.entries.value
     fun Int.slideOutFraction() = (this * .1f).toInt()
-    fun isPushing() = entries().size >= context.animationSyncedEntries.size
+    fun isPushing() = entries().size >= context.previousEntries.size
     (when (isPushing()) {
         true -> slideInHorizontally { it }
         false -> slideInHorizontally { (-it).slideOutFraction() }
