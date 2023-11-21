@@ -9,21 +9,14 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.gaw.kruiser.backstack.Backstack
 import de.gaw.kruiser.backstack.Entries
-import de.gaw.kruiser.backstack.ui.animation.util.LocalAnimationSyncedEntries
+import de.gaw.kruiser.backstack.ui.ScreenContent
 import de.gaw.kruiser.backstack.ui.util.collectEntries
+import de.gaw.kruiser.backstack.util.rememberPreviousBackstackOf
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.viewmodel.destinationViewModelStoreOwner
-import kotlinx.coroutines.flow.collectLatest
 
 interface ScreenAnimationContext {
     val backstack: Backstack
@@ -35,7 +28,7 @@ private data class ScreenAnimationContextImpl(
     override val previousEntries: Entries,
 ) : ScreenAnimationContext
 
-typealias ScreenAnimationSpec = AnimatedContentTransitionScope<Pair<Destination, Int>?>.(ScreenAnimationContext) -> ContentTransform
+typealias ScreenAnimationSpec = AnimatedContentTransitionScope<Destination?>.(ScreenAnimationContext) -> ContentTransform
 
 @Composable
 fun ScreenAnimation(
@@ -44,57 +37,42 @@ fun ScreenAnimation(
     animationSpec: ScreenAnimationSpec,
 ) {
     val entries by backstack.collectEntries()
-    val animationSyncedEntriesState = remember { mutableStateOf(entries) }
-    var previousEntries by remember { mutableStateOf(entries) }
-    LaunchedEffect(Unit) {
-        var cachedEntries = entries
-        backstack
-            .entries
-            .collectLatest {
-                previousEntries = cachedEntries
-                cachedEntries = it
-            }
-    }
 
-    CompositionLocalProvider(LocalAnimationSyncedEntries provides animationSyncedEntriesState) {
-        AnimatedContent(
-            modifier = Modifier
-                .fillMaxSize()
-                .then(modifier),
-            targetState = entries.lastOrNull()?.let { it to entries.lastIndex },
-            transitionSpec = {
-                animationSpec(
-                    this,
-                    ScreenAnimationContextImpl(
-                        backstack = backstack,
-                        previousEntries = previousEntries
-                    )
+    val previousBackstack = rememberPreviousBackstackOf(backstack)
+    val previousEntries by previousBackstack.collectEntries()
+
+    AnimatedContent(
+        modifier = Modifier
+            .fillMaxSize()
+            .then(modifier),
+        targetState = entries.lastOrNull(),
+        transitionSpec = {
+            animationSpec(
+                this,
+                ScreenAnimationContextImpl(
+                    backstack = backstack,
+                    previousEntries = previousEntries
                 )
-            },
-            label = "cardstack-animation"
-        ) { spec ->
-            when (spec) {
-                null -> Spacer(modifier = modifier.fillMaxSize())
-                else -> {
-                    val (destination, index) = spec
-                    val viewModelStoreOwner = destinationViewModelStoreOwner(destination) {
-                        !entries.contains(destination) || index > entries.lastIndex
-                    }
-
-                    val screen = remember { destination.build() }
-                    CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
-                        screen.Content()
-                    }
-                }
-            }
+            )
+        },
+        label = "cardstack-animation"
+    ) { destination ->
+        when (destination) {
+            null -> Spacer(modifier = modifier.fillMaxSize())
+            else -> ScreenContent(destination)
         }
     }
 }
 
+/**
+ * Animation showing the destinations as overlapping cards,
+ * animating in from the right side and animating out back towards the right side.
+ */
 val cardStackAnimationSpec: ScreenAnimationSpec = { context ->
     fun entries() = context.backstack.entries.value
     fun Int.slideOutFraction() = (this * .1f).toInt()
     fun isPushing() = entries().size >= context.previousEntries.size
+
     (when (isPushing()) {
         true -> slideInHorizontally { it }
         false -> slideInHorizontally { (-it).slideOutFraction() }

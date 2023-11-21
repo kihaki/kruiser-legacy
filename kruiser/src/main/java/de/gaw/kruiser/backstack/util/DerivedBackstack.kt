@@ -2,9 +2,11 @@ package de.gaw.kruiser.backstack.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import de.gaw.kruiser.backstack.Backstack
 import de.gaw.kruiser.backstack.Entries
 import de.gaw.kruiser.backstack.ImmutableEntries
@@ -18,7 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 private class DerivedBackstack(
     scope: CoroutineScope,
     parent: Backstack,
-    mapping: Entries.() -> Entries,
+    mapping: ImmutableEntries.() -> Entries,
 ) : Backstack {
     override val entries: StateFlow<ImmutableEntries> =
         parent.entries.map { mapping(it).toPersistentList() }
@@ -29,11 +31,34 @@ private class DerivedBackstack(
             )
 }
 
+/**
+ * Returns a [Backstack] that was mapped via [mapping]
+ *
+ * @param backstack: [Backstack] to map.
+ * @param mapping: the mapping to apply to all emissions of [Backstack]
+ */
 @Composable
-fun derivedBackstackOf(backstack: Backstack, mapping: Entries.() -> Entries): Backstack {
+fun rememberDerivedBackstackOf
+            (backstack: Backstack, mapping: ImmutableEntries.() -> Entries): Backstack {
     val scope = rememberCoroutineScope()
     val currentMapping by rememberUpdatedState(mapping)
     return remember(scope, backstack) {
         DerivedBackstack(scope, backstack, currentMapping)
+    }
+}
+
+/**
+ * Keeps the previous backstack state of the provided [Backstack].
+ * This is useful to determine if there was a push or pop action for example.
+ *
+ * @param backstack: [Backstack] to keep the previous state of
+ */
+@Composable
+fun rememberPreviousBackstackOf(backstack: Backstack): Backstack {
+    var cachedEntries by remember { mutableStateOf(backstack.entries.value) }
+    return rememberDerivedBackstackOf(backstack) {
+        val previousEntries = cachedEntries
+        cachedEntries = this
+        previousEntries
     }
 }

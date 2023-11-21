@@ -1,11 +1,9 @@
 package de.gaw.kruiser.backstack.ui.animation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import de.gaw.kruiser.backstack.Backstack
-import de.gaw.kruiser.backstack.ui.animation.util.LocalAnimationSyncedEntries
+import de.gaw.kruiser.backstack.ui.ScreenContent
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 
 /**
@@ -18,8 +16,5 @@ fun NoAnimation(
     val entriesState = backstack.collectEntries()
     val entries by entriesState
     val currentEntry = entries.last()
-    CompositionLocalProvider(LocalAnimationSyncedEntries provides entriesState) {
-        val screen = remember(currentEntry) { currentEntry.build() }
-        screen.Content()
-    }
+    ScreenContent(currentEntry)
 }
