@@ -20,5 +20,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "kruiser sample"
-include(":sample-app")
+if (!System.getenv("JITPACK").toBoolean()) {
+    include(":sample-app")
+}
 include(":kruiser")
