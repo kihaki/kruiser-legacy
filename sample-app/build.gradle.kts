@@ -13,7 +13,9 @@ android {
     compileSdk = 34
 
     val localProps = Properties().apply {
-        load(FileInputStream(File(projectDir, "local.properties")))
+        File(projectDir, "local.properties").takeIf { it.exists() }?.let {
+            load(FileInputStream(it))
+        }
     }
 
     defaultConfig {
@@ -31,7 +33,7 @@ android {
 
     buildTypes {
         all {
-            buildConfigField("String", "UNSPLASH_KEY", localProps.getProperty("UNSPLASH_KEY"))
+            buildConfigField("String", "UNSPLASH_KEY", localProps.getProperty("UNSPLASH_KEY") ?: "")
         }
         release {
             isMinifyEnabled = false
