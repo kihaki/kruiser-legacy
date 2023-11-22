@@ -3,9 +3,6 @@ package de.gaw.kruiser.backstack.ui.animation
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -34,10 +31,10 @@ typealias ScreenAnimationSpec = AnimatedContentTransitionScope<Destination?>.(Sc
 fun ScreenAnimation(
     backstack: Backstack,
     modifier: Modifier = Modifier,
+    label: String = "screen-animation",
     animationSpec: ScreenAnimationSpec,
 ) {
     val entries by backstack.collectEntries()
-
     val previousBackstack = rememberPreviousBackstackOf(backstack)
     val previousEntries by previousBackstack.collectEntries()
 
@@ -55,34 +52,11 @@ fun ScreenAnimation(
                 )
             )
         },
-        label = "cardstack-animation"
+        label = label,
     ) { destination ->
         when (destination) {
             null -> Spacer(modifier = modifier.fillMaxSize())
             else -> ScreenContent(destination)
         }
-    }
-}
-
-/**
- * Animation showing the destinations as overlapping cards,
- * animating in from the right side and animating out back towards the right side.
- */
-val cardStackAnimationSpec: ScreenAnimationSpec = { context ->
-    fun entries() = context.backstack.entries.value
-    fun Int.slideOutFraction() = (this * .1f).toInt()
-    fun isPushing() = entries().size >= context.previousEntries.size
-
-    (when (isPushing()) {
-        true -> slideInHorizontally { it }
-        false -> slideInHorizontally { (-it).slideOutFraction() }
-    } togetherWith when (isPushing()) {
-        true -> slideOutHorizontally { (-it).slideOutFraction() }
-        false -> slideOutHorizontally { it }
-    }).apply {
-        targetContentZIndex = when (isPushing()) {
-            true -> entries().size
-            false -> entries().size - 1
-        }.toFloat()
     }
 }

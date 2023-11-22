@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.Backstack
+import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.util.rememberDerivedBackstackOf
 
 /**
@@ -11,7 +12,7 @@ import de.gaw.kruiser.backstack.util.rememberDerivedBackstackOf
  */
 @Composable
 fun DoubleCardstackAnimation(
-    backstack: Backstack,
+    backstack: Backstack = LocalBackstack.current,
 ) {
     val offsetBackstack = rememberDerivedBackstackOf(backstack) { dropLast(1) }
     Row {

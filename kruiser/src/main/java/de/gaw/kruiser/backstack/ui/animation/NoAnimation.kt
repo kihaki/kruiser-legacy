@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import de.gaw.kruiser.backstack.Backstack
 import de.gaw.kruiser.backstack.ui.ScreenContent
+import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 
 /**
@@ -11,7 +12,7 @@ import de.gaw.kruiser.backstack.ui.util.collectEntries
  */
 @Composable
 fun NoAnimation(
-    backstack: Backstack,
+    backstack: Backstack = LocalBackstack.current,
 ) {
     val entriesState = backstack.collectEntries()
     val entries by entriesState

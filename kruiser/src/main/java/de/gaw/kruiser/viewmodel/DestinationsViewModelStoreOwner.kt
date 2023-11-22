@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import de.gaw.kruiser.destination.Destination
 
-object DestinationsViewModelStoreOwner {
+private object DestinationsViewModelStoreOwner {
     private val viewModelStoreOwners: MutableMap<Destination, ViewModelStoreOwner> = mutableMapOf()
 
     fun remove(destination: Destination) = viewModelStoreOwners.remove(destination)
@@ -40,7 +40,7 @@ fun destinationViewModelStoreOwner(
     val destinationViewModelStoreOwner = DestinationsViewModelStoreOwner[destination]
 
     val currentCanDispose by rememberUpdatedState(canDispose)
-    DisposableEffect(destination) {
+    DisposableEffect(destination, destinationViewModelStoreOwner) {
         onDispose {
             if (currentCanDispose(destination)) {
                 destinationViewModelStoreOwner.viewModelStore.clear()

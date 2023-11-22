@@ -14,4 +14,3 @@ interface Backstack {
 interface MutableBackstack : Backstack {
     fun mutate(block: Entries.() -> Entries)
 }
-

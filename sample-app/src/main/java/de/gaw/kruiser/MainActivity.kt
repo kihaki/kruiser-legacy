@@ -40,7 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import de.gaw.kruiser.backstack.push
-import de.gaw.kruiser.backstack.ui.BackstackContainer
+import de.gaw.kruiser.backstack.ui.BackstackContent
 import de.gaw.kruiser.backstack.ui.animation.CardstackAnimation
 import de.gaw.kruiser.backstack.ui.animation.DoubleCardstackAnimation
 import de.gaw.kruiser.backstack.ui.util.collectEntries
@@ -65,7 +65,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.io.Serializable
-
 
 private val httpClient = HttpClient(OkHttp) {
     install(ContentNegotiation) {
@@ -104,7 +103,9 @@ class MainActivity : ComponentActivity() {
                         addToCache()
                     }
                     val backstack = rememberSaveableBackstack(listOf(DashboardWizard))
-                    CardstackAnimation(backstack)
+                    BackstackContent(backstack) {
+                        CardstackAnimation()
+                    }
                 }
             }
         }
@@ -134,10 +135,10 @@ object DashboardWizard : Destination, Serializable {
                     .fillMaxSize(),
             ) {
                 val isPortrait = maxWidth <= maxHeight
-                BackstackContainer(backstack) {
+                BackstackContent(backstack) {
                     when (isPortrait) {
-                        true -> CardstackAnimation(backstack)
-                        false -> DoubleCardstackAnimation(backstack)
+                        true -> CardstackAnimation()
+                        false -> DoubleCardstackAnimation()
                     }
                 }
 
