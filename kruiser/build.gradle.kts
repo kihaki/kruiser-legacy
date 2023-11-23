@@ -75,8 +75,8 @@ afterEvaluate {
         publications {
             register<MavenPublication>("release") {
                 groupId = "de.gaw.kruiser"
-                artifactId = "kruiser-core"
-                version = "0.3.5"
+                artifactId = "kruiser"
+                version = "0.3.6"
 
                 afterEvaluate {
                     from(components["release"])
