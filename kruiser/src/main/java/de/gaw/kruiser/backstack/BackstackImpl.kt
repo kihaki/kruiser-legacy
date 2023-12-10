@@ -6,7 +6,7 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-fun MutableBackstack(initial: Entries = persistentListOf()): MutableBackstack =
+fun MutableBackstack(initial: BackstackEntries = emptyList()): MutableBackstack =
     MutableBackstackImpl(initial.toImmutableList())
 
 private class MutableBackstackImpl(
@@ -14,7 +14,7 @@ private class MutableBackstackImpl(
 ) : MutableBackstack {
     override val entries = MutableStateFlow(initial)
 
-    override fun mutate(block: Entries.() -> Entries) {
+    override fun mutate(block: BackstackEntries.() -> BackstackEntries) {
         entries.update {
             block(it).toPersistentList()
         }

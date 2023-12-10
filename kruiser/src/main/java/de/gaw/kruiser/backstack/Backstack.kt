@@ -5,12 +5,12 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.StateFlow
 
 typealias ImmutableEntries = ImmutableList<Destination>
-typealias Entries = List<Destination>
+typealias BackstackEntries = List<Destination>
 
 interface Backstack {
-    val entries: StateFlow<ImmutableEntries>
+    val entries: StateFlow<BackstackEntries>
 }
 
 interface MutableBackstack : Backstack {
-    fun mutate(block: Entries.() -> Entries)
+    fun mutate(block: BackstackEntries.() -> BackstackEntries)
 }

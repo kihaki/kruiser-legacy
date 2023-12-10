@@ -8,8 +8,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import de.gaw.kruiser.backstack.Backstack
-import de.gaw.kruiser.backstack.Entries
+import de.gaw.kruiser.backstack.BackstackEntries
 import de.gaw.kruiser.backstack.ImmutableEntries
+import de.gaw.kruiser.backstack.currentEntries
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,10 +21,12 @@ import kotlinx.coroutines.flow.stateIn
 private class DerivedBackstack(
     scope: CoroutineScope,
     parent: Backstack,
-    mapping: ImmutableEntries.() -> Entries,
+    mapping: BackstackEntries.() -> BackstackEntries,
 ) : Backstack {
     override val entries: StateFlow<ImmutableEntries> =
-        parent.entries.map { mapping(it).toPersistentList() }
+        parent.entries
+            .map(mapping)
+            .map(BackstackEntries::toPersistentList)
             .stateIn(
                 scope = scope,
                 started = SharingStarted.Eagerly,
@@ -38,8 +41,10 @@ private class DerivedBackstack(
  * @param mapping: the mapping to apply to all emissions of [Backstack]
  */
 @Composable
-fun rememberDerivedBackstackOf
-            (backstack: Backstack, mapping: ImmutableEntries.() -> Entries): Backstack {
+fun rememberDerivedBackstackOf(
+    backstack: Backstack,
+    mapping: BackstackEntries.() -> BackstackEntries,
+): Backstack {
     val scope = rememberCoroutineScope()
     val currentMapping by rememberUpdatedState(mapping)
     return remember(scope, backstack) {
@@ -55,7 +60,7 @@ fun rememberDerivedBackstackOf
  */
 @Composable
 fun rememberPreviousBackstackOf(backstack: Backstack): Backstack {
-    var cachedEntries by remember { mutableStateOf(backstack.entries.value) }
+    var cachedEntries by remember { mutableStateOf(backstack.currentEntries()) }
     return rememberDerivedBackstackOf(backstack) {
         val previousEntries = cachedEntries
         cachedEntries = this

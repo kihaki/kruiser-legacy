@@ -39,6 +39,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import de.gaw.kruiser.backstack.currentEntries
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.BackstackContent
 import de.gaw.kruiser.backstack.ui.animation.CardstackAnimation
@@ -122,7 +123,7 @@ object DashboardWizard : Destination, Serializable {
 
             // Push the first unsplash image once its available
             LaunchedEffect(backstack) {
-                if (backstack.entries.value.lastOrNull()?.javaClass != UnsplashImage::class.java) {
+                if (backstack.currentEntries().lastOrNull()?.javaClass != UnsplashImage::class.java) {
                     imagesCache.filter { it.isNotEmpty() }.first().let {
                         backstack.push(UnsplashImage(0, it.first()))
                     }
@@ -186,7 +187,7 @@ object DashboardWizard : Destination, Serializable {
                         enabled = cachedImages.isNotEmpty(),
                         onClick = {
                             val photos =
-                                backstack.entries.value.filterIsInstance<UnsplashImage>()
+                                backstack.currentEntries().filterIsInstance<UnsplashImage>()
                             val nextIndex = photos.size
                             backstack.push(
                                 UnsplashImage(

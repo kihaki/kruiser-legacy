@@ -6,6 +6,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.Backstack
+import de.gaw.kruiser.backstack.currentEntries
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 
 /**
@@ -26,7 +27,7 @@ fun CardstackAnimation(
  * animating in from the right side and animating out back towards the right side.
  */
 val cardStackSpec: ScreenAnimationSpec = { context ->
-    fun entries() = context.backstack.entries.value
+    fun entries() = context.backstack.currentEntries()
     fun Int.slideOutFraction() = (this * .1f).toInt()
     fun isPushing() = entries().size >= context.previousEntries.size
 
