@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import de.gaw.kruiser.backstack.BackstackEntries
+import de.gaw.kruiser.backstack.BackstackEntry
 import de.gaw.kruiser.backstack.MutableBackstack
 import de.gaw.kruiser.destination.Destination
 
@@ -16,12 +17,13 @@ fun rememberSaveableBackstack(initial: BackstackEntries = emptyList()) = remembe
 }
 
 @Composable
-fun rememberSaveableBackstack(initial: Destination) = rememberSaveableBackstack(listOf(initial))
+fun rememberSaveableBackstack(initial: Destination) =
+    rememberSaveableBackstack(listOf(BackstackEntry(initial)))
 
-fun mutableBackstackSaver(): Saver<MutableBackstack, List<Destination>> =
+fun mutableBackstackSaver(): Saver<MutableBackstack, List<BackstackEntry>> =
     MutableBackstackSaver
 
-private val MutableBackstackSaver = Saver<MutableBackstack, List<Destination>>(
+private val MutableBackstackSaver = Saver<MutableBackstack, List<BackstackEntry>>(
     save = { it.entries.value.toList() },
     restore = { entries ->
         MutableBackstack(initial = entries)

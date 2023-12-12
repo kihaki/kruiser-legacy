@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.gaw.kruiser.backstack.Backstack
+import de.gaw.kruiser.backstack.BackstackEntry
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.destination.Destination
@@ -16,16 +17,15 @@ import de.gaw.kruiser.viewmodel.viewModelStoreOwner
  */
 @Composable
 fun ScreenContent(
-    destination: Destination,
-    savedStateKey: Any = destination,
+    backstackEntry: BackstackEntry,
     stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current,
     backstack: Backstack = LocalBackstack.current,
 ) {
-    stateHolder.SaveableStateProvider(savedStateKey) {
-        val destinationViewModelStoreOwner = backstack.viewModelStoreOwner(destination)
+    stateHolder.SaveableStateProvider(backstackEntry.id) {
+        val screen = remember(backstackEntry) { backstackEntry.destination.build() }
+        val destinationViewModelStoreOwner = backstack.viewModelStoreOwner(backstackEntry)
 
         CompositionLocalProvider(LocalViewModelStoreOwner provides destinationViewModelStoreOwner) {
-            val screen = remember(destination) { destination.build() }
             screen.Content()
         }
     }

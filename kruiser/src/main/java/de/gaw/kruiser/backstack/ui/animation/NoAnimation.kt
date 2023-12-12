@@ -16,6 +16,6 @@ fun NoAnimation(
 ) {
     val entriesState = backstack.collectEntries()
     val entries by entriesState
-    val currentEntry = entries.last()
-    ScreenContent(currentEntry)
+    val entry = entries.last()
+    ScreenContent(entry)
 }

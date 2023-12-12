@@ -10,6 +10,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -39,6 +41,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import de.gaw.kruiser.backstack.MutableBackstack
 import de.gaw.kruiser.backstack.currentEntries
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.BackstackContent
@@ -66,6 +69,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.io.Serializable
+import java.util.UUID
 
 private val httpClient = HttpClient(OkHttp) {
     install(ContentNegotiation) {
@@ -89,6 +93,13 @@ fun addToCache() = MainScope().launch {
     imagesCache.update { it + body.mapNotNull { items -> items.urls?.regular } }
 }
 
+@Composable
+fun Cardstack(backstack: MutableBackstack) {
+    BackstackContent(backstack) {
+        CardstackAnimation()
+    }
+}
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -103,10 +114,8 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(Unit) {
                         addToCache()
                     }
-                    val backstack = rememberSaveableBackstack(listOf(DashboardWizard))
-                    BackstackContent(backstack) {
-                        CardstackAnimation()
-                    }
+                    val backstack = rememberSaveableBackstack(DashboardWizard)
+                    Cardstack(backstack)
                 }
             }
         }
@@ -123,7 +132,9 @@ object DashboardWizard : Destination, Serializable {
 
             // Push the first unsplash image once its available
             LaunchedEffect(backstack) {
-                if (backstack.currentEntries().lastOrNull()?.javaClass != UnsplashImage::class.java) {
+                if (backstack.currentEntries()
+                        .lastOrNull()?.javaClass != UnsplashImage::class.java
+                ) {
                     imagesCache.filter { it.isNotEmpty() }.first().let {
                         backstack.push(UnsplashImage(0, it.first()))
                     }
@@ -219,22 +230,33 @@ data class UnsplashImage(val index: Int = 0, val url: String) : Destination, Ser
             val viewModel = viewModel<UnsplashImageScreenViewModel>(
                 factory = UnsplashImageScreenViewModel.Factory(url = url)
             )
+
+            val someId = rememberSaveable { UUID.randomUUID().toString().take(5) }
+
             Surface {
-                LaunchedEffect(Unit) {
-                    if (imagesCache.value.size < (index + 5)) {
-                        addToCache()
+                Box(contentAlignment = Alignment.Center) {
+
+                    LaunchedEffect(Unit) {
+                        if (imagesCache.value.size < (index + 5)) {
+                            addToCache()
+                        }
                     }
+                    AsyncImage(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(url)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                    )
+                    Text(
+                        someId,
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier.background(Color.White)
+                    )
                 }
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(url)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                )
             }
         }
     }

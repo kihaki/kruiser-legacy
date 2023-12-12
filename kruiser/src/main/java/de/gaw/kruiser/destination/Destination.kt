@@ -1,11 +1,12 @@
 package de.gaw.kruiser.destination
 
 import androidx.compose.runtime.Composable
+import java.io.Serializable
 
 /**
  * May potentially live forever
  */
-interface Destination {
+interface Destination : Serializable {
     fun build(): Screen
 }
 

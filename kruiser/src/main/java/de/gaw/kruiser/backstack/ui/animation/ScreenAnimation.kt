@@ -10,10 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.Backstack
 import de.gaw.kruiser.backstack.BackstackEntries
+import de.gaw.kruiser.backstack.BackstackEntry
 import de.gaw.kruiser.backstack.ui.ScreenContent
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.rememberPreviousBackstackOf
-import de.gaw.kruiser.destination.Destination
 
 interface ScreenAnimationContext {
     val backstack: Backstack
@@ -25,7 +25,7 @@ private data class ScreenAnimationContextImpl(
     override val previousEntries: BackstackEntries,
 ) : ScreenAnimationContext
 
-typealias ScreenAnimationSpec = AnimatedContentTransitionScope<Destination?>.(ScreenAnimationContext) -> ContentTransform
+typealias ScreenAnimationSpec = AnimatedContentTransitionScope<BackstackEntry?>.(ScreenAnimationContext) -> ContentTransform
 
 @Composable
 fun ScreenAnimation(
@@ -53,10 +53,10 @@ fun ScreenAnimation(
             )
         },
         label = label,
-    ) { destination ->
-        when (destination) {
+    ) { entry ->
+        when (entry) {
             null -> Spacer(modifier = modifier.fillMaxSize())
-            else -> ScreenContent(destination)
+            else -> ScreenContent(entry)
         }
     }
 }
