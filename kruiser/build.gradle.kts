@@ -43,7 +43,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.6"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
         resources {
@@ -86,7 +86,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "de.gaw.kruiser"
                 artifactId = "kruiser"
-                version = "0.3.6"
+                version = "0.3.7"
 
                 afterEvaluate {
                     from(components["release"])

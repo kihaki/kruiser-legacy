@@ -1,7 +1,10 @@
 package de.gaw.kruiser.destination
 
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import java.io.Serializable
+
+interface AndroidDestination : Destination, Parcelable
 
 /**
  * May potentially live forever
