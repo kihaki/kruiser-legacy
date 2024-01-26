@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     `maven-publish`
+    id("kotlin-parcelize")
 }
 
 android {
@@ -12,7 +13,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 32
+        minSdk = 31
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -43,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
+        kotlinCompilerExtensionVersion = "1.5.9"
     }
     packaging {
         resources {

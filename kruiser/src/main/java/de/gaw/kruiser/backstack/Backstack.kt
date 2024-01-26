@@ -15,7 +15,12 @@ data class BackstackEntry(
 ) : Serializable
 
 interface Backstack {
+    val id: String
     val entries: StateFlow<BackstackEntries>
+
+    companion object {
+        fun generateId() = UUID.randomUUID().toString()
+    }
 }
 
 interface MutableBackstack : Backstack {

@@ -1,5 +1,6 @@
 package de.gaw.kruiser.backstack.util
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import de.gaw.kruiser.backstack.Backstack
+import de.gaw.kruiser.backstack.Backstack.Companion.generateId
 import de.gaw.kruiser.backstack.BackstackEntries
 import de.gaw.kruiser.backstack.ImmutableEntries
 import de.gaw.kruiser.backstack.currentEntries
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.stateIn
 private class DerivedBackstack(
     scope: CoroutineScope,
     parent: Backstack,
+    override val id: String = "${generateId()} derived of [${parent.id.takeLast(5)}]",
     mapping: BackstackEntries.() -> BackstackEntries,
 ) : Backstack {
     override val entries: StateFlow<ImmutableEntries> =
@@ -47,8 +50,16 @@ fun rememberDerivedBackstackOf(
 ): Backstack {
     val scope = rememberCoroutineScope()
     val currentMapping by rememberUpdatedState(mapping)
-    return remember(scope, backstack) {
-        DerivedBackstack(scope, backstack, currentMapping)
+    return remember(scope, backstack.id) {
+        Log.v(
+            "VisibleThing",
+            "ScreenTransition DERIVING FROM ${backstack.id.take(5)}"
+        )
+        DerivedBackstack(
+            scope = scope,
+            parent = backstack,
+            mapping = currentMapping,
+        )
     }
 }
 

@@ -6,25 +6,39 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.Backstack
 import de.gaw.kruiser.backstack.MutableBackstack
 import de.gaw.kruiser.backstack.pop
-import de.gaw.kruiser.backstack.ui.animation.CardstackAnimation
-import de.gaw.kruiser.backstack.ui.animation.NoAnimation
+import de.gaw.kruiser.backstack.ui.transition.orchestrator.BackstackRenderer
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
 
-/**
- * Handles back presses and sets the [LocalBackstack] defers rendering to the [content] composable.
- * By default a [CardstackAnimation] is used for rendering.
- */
 @Composable
-fun BackstackContent(
+fun Backstack(
+    modifier: Modifier = Modifier,
     backstack: MutableBackstack = rememberSaveableBackstack(),
     stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
-    content: @Composable (Backstack) -> Unit = { NoAnimation() },
+) {
+    WithBackstack(
+        backstack = backstack,
+        stateHolder = stateHolder,
+    ) {
+        BackstackRenderer(modifier = modifier)
+    }
+}
+
+/**
+ * Handles back presses and sets the [LocalMutableBackstack] defers rendering to the [content] composable.
+ */
+@Composable
+fun WithBackstack(
+    backstack: MutableBackstack = rememberSaveableBackstack(),
+    stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
+    content: @Composable (Backstack) -> Unit,
 ) {
     val entries by backstack.collectEntries()
 
@@ -34,6 +48,7 @@ fun BackstackContent(
     )
 
     CompositionLocalProvider(
+        LocalMutableBackstack provides backstack,
         LocalBackstack provides backstack,
         LocalSaveableStateHolder provides stateHolder,
     ) {

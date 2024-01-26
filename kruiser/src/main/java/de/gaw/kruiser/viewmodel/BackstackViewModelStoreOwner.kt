@@ -17,21 +17,17 @@ import de.gaw.kruiser.destination.Destination
  * [BackstackEntry]s.
  */
 private object BackstackViewModelStoreOwner {
-    private val viewModelStoreOwners: MutableMap<BackstackEntry, ViewModelStoreOwner> = mutableMapOf()
+    private val viewModelStoreOwners: MutableMap<BackstackEntry, ViewModelStoreOwner> =
+        mutableMapOf()
 
     fun remove(entry: BackstackEntry) = viewModelStoreOwners.remove(entry)
 
-    operator fun get(entry: BackstackEntry): ViewModelStoreOwner {
-        return when (val owner = viewModelStoreOwners[entry]) {
-            null -> object : ViewModelStoreOwner {
+    operator fun get(entry: BackstackEntry): ViewModelStoreOwner =
+        viewModelStoreOwners.getOrPut(entry) {
+            object : ViewModelStoreOwner {
                 override val viewModelStore: ViewModelStore = ViewModelStore()
-            }.also {
-                viewModelStoreOwners[entry] = it
             }
-
-            else -> owner
         }
-    }
 }
 
 /**
@@ -48,10 +44,9 @@ fun backstackEntryViewModelStoreOwner(
 ): ViewModelStoreOwner {
     val backstackEntryViewModelStoreOwner = BackstackViewModelStoreOwner[entry]
 
-    val currentCanDispose by rememberUpdatedState(disposeWhen)
-    DisposableEffect(entry, backstackEntryViewModelStoreOwner) {
+    DisposableEffect(backstackEntryViewModelStoreOwner) {
         onDispose {
-            if (currentCanDispose(entry)) {
+            if (disposeWhen(entry)) {
                 backstackEntryViewModelStoreOwner.viewModelStore.clear()
                 BackstackViewModelStoreOwner.remove(entry)
             }
@@ -69,9 +64,8 @@ fun backstackEntryViewModelStoreOwner(
  */
 @Composable
 fun Backstack.viewModelStoreOwner(entry: BackstackEntry): ViewModelStoreOwner {
-    val currentBackstack by rememberUpdatedState(this)
     return backstackEntryViewModelStoreOwner(
         entry = entry,
-        disposeWhen = { !currentBackstack.currentEntries().contains(it) },
+        disposeWhen = { !currentEntries().contains(it) },
     )
 }
