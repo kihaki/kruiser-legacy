@@ -1,6 +1,5 @@
 package de.gaw.kruiser.backstack.util
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,10 +50,6 @@ fun rememberDerivedBackstackOf(
     val scope = rememberCoroutineScope()
     val currentMapping by rememberUpdatedState(mapping)
     return remember(scope, backstack.id) {
-        Log.v(
-            "VisibleThing",
-            "ScreenTransition DERIVING FROM ${backstack.id.take(5)}"
-        )
         DerivedBackstack(
             scope = scope,
             parent = backstack,

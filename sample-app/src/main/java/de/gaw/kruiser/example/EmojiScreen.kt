@@ -2,6 +2,7 @@ package de.gaw.kruiser.example
 
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -21,10 +22,11 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,12 +36,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
-import de.gaw.kruiser.backstack.util.rememberIsOnBackstack
 import de.gaw.kruiser.backstack.ui.transition.AnimatedTransition
 import de.gaw.kruiser.backstack.ui.transition.CardTransition
+import de.gaw.kruiser.backstack.ui.transition.rememberIsDestinationVisible
 import de.gaw.kruiser.backstack.ui.transparency.TransparentScreen
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
+import de.gaw.kruiser.backstack.util.rememberIsOnBackstack
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
 import kotlinx.collections.immutable.persistentListOf
@@ -134,15 +137,18 @@ object BottomSheetDestination : AndroidDestination {
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() = TransparentScreen {
+            val animDurationMs = 4_000
             val isOnBackstack by rememberIsOnBackstack()
 
-            val isBackgroundScrimmed by rememberSaveable {
-                mutableStateOf(false)
-            }.apply {
-                value = isOnBackstack
+            var isBackgroundScrimmed by rememberIsDestinationVisible()
+
+            LaunchedEffect(isOnBackstack) {
+                isBackgroundScrimmed = isOnBackstack
             }
+
             val backgroundTransparency by animateFloatAsState(
-                if (isBackgroundScrimmed) .3f else .0f,
+                animationSpec = tween(animDurationMs),
+                targetValue = if (isBackgroundScrimmed) .3f else .0f,
                 label = "bottom-sheet-background-scrim",
             )
             Box(
@@ -152,8 +158,8 @@ object BottomSheetDestination : AndroidDestination {
                 contentAlignment = Alignment.BottomCenter,
             ) {
                 AnimatedTransition(
-                    enter = fadeIn() + slideInVertically { it },
-                    exit = fadeOut() + slideOutVertically { it },
+                    enter = fadeIn(tween(animDurationMs)) + slideInVertically(tween(animDurationMs)) { it },
+                    exit = fadeOut(tween(animDurationMs)) + slideOutVertically(tween(animDurationMs)) { it },
                 ) {
                     Card(
                         modifier = Modifier

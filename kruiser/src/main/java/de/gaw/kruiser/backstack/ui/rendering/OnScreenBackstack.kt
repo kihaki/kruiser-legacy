@@ -91,7 +91,7 @@ class DefaultOnScreenBackstack(
                 exiting.update { cur ->
                     val didShrink = entries.size < previousEntries.size
                     val exiting = when {
-                        didShrink -> (cur + previousEntries.lastOrNull()).filterNotNull()
+                        didShrink -> listOfNotNull(previousEntries.lastOrNull()) + cur
                         else -> cur
                     }.filterNot { entry ->
                         transitions[entry].let { transition ->

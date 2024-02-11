@@ -6,6 +6,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,14 +34,7 @@ fun AnimatedTransition(
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
     val entry: BackstackEntry = LocalBackstackEntry.currentOrThrow
-    val transitionTracker = LocalScreenTransitionTracker.currentOrThrow
-
-    var visible by remember {
-        val isInitiallyVisible = transitionTracker.transitionState(entry)?.let {
-            it == EnterTransitionRunning || it == EntryTransitionDone
-        } ?: false
-        mutableStateOf(isInitiallyVisible)
-    }
+    var visible by rememberIsDestinationVisible()
 
     val backstack = LocalBackstack.currentOrThrow
     val backstackEntries by backstack.collectEntries()
@@ -57,5 +51,18 @@ fun AnimatedTransition(
     ) {
         content()
         UpdateTransitionStateEffect()
+    }
+}
+
+@Composable
+fun rememberIsDestinationVisible(
+    entry: BackstackEntry = LocalBackstackEntry.currentOrThrow,
+    transitionTracker: ScreenTransitionTracker = LocalScreenTransitionTracker.currentOrThrow,
+): MutableState<Boolean> {
+    return remember {
+        val isInitiallyVisible = transitionTracker.transitionState(entry)?.let {
+            it == EnterTransitionRunning || it == EntryTransitionDone
+        } ?: false
+        mutableStateOf(isInitiallyVisible)
     }
 }
