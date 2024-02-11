@@ -1,6 +1,5 @@
 package de.gaw.kruiser.backstack.ui.transition.orchestrator
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
@@ -40,19 +39,9 @@ fun BackstackRenderer(
          */
         val stackToRender = rememberScreenTransitionsBackstack(backstack)
 
-        LaunchedEffect(stackToRender) {
-            Log.v("VisibleThing", "Stack To Render: ${stackToRender.id}")
-        }
-
         CompositionLocalProvider(LocalScreenTransitionBackstack provides stackToRender) {
             val entriesToRender by stackToRender.collectEntries()
 
-            LaunchedEffect(entriesToRender) {
-                Log.v("VisibleThing", "Entries to Render: ${entriesToRender.count()}")
-                entriesToRender.fastForEach {
-                    Log.v("VisibleThing", "Entries to Render: $it")
-                }
-            }
             entriesToRender.fastForEach { entry ->
                 key(entry.id) { // Key is important here! TODO: Check why.
                     entry.Render()
@@ -64,7 +53,6 @@ fun BackstackRenderer(
 
 @Composable
 fun BackstackEntry.rememberScreen(): Screen = remember(id) {
-    Log.v("VisibleThing", "Building $this")
     destination.build()
 }
 

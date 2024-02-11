@@ -1,6 +1,5 @@
 package de.gaw.kruiser.backstack.ui.transition.orchestrator.transition
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.EnterTransition
@@ -37,9 +36,8 @@ fun AnimatedTransition(
     val entry: BackstackEntry = LocalBackstackEntry.current
     val transitionTracker = LocalScreenTransitionBackstack.currentOrThrow
 
-    var visible by rememberSaveable(key = "${entry.id}-visible") {
-        Log.v("VisibleThing", "Creating visible for $entry")
-        mutableStateOf(transitionTracker.initialVisibility(entry))
+    var visible by rememberSaveable {
+        mutableStateOf(transitionTracker.isEntryTransitionDone(entry))
     }
 
     val backstack = LocalBackstack.currentOrThrow

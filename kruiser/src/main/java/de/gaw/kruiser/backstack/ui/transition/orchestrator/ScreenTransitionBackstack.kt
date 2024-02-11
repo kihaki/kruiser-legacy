@@ -1,6 +1,5 @@
 package de.gaw.kruiser.backstack.ui.transition.orchestrator
 
-import android.util.Log
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.EnterExitState.Visible
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -63,7 +62,7 @@ class DefaultScreenTransitionBackstack(
             }
         }.stateIn(scope, Eagerly, current.entries.value)
 
-    override fun initialVisibility(entry: BackstackEntry): Boolean =
+    override fun isEntryTransitionDone(entry: BackstackEntry): Boolean =
         transitionState(entry) == EntryTransitionDone
 
     init {
@@ -72,7 +71,7 @@ class DefaultScreenTransitionBackstack(
             combine(current.entries, transitionStates) { entries, transitions ->
                 entries to transitions
             }.collectLatest { (entries, transitions) ->
-                // Update cached exiting entry
+                // Check if exiting entries need to be adjusted
                 exiting.update { cur ->
                     val didShrink = entries.size < previousEntries.size
                     val exiting = when {
@@ -84,15 +83,12 @@ class DefaultScreenTransitionBackstack(
                         }
                     }
 
-                    Log.v("ScreenTransitioning", "Exiting Entries: ${exiting.size}")
-
-                    // Remove junk
+                    // Remove stale transitions and leftovers
                     transitionStates.update { states ->
                         val updatedTransitionStates = states.filter { (entry, _) ->
                             exiting.contains(entry) || entries.contains(entry)
                         }
 
-                        // Update previous entries
                         previousEntries = entries
 
                         updatedTransitionStates
@@ -131,7 +127,7 @@ interface ScreenTransitionTracker {
     /**
      * If the screen transition should start out as visible or invisible
      */
-    fun initialVisibility(entry: BackstackEntry): Boolean
+    fun isEntryTransitionDone(entry: BackstackEntry): Boolean
 
     val transitionStates: StateFlow<Map<BackstackEntry, ScreenTransitionState>>
     fun updateTransitionState(entry: BackstackEntry, transitionState: ScreenTransitionState)
@@ -144,10 +140,6 @@ fun rememberScreenTransitionsBackstack(
 ): ScreenTransitionBackstack {
     val scope = rememberCoroutineScope()
     return remember(backstack.id) {
-        Log.v(
-            "VisibleThing",
-            "ScreenTransition Backstack created for ${backstack.id.take(5)}"
-        )
         DefaultScreenTransitionBackstack(
             scope = scope,
             current = backstack,
