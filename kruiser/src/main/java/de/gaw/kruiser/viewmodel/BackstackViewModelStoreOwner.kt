@@ -2,13 +2,11 @@ package de.gaw.kruiser.viewmodel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
-import de.gaw.kruiser.backstack.Backstack
-import de.gaw.kruiser.backstack.BackstackEntry
+import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.currentEntries
 import de.gaw.kruiser.destination.Destination
 

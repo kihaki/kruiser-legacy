@@ -4,9 +4,9 @@ import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import de.gaw.kruiser.backstack.BackstackEntries
-import de.gaw.kruiser.backstack.BackstackEntry
-import de.gaw.kruiser.backstack.MutableBackstack
+import de.gaw.kruiser.backstack.core.BackstackEntries
+import de.gaw.kruiser.backstack.core.BackstackEntry
+import de.gaw.kruiser.backstack.core.MutableBackstack
 import de.gaw.kruiser.destination.Destination
 import kotlinx.parcelize.Parcelize
 

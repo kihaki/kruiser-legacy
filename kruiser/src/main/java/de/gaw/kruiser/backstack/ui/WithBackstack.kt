@@ -7,10 +7,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.backstack.Backstack
-import de.gaw.kruiser.backstack.MutableBackstack
+import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.MutableBackstack
 import de.gaw.kruiser.backstack.pop
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.BackstackRenderer
+import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder

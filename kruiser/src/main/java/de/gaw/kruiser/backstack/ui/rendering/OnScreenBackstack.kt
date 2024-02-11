@@ -1,22 +1,23 @@
-package de.gaw.kruiser.backstack.ui.transition.orchestrator
+package de.gaw.kruiser.backstack.ui.rendering
 
-import androidx.compose.animation.EnterExitState
-import androidx.compose.animation.EnterExitState.Visible
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import de.gaw.kruiser.backstack.Backstack
-import de.gaw.kruiser.backstack.Backstack.Companion.generateId
-import de.gaw.kruiser.backstack.BackstackEntries
-import de.gaw.kruiser.backstack.BackstackEntry
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.ScreenTransitionState.EntryTransitionDone
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.ScreenTransitionState.ExitTransitionDone
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.ScreenTransitionState.ExitTransitionRunning
+import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackEntries
+import de.gaw.kruiser.backstack.core.BackstackEntry
+import de.gaw.kruiser.backstack.core.generateId
+import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState
+import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.EntryTransitionDone
+import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransitionDone
+import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransitionRunning
+import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionTracker
+import de.gaw.kruiser.backstack.ui.transition.transitionState
+import de.gaw.kruiser.backstack.ui.transparency.BackstackEntriesTransparencyState
+import de.gaw.kruiser.backstack.ui.transparency.DefaultBackstackEntriesTransparencyState
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
-import de.gaw.kruiser.destination.Screen
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,24 +29,27 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-val LocalScreenTransitionBackstack = compositionLocalOf<ScreenTransitionBackstack?> { null }
+val LocalOnScreenBackstack = compositionLocalOf<OnScreenBackstack?> { null }
 
 /**
  * Backstack that reflects the state of [BackstackEntry]s that are visible on screen.
- * Also stores the [ScreenTransitionState] of [BackstackEntry]s that are on the [Backstack],
+ * Also stores the [ScreenTransitionState] of [BackstackEntry]s that are on the [Backstack] and
+ * manages transparency via [BackstackEntriesTransparencyState].
  */
-interface ScreenTransitionBackstack :
+interface OnScreenBackstack :
     Backstack,
-    ScreenTransitionTracker
+    ScreenTransitionTracker,
+    BackstackEntriesTransparencyState
 
-class DefaultScreenTransitionBackstack(
+class DefaultOnScreenBackstack(
     scope: CoroutineScope,
     current: Backstack,
-    override val id: String = "${generateId()} derived from [${current.id.takeLast(5)}]",
-) : ScreenTransitionBackstack {
+    override val id: String = "${current.id}::${Backstack.generateId()}",
+) : OnScreenBackstack,
+    BackstackEntriesTransparencyState by DefaultBackstackEntriesTransparencyState() {
     private var previousEntries = current.entries.value
-
     private val exiting = MutableStateFlow<BackstackEntries>(emptyList())
+
     override val transitionStates = MutableStateFlow(
         current.entries.value.associateWith { EntryTransitionDone }
     )
@@ -53,17 +57,29 @@ class DefaultScreenTransitionBackstack(
     override val entries: StateFlow<BackstackEntries> =
         combine(current.entries, exiting, transitionStates) { entries, exiting, transitions ->
             val lastVisible = entries.lastOrNull { transitions[it] == EntryTransitionDone }
+
+            val visible = if (lastVisible == null) {
+                emptyList()
+            } else {
+                var previousEntry = lastVisible
+                entries
+                    .dropLastWhile { it != lastVisible } // Now we have all entries that are not animating in
+                    .takeLastWhile { currentEntry ->
+                        (currentEntry == lastVisible || transparentEntries.value.contains(
+                            previousEntry
+                        )).also {
+                            previousEntry = currentEntry
+                        }
+                    }
+            }
+
             val transitioning = entries.takeLastWhile { transitions[it] != EntryTransitionDone }
-            val renderEntries =
-                (listOf(lastVisible) + transitioning).filterNotNull().toPersistentList()
+            val renderEntries = (visible + transitioning).toPersistentList()
             when (exiting.isEmpty()) {
                 true -> renderEntries
                 false -> (renderEntries + exiting).toPersistentList()
             }
         }.stateIn(scope, Eagerly, current.entries.value)
-
-    override fun isEntryTransitionDone(entry: BackstackEntry): Boolean =
-        transitionState(entry) == EntryTransitionDone
 
     init {
         // Cache the topmost removed entry to show it while it is running exit animations
@@ -123,53 +139,16 @@ class DefaultScreenTransitionBackstack(
     }
 }
 
-interface ScreenTransitionTracker {
-    /**
-     * If the screen transition should start out as visible or invisible
-     */
-    fun isEntryTransitionDone(entry: BackstackEntry): Boolean
-
-    val transitionStates: StateFlow<Map<BackstackEntry, ScreenTransitionState>>
-    fun updateTransitionState(entry: BackstackEntry, transitionState: ScreenTransitionState)
-    fun onDisposeFromComposition(entry: BackstackEntry)
-}
-
 @Composable
-fun rememberScreenTransitionsBackstack(
+fun rememberOnScreenBackstack(
     backstack: Backstack = LocalBackstack.currentOrThrow,
-): ScreenTransitionBackstack {
+): OnScreenBackstack {
     val scope = rememberCoroutineScope()
     return remember(backstack.id) {
-        DefaultScreenTransitionBackstack(
+        DefaultOnScreenBackstack(
             scope = scope,
             current = backstack,
         )
     }
 }
 
-/**
- * Describes the state of a [BackstackRenderer]s [Screen] transition
- */
-enum class ScreenTransitionState {
-    EnterTransitionRunning,
-    EntryTransitionDone,
-    ExitTransitionRunning,
-    ExitTransitionDone;
-
-    companion object {
-        @OptIn(ExperimentalAnimationApi::class)
-        fun fromTransition(currentState: EnterExitState, targetState: EnterExitState) = when {
-            currentState != targetState -> when (targetState) {
-                Visible -> EnterTransitionRunning
-                else -> ExitTransitionRunning
-            }
-
-            else -> when (targetState) {
-                Visible -> EntryTransitionDone
-                else -> ExitTransitionDone
-            }
-        }
-    }
-}
-
-fun ScreenTransitionTracker.transitionState(entry: BackstackEntry) = transitionStates.value[entry]

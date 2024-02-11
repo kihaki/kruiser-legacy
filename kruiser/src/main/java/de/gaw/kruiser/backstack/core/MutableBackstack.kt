@@ -1,6 +1,5 @@
-package de.gaw.kruiser.backstack
+package de.gaw.kruiser.backstack.core
 
-import de.gaw.kruiser.backstack.Backstack.Companion.generateId
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,11 +7,17 @@ import kotlinx.coroutines.flow.update
 
 fun MutableBackstack(
     initial: BackstackEntries = emptyList(),
-    id: String = generateId(),
+    id: String = MutableBackstack.generateId(),
 ): MutableBackstack = MutableBackstackImpl(
     initial = initial.toImmutableList(),
     id = id,
 )
+
+interface MutableBackstack : Backstack {
+    fun mutate(block: BackstackEntries.() -> BackstackEntries)
+
+    companion object
+}
 
 private class MutableBackstackImpl(
     initial: ImmutableEntries,
@@ -26,3 +31,5 @@ private class MutableBackstackImpl(
         }
     }
 }
+
+fun MutableBackstack.Companion.generateId() = Backstack.generateId()

@@ -2,7 +2,7 @@ package de.gaw.kruiser.example
 
 import androidx.compose.runtime.Composable
 import de.gaw.kruiser.backstack.ui.Backstack
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.transition.CardTransition
+import de.gaw.kruiser.backstack.ui.transition.CardTransition
 import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen

@@ -1,12 +1,12 @@
-package de.gaw.kruiser.backstack.ui.transition.orchestrator.transition
+package de.gaw.kruiser.backstack.ui.transition
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.backstack.Backstack
-import de.gaw.kruiser.backstack.BackstackEntry
+import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackEntry
 
 @Composable
 fun CardTransition(

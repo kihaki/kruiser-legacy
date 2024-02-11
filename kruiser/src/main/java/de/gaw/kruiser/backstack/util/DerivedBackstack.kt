@@ -8,10 +8,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import de.gaw.kruiser.backstack.Backstack
-import de.gaw.kruiser.backstack.Backstack.Companion.generateId
-import de.gaw.kruiser.backstack.BackstackEntries
-import de.gaw.kruiser.backstack.ImmutableEntries
+import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackEntries
+import de.gaw.kruiser.backstack.core.ImmutableEntries
+import de.gaw.kruiser.backstack.core.generateId
 import de.gaw.kruiser.backstack.currentEntries
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.stateIn
 private class DerivedBackstack(
     scope: CoroutineScope,
     parent: Backstack,
-    override val id: String = "${generateId()} derived of [${parent.id.takeLast(5)}]",
+    override val id: String = "${parent.id}::${Backstack.generateId()}",
     mapping: BackstackEntries.() -> BackstackEntries,
 ) : Backstack {
     override val entries: StateFlow<ImmutableEntries> =

@@ -9,8 +9,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.ui.WithBackstack
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.BackstackRenderer
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.transition.CardTransition
+import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
+import de.gaw.kruiser.backstack.ui.transition.CardTransition
 import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen

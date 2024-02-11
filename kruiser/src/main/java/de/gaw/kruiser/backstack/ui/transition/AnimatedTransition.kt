@@ -1,4 +1,4 @@
-package de.gaw.kruiser.backstack.ui.transition.orchestrator.transition
+package de.gaw.kruiser.backstack.ui.transition
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -9,14 +9,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.backstack.Backstack
-import de.gaw.kruiser.backstack.BackstackEntry
-import de.gaw.kruiser.backstack.ui.LocalBackstackEntry
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.LocalScreenTransitionBackstack
-import de.gaw.kruiser.backstack.ui.transition.orchestrator.UpdateTransitionStateEffect
+import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackEntry
+import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
+import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.EnterTransitionRunning
+import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.EntryTransitionDone
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
@@ -33,11 +32,14 @@ fun AnimatedTransition(
     label: String? = null,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
-    val entry: BackstackEntry = LocalBackstackEntry.current
-    val transitionTracker = LocalScreenTransitionBackstack.currentOrThrow
+    val entry: BackstackEntry = LocalBackstackEntry.currentOrThrow
+    val transitionTracker = LocalScreenTransitionTracker.currentOrThrow
 
-    var visible by rememberSaveable {
-        mutableStateOf(transitionTracker.isEntryTransitionDone(entry))
+    var visible by remember {
+        val isInitiallyVisible = transitionTracker.transitionState(entry)?.let {
+            it == EnterTransitionRunning || it == EntryTransitionDone
+        } ?: false
+        mutableStateOf(isInitiallyVisible)
     }
 
     val backstack = LocalBackstack.currentOrThrow
