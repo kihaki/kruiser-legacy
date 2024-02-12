@@ -20,13 +20,12 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,11 +37,10 @@ import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.transition.AnimatedTransition
 import de.gaw.kruiser.backstack.ui.transition.CardTransition
-import de.gaw.kruiser.backstack.ui.transition.rememberIsDestinationVisible
+import de.gaw.kruiser.backstack.ui.transition.rememberIsVisible
 import de.gaw.kruiser.backstack.ui.transparency.TransparentScreen
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
-import de.gaw.kruiser.backstack.util.rememberIsOnBackstack
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
 import kotlinx.collections.immutable.persistentListOf
@@ -52,7 +50,6 @@ import java.util.UUID
 val emojis = persistentListOf(
     "\uD83D\uDE0E", // Sunglasses
     "\uD83D\uDD25", // Fire
-    "\uD83E\uDEE0", // Melt
     "\uD83E\uDD23", // Rofl
     "\uD83D\uDE1D", // Tongue
 )
@@ -92,39 +89,45 @@ private fun EmojiCard(emoji: String) {
     @Suppress("UNUSED_VARIABLE")
     val viewModel =
         viewModel<EmojiViewModel>(factory = remember(emoji) { EmojiViewModel.Factory(emoji) })
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+    Surface(
+        shadowElevation = 4.dp,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
-            Text(text = emoji, style = MaterialTheme.typography.headlineLarge)
-            Spacer(modifier = Modifier.size(16.dp))
-            Text(
-                text = LocalBackstackEntry.currentOrThrow.id.takeLast(5),
-                style = MaterialTheme.typography.headlineLarge
-            )
-            Spacer(modifier = Modifier.size(16.dp))
-            val randomHash = rememberSaveable {
-                UUID.randomUUID().toString().takeLast(5)
-            }
-            Text(text = randomHash, style = MaterialTheme.typography.headlineLarge)
-            Spacer(modifier = Modifier.size(16.dp))
-            ElevatedButton(
-                onClick = {
-                    backstack.push(EmojiDestination(emojis.filterNot { it == emoji }.random()))
-                },
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("Next")
-            }
-            Spacer(modifier = Modifier.size(16.dp))
-            ElevatedButton(
-                onClick = {
-                    backstack.push(BottomSheetDestination)
-                },
-            ) {
-                Text("Show Bottom Sheet")
+                Text(text = emoji, style = MaterialTheme.typography.headlineLarge)
+                Spacer(modifier = Modifier.size(16.dp))
+                val shortEntryId = LocalBackstackEntry.currentOrThrow.id.takeLast(5)
+                Text(
+                    text = "Id: $shortEntryId",
+                    style = MaterialTheme.typography.headlineLarge
+                )
+                Spacer(modifier = Modifier.size(16.dp))
+                val randomHash = rememberSaveable {
+                    UUID.randomUUID().toString().takeLast(5)
+                }
+                Text(text = "Saved: $randomHash", style = MaterialTheme.typography.headlineLarge)
+                Spacer(modifier = Modifier.size(16.dp))
+                ElevatedButton(
+                    onClick = {
+                        backstack.push(EmojiDestination(emojis.filterNot { it == emoji }.random()))
+                    },
+                ) {
+                    Text("Next")
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                ElevatedButton(
+                    onClick = {
+                        backstack.push(BottomSheetDestination)
+                    },
+                ) {
+                    Text("Show Bottom Sheet")
+                }
             }
         }
     }
@@ -138,13 +141,7 @@ object BottomSheetDestination : AndroidDestination {
         @Composable
         override fun Content() = TransparentScreen {
             val animDurationMs = 4_000
-            val isOnBackstack by rememberIsOnBackstack()
-
-            var isBackgroundScrimmed by rememberIsDestinationVisible()
-
-            LaunchedEffect(isOnBackstack) {
-                isBackgroundScrimmed = isOnBackstack
-            }
+            val isBackgroundScrimmed by rememberIsVisible()
 
             val backgroundTransparency by animateFloatAsState(
                 animationSpec = tween(animDurationMs),

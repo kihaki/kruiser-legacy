@@ -13,6 +13,9 @@ import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 
+/**
+ * Contains true if [entry] is on [backstack].
+ */
 @Composable
 fun rememberIsOnBackstack(
     entry: BackstackEntry = LocalBackstackEntry.currentOrThrow,
