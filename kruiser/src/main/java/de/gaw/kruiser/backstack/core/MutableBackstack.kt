@@ -5,11 +5,7 @@ import de.gaw.kruiser.destination.Destination
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 @JvmName("mutableBackstackFromDestinations")
@@ -48,9 +44,8 @@ interface MutableBackstack : Backstack {
 }
 
 fun SavedStateMutableBackstack(
-    vararg initial: Destination,
+    initial: List<Destination>,
     savedStateHandle: SavedStateHandle,
-    scope: CoroutineScope,
     stateKey: String,
 ): MutableBackstack {
     val savedStateKey = "bs:$stateKey"
@@ -62,11 +57,10 @@ fun SavedStateMutableBackstack(
 
     val entriesKey = "$savedStateKey:entries"
     if (!savedStateHandle.contains(entriesKey)) {
-        savedStateHandle[entriesKey] = initial.map(::BackstackEntry).toList()
+        savedStateHandle[entriesKey] = initial.map(::BackstackEntry)
     }
 
     return SavedStateMutableBackstack(
-        scope = scope,
         idKey = idKey,
         entriesKey = entriesKey,
         savedStateHandle = savedStateHandle
@@ -74,7 +68,6 @@ fun SavedStateMutableBackstack(
 }
 
 private class SavedStateMutableBackstack(
-    scope: CoroutineScope,
     idKey: String,
     private val entriesKey: String,
     private val savedStateHandle: SavedStateHandle,
@@ -84,14 +77,14 @@ private class SavedStateMutableBackstack(
         savedStateHandle[entriesKey] = block(savedStateHandle[entriesKey] ?: persistentListOf())
     }
 
-    override val id: String = savedStateHandle[idKey]!!
-    override val entries = savedStateHandle
-        .getStateFlow(
-            key = entriesKey,
-            initialValue = emptyList<BackstackEntry>(),
-        )
-        .map(List<BackstackEntry>::toPersistentList)
-        .stateIn(scope, SharingStarted.Eagerly, persistentListOf())
+    override val id: String by lazy { savedStateHandle[idKey]!! }
+    override val entries by lazy {
+        savedStateHandle
+            .getStateFlow(
+                key = entriesKey,
+                initialValue = emptyList<BackstackEntry>(),
+            )
+    }
 }
 
 private class MutableBackstackImpl(

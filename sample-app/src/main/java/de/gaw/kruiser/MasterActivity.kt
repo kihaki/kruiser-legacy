@@ -1,6 +1,7 @@
 package de.gaw.kruiser
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,24 +21,45 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import de.gaw.kruiser.backstack.core.MutableBackstack
 import de.gaw.kruiser.backstack.core.SavedStateMutableBackstack
 import de.gaw.kruiser.backstack.ui.Backstack
-import de.gaw.kruiser.example.BackstackInScaffoldExampleDestination
+import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.example.EmojiDestination
+import de.gaw.kruiser.example.emojis
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-interface MasterNavigationState : MutableBackstack
-private class DefaultMasterNavigationState(
-    backstack: MutableBackstack,
-) : MasterNavigationState,
-    MutableBackstack by backstack
+interface MutableBackstackProvider {
+    val backstack: MutableBackstack
+}
 
-class MasterNavigationStateViewModel(savedState: SavedStateHandle) : ViewModel() {
-    val navigationState: MasterNavigationState = DefaultMasterNavigationState(
-        backstack = SavedStateMutableBackstack(
-            BackstackInScaffoldExampleDestination,
-            savedStateHandle = savedState,
-            scope = viewModelScope,
-            stateKey = "nav:master",
-        )
+class SavedStateMutableBackstackProvider(
+    vararg initial: Destination,
+    savedState: SavedStateHandle,
+    key: String,
+) : MutableBackstackProvider {
+    override val backstack = SavedStateMutableBackstack(
+        initial = initial.toList(),
+        savedStateHandle = savedState,
+        stateKey = key,
     )
+}
+
+class MasterNavigationStateViewModel(savedState: SavedStateHandle) :
+    ViewModel(),
+    MutableBackstackProvider by SavedStateMutableBackstackProvider(
+//        BackstackInScaffoldExampleDestination,
+        EmojiDestination(emojis.random()),
+        savedState = savedState,
+        key = "nav:master",
+    ) {
+
+    init {
+        viewModelScope.launch {
+            backstack.entries.collectLatest {
+                Log.v("Backstack Update", "Backstack Update: $it")
+            }
+        }
+    }
 }
 
 @Composable
@@ -68,7 +90,7 @@ class MasterActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Backstack(
-                        backstack = masterNavigationStateViewModel().navigationState,
+                        backstack = masterNavigationStateViewModel().backstack,
                     )
                 }
             }

@@ -3,6 +3,7 @@ package de.gaw.kruiser.backstack.ui.rendering
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.saveable.SaveableStateHolder
@@ -28,6 +29,7 @@ fun BackstackRenderer(
     modifier: Modifier = Modifier,
     backstack: Backstack = LocalBackstack.currentOrThrow,
 ) {
+    val stateHolder = rememberSaveableStateHolder()
     Box(modifier = modifier) {
         /**
          * Contains [BackstackEntry]s that are animating in/out or are currently visible on screen.
@@ -38,6 +40,7 @@ fun BackstackRenderer(
             LocalOnScreenBackstack provides onScreenBackstack,
             LocalScreenTransitionTracker provides onScreenBackstack,
             LocalTransparencyState provides onScreenBackstack,
+            LocalBackstackSaveableStateHolder provides stateHolder,
         ) {
             val onScreenEntries by onScreenBackstack.collectEntries()
 
@@ -50,9 +53,11 @@ fun BackstackRenderer(
     }
 }
 
+val LocalBackstackSaveableStateHolder = compositionLocalOf<SaveableStateHolder?> { null }
+
 @Composable
 fun BackstackEntry.Render(
-    stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
+    stateHolder: SaveableStateHolder = LocalBackstackSaveableStateHolder.currentOrThrow,
 ) {
     CompositionLocalProvider(LocalBackstackEntry provides this) {
         stateHolder.SaveableStateProvider(id) {
