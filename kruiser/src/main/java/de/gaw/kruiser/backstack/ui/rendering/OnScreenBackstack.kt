@@ -93,13 +93,13 @@ class DefaultOnScreenBackstack(
                     val exiting = when {
                         didShrink -> {
                             val transparent = transparentEntries.value
-                            val toOut = previousEntries.takeLast(previousEntries.size - entries.size)
-                            if (toOut.lastOrNull()?.let { transparent.contains(it) } == true){
-                                val toFilter = toOut
+                            if (previousEntries.lastOrNull()?.let { transparent.contains(it) } == true){
+                                val outCandidates = previousEntries.takeLast(previousEntries.size - entries.size)
+                                val toFilter = outCandidates
                                     .dropLastWhile { transparent.contains(it) } // all transparent
                                     .dropLast(1) // the one below the transparent
                                     .toSet()
-                                (toOut - toFilter) + cur
+                                (outCandidates - toFilter) + cur
                             } else {
                                 listOfNotNull(previousEntries.lastOrNull()) + cur
                             }
