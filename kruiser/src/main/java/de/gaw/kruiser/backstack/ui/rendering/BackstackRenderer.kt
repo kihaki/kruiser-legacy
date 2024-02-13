@@ -28,7 +28,7 @@ import de.gaw.kruiser.viewmodel.viewModelStoreOwner
 @Composable
 fun BackstackRenderer(
     modifier: Modifier = Modifier,
-    backstack: Backstack = LocalBackstack.currentOrThrow,
+    backstack: Backstack,
 ) {
     Box(modifier = modifier) {
         /**

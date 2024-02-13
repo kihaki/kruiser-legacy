@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.SavedStateHandle
@@ -25,6 +24,7 @@ import de.gaw.kruiser.backstack.ui.Backstack
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.example.BackstackInScaffoldExampleDestination
 import de.gaw.kruiser.example.EmojiDestination
+import de.gaw.kruiser.example.ExampleListDestination
 import de.gaw.kruiser.example.emojis
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -49,8 +49,9 @@ class SavedStateMutableBackstackProvider(
 class MasterNavigationStateViewModel(savedState: SavedStateHandle) :
     ViewModel(),
     MutableBackstackProvider by SavedStateMutableBackstackProvider(
-        EmojiDestination(emojis.random()),
-        BackstackInScaffoldExampleDestination,
+        ExampleListDestination,
+//        EmojiDestination(emojis.random()),
+//        BackstackInScaffoldExampleDestination,
         savedState = savedState,
         key = "nav:master",
     ) {

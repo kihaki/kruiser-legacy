@@ -27,7 +27,10 @@ fun Backstack(
         backstack = backstack,
         stateHolder = stateHolder,
     ) {
-        BackstackRenderer(modifier = modifier)
+        BackstackRenderer(
+            modifier = modifier,
+            backstack = backstack,
+        )
     }
 }
 
