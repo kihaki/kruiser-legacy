@@ -83,6 +83,8 @@ class DefaultOnScreenBackstack(
 
     init {
         // Cache the topmost removed entry to show it while it is running exit animations
+
+
         scope.launch {
             combine(current.entries, transitionStates) { entries, transitions ->
                 entries to transitions
@@ -91,19 +93,12 @@ class DefaultOnScreenBackstack(
                 exiting.update { cur ->
                     val didShrink = entries.size < previousEntries.size
                     val exiting = when {
-                        didShrink -> {
-                            val transparent = transparentEntries.value
-                            if (previousEntries.lastOrNull()?.let { transparent.contains(it) } == true){
-                                val outCandidates = previousEntries.takeLast(previousEntries.size - entries.size)
-                                val toFilter = outCandidates
-                                    .dropLastWhile { transparent.contains(it) } // all transparent
-                                    .dropLast(1) // the one below the transparent
-                                    .toSet()
-                                (outCandidates - toFilter) + cur
-                            } else {
-                                listOfNotNull(previousEntries.lastOrNull()) + cur
-                            }
-                        }
+                        didShrink -> cur + getOutanimatingEntries(
+                            entries = entries,
+                            previousEntries = previousEntries,
+                            transparentEntries = transparentEntries.value,
+                        )
+
                         else -> cur
                     }.filterNot { entry ->
                         transitions[entry].let { transition ->
@@ -147,6 +142,23 @@ class DefaultOnScreenBackstack(
             -> updateTransitionState(entry, ExitTransitionDone)
 
             else -> Unit
+        }
+    }
+
+    private fun getOutanimatingEntries(
+        entries: BackstackEntries,
+        previousEntries: BackstackEntries,
+        transparentEntries: BackstackEntries,
+    ): List<BackstackEntry> {
+        return if (previousEntries.lastOrNull()?.let { transparentEntries.contains(it) } == true) {
+            val outCandidates = previousEntries.takeLast(previousEntries.size - entries.size)
+            val toFilter = outCandidates
+                .dropLastWhile { transparentEntries.contains(it) } // all transparent
+                .dropLast(1) // the one below the transparent
+                .toSet()
+            (outCandidates - toFilter)
+        } else {
+            listOfNotNull(previousEntries.lastOrNull())
         }
     }
 }
