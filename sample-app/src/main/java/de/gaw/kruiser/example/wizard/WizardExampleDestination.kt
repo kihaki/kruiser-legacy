@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -74,7 +75,12 @@ object WizardExampleDestination : AndroidDestination {
                             actions = {
 //                                IconButton(onClick = { parentBackstack.popWizard() }) {
                                 IconButton(onClick = {
-                                    parentBackstack.push(WarningDialogDestination(title = "Warning", message = "Nah, all good actually."))
+                                    parentBackstack.push(
+                                        WarningDialogDestination(
+                                            title = "Warning",
+                                            message = "Nah, all good actually."
+                                        )
+                                    )
                                 }) {
                                     Icon(
                                         imageVector = Icons.Filled.Close,
@@ -92,7 +98,10 @@ object WizardExampleDestination : AndroidDestination {
                     )
                 },
                 bottomBar = {
-                    Surface(shadowElevation = 2.dp) {
+                    Surface(
+                        modifier = Modifier.imePadding(),
+                        shadowElevation = 2.dp,
+                    ) {
                         BottomAppBar {
                             val backEnabled = wizardEntries.size > 1
                             ListItem(
@@ -166,6 +175,7 @@ fun MutableBackstack.popWizard() = mutate {
     popWizard()
 }
 
-fun BackstackEntries.popWizard() = findLast { it.destination is WizardExampleDestination }?.let { wizard ->
-    this - wizard
-} ?: this
+fun BackstackEntries.popWizard() =
+    findLast { it.destination is WizardExampleDestination }?.let { wizard ->
+        this - wizard
+    } ?: this
