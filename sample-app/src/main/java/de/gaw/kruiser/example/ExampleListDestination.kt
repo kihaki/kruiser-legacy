@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -104,7 +105,10 @@ object WizardExampleDestination : AndroidDestination {
                     })
                 },
                 content = {
-                    Backstack(backstack = wizardBackstack)
+                    Backstack(
+                        modifier = Modifier.padding(it),
+                        backstack = wizardBackstack,
+                    )
                 },
                 bottomBar = {
                     BottomAppBar {
