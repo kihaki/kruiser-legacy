@@ -25,7 +25,7 @@ object BackstackInScaffoldExampleDestination : AndroidDestination {
         @Composable
         override fun Content() = CardTransition {
             WithBackstack(
-                backstack = rememberSaveableBackstack(EmojiDestination(emojis.drop(1).first())),
+                backstack = rememberSaveableBackstack(EmojiDestination(emojis.random())),
             ) {
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("Nested Example") }) },

@@ -16,6 +16,7 @@ import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.ui.transition.LocalScreenTransitionTracker
 import de.gaw.kruiser.backstack.ui.transparency.LocalTransparencyState
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.backstack.util.rememberScreen
@@ -29,7 +30,6 @@ fun BackstackRenderer(
     modifier: Modifier = Modifier,
     backstack: Backstack = LocalBackstack.currentOrThrow,
 ) {
-    val stateHolder = rememberSaveableStateHolder()
     Box(modifier = modifier) {
         /**
          * Contains [BackstackEntry]s that are animating in/out or are currently visible on screen.
@@ -40,7 +40,6 @@ fun BackstackRenderer(
             LocalOnScreenBackstack provides onScreenBackstack,
             LocalScreenTransitionTracker provides onScreenBackstack,
             LocalTransparencyState provides onScreenBackstack,
-            LocalBackstackSaveableStateHolder provides stateHolder,
         ) {
             val onScreenEntries by onScreenBackstack.collectEntries()
 
@@ -53,11 +52,9 @@ fun BackstackRenderer(
     }
 }
 
-val LocalBackstackSaveableStateHolder = compositionLocalOf<SaveableStateHolder?> { null }
-
 @Composable
 fun BackstackEntry.Render(
-    stateHolder: SaveableStateHolder = LocalBackstackSaveableStateHolder.currentOrThrow,
+    stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow,
 ) {
     CompositionLocalProvider(LocalBackstackEntry provides this) {
         stateHolder.SaveableStateProvider(id) {

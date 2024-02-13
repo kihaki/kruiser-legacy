@@ -18,7 +18,6 @@ fun rememberSaveableBackstack(initial: List<Destination>): MutableBackstack =
 @Composable
 fun rememberSaveableBackstack(initial: BackstackEntries = emptyList()): MutableBackstack =
     rememberSaveable(
-        initial,
         saver = mutableBackstackSaver(),
     ) {
         MutableBackstack(initial = initial)

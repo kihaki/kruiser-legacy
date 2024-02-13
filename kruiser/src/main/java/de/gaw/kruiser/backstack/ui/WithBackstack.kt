@@ -40,19 +40,21 @@ fun WithBackstack(
     stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
     content: @Composable (Backstack) -> Unit,
 ) {
-    val entries by backstack.collectEntries()
-
-    BackHandler(
-        enabled = entries.size > 1,
-        onBack = backstack::pop,
-    )
-
     CompositionLocalProvider(
         LocalMutableBackstack provides backstack,
         LocalBackstack provides backstack,
         LocalSaveableStateHolder provides stateHolder,
     ) {
-        content(backstack)
+        stateHolder.SaveableStateProvider(key = "bs:${backstack.id}") {
+            val entries by backstack.collectEntries()
+
+            BackHandler(
+                enabled = entries.size > 1,
+                onBack = backstack::pop,
+            )
+
+            content(backstack)
+        }
     }
 }
 

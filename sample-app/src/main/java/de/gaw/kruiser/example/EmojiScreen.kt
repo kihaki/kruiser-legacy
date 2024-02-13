@@ -128,6 +128,14 @@ private fun EmojiCard(emoji: String) {
                 ) {
                     Text("Show Bottom Sheet")
                 }
+                Spacer(modifier = Modifier.size(16.dp))
+                ElevatedButton(
+                    onClick = {
+                        backstack.push(BackstackInScaffoldExampleDestination)
+                    },
+                ) {
+                    Text("Push Stack")
+                }
             }
         }
     }
