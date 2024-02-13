@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.core.MutableBackstack
 import de.gaw.kruiser.backstack.pop
 import de.gaw.kruiser.backstack.push
@@ -71,7 +72,10 @@ object WizardExampleDestination : AndroidDestination {
                                 }
                             },
                             actions = {
-                                IconButton(onClick = { parentBackstack.popWizard() }) {
+//                                IconButton(onClick = { parentBackstack.popWizard() }) {
+                                IconButton(onClick = {
+                                    parentBackstack.push(WarningDialogDestination(title = "Warning", message = "Nah, all good actually."))
+                                }) {
                                     Icon(
                                         imageVector = Icons.Filled.Close,
                                         contentDescription = "Close Wizard"
@@ -159,7 +163,9 @@ object WizardExampleDestination : AndroidDestination {
 }
 
 fun MutableBackstack.popWizard() = mutate {
-    findLast { it.destination is WizardExampleDestination }?.let { wizard ->
-        this - wizard
-    } ?: this
+    popWizard()
 }
+
+fun BackstackEntries.popWizard() = findLast { it.destination is WizardExampleDestination }?.let { wizard ->
+    this - wizard
+} ?: this
