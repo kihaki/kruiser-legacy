@@ -151,7 +151,10 @@ class DefaultOnScreenBackstack(
         transparentEntries: BackstackEntries,
     ): List<BackstackEntry> {
         return if (previousEntries.lastOrNull()?.let { transparentEntries.contains(it) } == true) {
-            val outCandidates = previousEntries.takeLast(previousEntries.size - entries.size)
+            // TODO: Check if we are not rendering one too many
+            val outCandidates = previousEntries
+                .filterNot { it in entries }
+                .takeLast(previousEntries.size - entries.size)
             val toFilter = outCandidates
                 .dropLastWhile { transparentEntries.contains(it) } // all transparent
                 .dropLast(1) // the one below the transparent
