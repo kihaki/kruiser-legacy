@@ -2,11 +2,19 @@ package de.gaw.kruiser.example.wizard
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -14,11 +22,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.backstack.core.MutableBackstack
 import de.gaw.kruiser.backstack.pop
 import de.gaw.kruiser.backstack.push
@@ -47,25 +58,28 @@ object WizardExampleDestination : AndroidDestination {
             val wizardEntries by wizardBackstack.collectEntries()
             Scaffold(
                 topBar = {
-                    TopAppBar(
-                        title = {
-                            Column {
-                                Text("Wizard")
-                                val progress by animateFloatAsState(
-                                    targetValue = (wizardEntries.size - 1).toFloat() / (pageCount - 1),
-                                    label = "wizard-progress",
-                                )
-                                LinearProgressIndicator(progress = { progress })
-                            }
-                        },
-                        actions = {
-                            IconButton(onClick = { parentBackstack.popWizard() }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Close,
-                                    contentDescription = "Close Wizard"
-                                )
-                            }
-                        })
+                    Surface(shadowElevation = 2.dp) {
+                        TopAppBar(
+                            title = {
+                                Column {
+                                    Text("Wizard")
+                                    val progress by animateFloatAsState(
+                                        targetValue = (wizardEntries.size - 1).toFloat() / (pageCount - 1),
+                                        label = "wizard-progress",
+                                    )
+                                    LinearProgressIndicator(progress = { progress })
+                                }
+                            },
+                            actions = {
+                                IconButton(onClick = { parentBackstack.popWizard() }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Close,
+                                        contentDescription = "Close Wizard"
+                                    )
+                                }
+                            },
+                        )
+                    }
                 },
                 content = {
                     Backstack(
@@ -74,41 +88,69 @@ object WizardExampleDestination : AndroidDestination {
                     )
                 },
                 bottomBar = {
-                    BottomAppBar {
-                        if (wizardEntries.size > 1) {
+                    Surface(shadowElevation = 2.dp) {
+                        BottomAppBar {
+                            val backEnabled = wizardEntries.size > 1
                             ListItem(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .clickable(onClick = wizardBackstack::pop),
-                                headlineContent = { Text("Back") },
+                                    .clickable(
+                                        enabled = backEnabled,
+                                        onClick = wizardBackstack::pop,
+                                    ),
+                                headlineContent = {
+                                    val textAlpha by animateFloatAsState(
+                                        targetValue = if (backEnabled) 1f else .5f,
+                                        label = "back-alpha",
+                                    )
+                                    Text(modifier = Modifier.alpha(textAlpha), text = "Back")
+                                },
+                            )
+                            ListItem(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable(
+                                        onClick = {
+                                            when {
+                                                wizardEntries.size < pageCount -> wizardBackstack.push(
+                                                    WizardPageDestination(wizardEntries.size + 1)
+                                                )
+
+                                                else -> parentBackstack.popWizard()
+                                            }
+                                        },
+                                    ),
+                                headlineContent = {
+                                    AnimatedContent(
+                                        wizardEntries.size < pageCount,
+                                        transitionSpec = {
+                                            slideInVertically { it } togetherWith
+                                                    slideOutVertically { -it }
+                                        },
+                                        label = "next-button-label-transition",
+                                    ) { isFinish ->
+                                        Row {
+                                            when (isFinish) {
+                                                true -> {
+                                                    Text("Next")
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Icon(
+                                                        Icons.AutoMirrored.Filled.ArrowForward,
+                                                        "next-icon"
+                                                    )
+                                                }
+
+                                                else -> {
+                                                    Text("Finish")
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Icon(Icons.Filled.Done, "done-icon")
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
                             )
                         }
-                        ListItem(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable(
-                                    onClick = {
-                                        when {
-                                            wizardEntries.size < pageCount -> wizardBackstack.push(
-                                                WizardPageDestination(wizardEntries.size + 1)
-                                            )
-
-                                            else -> parentBackstack.popWizard()
-                                        }
-                                    },
-                                ),
-                            headlineContent = {
-                                AnimatedContent(
-                                    when {
-                                        wizardEntries.size < pageCount -> "Next"
-                                        else -> "Finish"
-                                    },
-                                    label = "next-button-label-transition",
-                                ) {
-                                    Text(text = it)
-                                }
-                            },
-                        )
                     }
                 }
             )
