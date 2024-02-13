@@ -8,11 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.backstack.ui.WithBackstack
-import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
+import de.gaw.kruiser.backstack.ui.Backstack
 import de.gaw.kruiser.backstack.ui.transition.CardTransition
-import de.gaw.kruiser.backstack.ui.util.LocalBackstack
-import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
@@ -26,18 +23,15 @@ object BackstackInScaffoldExampleDestination : AndroidDestination {
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() = CardTransition {
-            WithBackstack(
-                backstack = rememberSaveableBackstack(EmojiDestination(emojis.random())),
-            ) { backstack ->
-                Scaffold(
-                    topBar = { TopAppBar(title = { Text("Nested Example") }) },
-                    bottomBar = { BottomAppBar { } },
-                ) {
-                    BackstackRenderer(
-                        modifier = Modifier.padding(it),
-                        backstack = backstack,
-                    )
-                }
+            val backstack = rememberSaveableBackstack(EmojiDestination(emojis.random()))
+            Scaffold(
+                topBar = { TopAppBar(title = { Text("Nested Example") }) },
+                bottomBar = { BottomAppBar { } },
+            ) {
+                Backstack(
+                    modifier = Modifier.padding(it),
+                    backstack = backstack,
+                )
             }
         }
     }

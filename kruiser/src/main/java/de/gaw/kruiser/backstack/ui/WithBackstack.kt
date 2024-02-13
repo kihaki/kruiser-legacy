@@ -23,7 +23,7 @@ fun Backstack(
     backstack: MutableBackstack = rememberSaveableBackstack(),
     stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
 ) {
-    WithBackstack(
+    BackstackContext(
         backstack = backstack,
         stateHolder = stateHolder,
     ) {
@@ -38,7 +38,7 @@ fun Backstack(
  * Handles back presses and sets the [LocalMutableBackstack] defers rendering to the [content] composable.
  */
 @Composable
-fun WithBackstack(
+fun BackstackContext(
     backstack: MutableBackstack = rememberSaveableBackstack(),
     stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
     content: @Composable (Backstack) -> Unit,
