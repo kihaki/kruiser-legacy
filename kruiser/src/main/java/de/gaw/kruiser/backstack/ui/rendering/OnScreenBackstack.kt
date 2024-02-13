@@ -96,9 +96,8 @@ class DefaultOnScreenBackstack(
                             val toOut = previousEntries.takeLast(previousEntries.size - entries.size)
                             if (toOut.lastOrNull()?.let { transparent.contains(it) } == true){
                                 val toFilter = toOut
-                                    .dropLast(1) // last always
-                                    .dropLastWhile { transparent.contains(it) }
-                                    .dropLast(1)
+                                    .dropLastWhile { transparent.contains(it) } // all transparent
+                                    .dropLast(1) // the one below the transparent
                                     .toSet()
                                 (toOut - toFilter) + cur
                             } else {
