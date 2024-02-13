@@ -2,9 +2,7 @@ package de.gaw.kruiser.backstack.ui.transition
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.Spring.StiffnessMediumLow
-import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
@@ -14,10 +12,11 @@ import androidx.compose.ui.unit.IntOffset
 @Composable
 fun BottomCardTransition(
     modifier: Modifier = Modifier,
-    animationSpec: FiniteAnimationSpec<IntOffset> = spring(
-        stiffness = StiffnessMediumLow,
-        visibilityThreshold = IntOffset.VisibilityThreshold,
-    ),
+//    animationSpec: FiniteAnimationSpec<IntOffset> = spring(
+//        stiffness = StiffnessMediumLow,
+//        visibilityThreshold = IntOffset.VisibilityThreshold,
+//    ),
+    animationSpec: FiniteAnimationSpec<IntOffset> = tween(delayMillis = 16),
     label: String? = null,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {

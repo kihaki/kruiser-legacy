@@ -105,7 +105,7 @@ data class WarningDialogDestination(
                         }
                     }
                     ) {
-                        Text("It's good.")
+                        Text("Cool beans")
                     }
                 },
             )
