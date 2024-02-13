@@ -73,7 +73,6 @@ object WizardExampleDestination : AndroidDestination {
                                 }
                             },
                             actions = {
-//                                IconButton(onClick = { parentBackstack.popWizard() }) {
                                 IconButton(onClick = {
                                     parentBackstack.push(
                                         WarningDialogDestination(
