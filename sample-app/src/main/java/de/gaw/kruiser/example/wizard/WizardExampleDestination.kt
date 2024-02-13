@@ -1,6 +1,7 @@
 package de.gaw.kruiser.example.wizard
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -50,7 +51,11 @@ object WizardExampleDestination : AndroidDestination {
                         title = {
                             Column {
                                 Text("Wizard")
-                                LinearProgressIndicator(progress = { ((wizardEntries.size - 1).toFloat() / (pageCount - 1)) })
+                                val progress by animateFloatAsState(
+                                    targetValue = (wizardEntries.size - 1).toFloat() / (pageCount - 1),
+                                    label = "wizard-progress",
+                                )
+                                LinearProgressIndicator(progress = { progress })
                             }
                         },
                         actions = {
