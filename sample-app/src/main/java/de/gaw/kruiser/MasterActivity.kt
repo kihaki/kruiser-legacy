@@ -20,12 +20,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
 import de.gaw.kruiser.backstack.core.MutableBackstack
 import de.gaw.kruiser.backstack.core.SavedStateMutableBackstack
+import de.gaw.kruiser.backstack.debug.DebugBackstackLoggerEffect
 import de.gaw.kruiser.backstack.ui.Backstack
 import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.example.BackstackInScaffoldExampleDestination
-import de.gaw.kruiser.example.EmojiDestination
 import de.gaw.kruiser.example.ExampleListDestination
-import de.gaw.kruiser.example.emojis
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -92,8 +90,13 @@ class MasterActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val masterBackstack = masterNavigationStateViewModel().backstack
                     Backstack(
-                        backstack = masterNavigationStateViewModel().backstack,
+                        backstack = masterBackstack,
+                    )
+                    DebugBackstackLoggerEffect(
+                        tag = "MasterBackstack",
+                        backstack = masterBackstack,
                     )
                 }
             }

@@ -33,9 +33,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.core.MutableBackstack
+import de.gaw.kruiser.backstack.debug.DebugBackstackLoggerEffect
 import de.gaw.kruiser.backstack.pop
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.Backstack
+import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.transition.BottomCardTransition
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.collectEntries
@@ -56,6 +58,7 @@ object WizardExampleDestination : AndroidDestination {
         override fun Content() = BottomCardTransition {
             val parentBackstack = LocalMutableBackstack.currentOrThrow
             val wizardBackstack = rememberSaveableBackstack(WizardPageDestination(1))
+            val backstackEntry = LocalBackstackEntry.currentOrThrow
             val pageCount = 5
             val wizardEntries by wizardBackstack.collectEntries()
             Scaffold(
@@ -93,6 +96,10 @@ object WizardExampleDestination : AndroidDestination {
                 content = {
                     Backstack(
                         modifier = Modifier.padding(it),
+                        backstack = wizardBackstack,
+                    )
+                    DebugBackstackLoggerEffect(
+                        tag = "Wizard ${backstackEntry.id} backstack",
                         backstack = wizardBackstack,
                     )
                 },
