@@ -13,7 +13,6 @@ import de.gaw.kruiser.backstack.core.Backstack
 import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.results.LocalBackstackEntriesResultsStore
 import de.gaw.kruiser.backstack.ui.transition.LocalScreenTransitionTracker
-import de.gaw.kruiser.backstack.ui.transparency.LocalTransparencyState
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.backstack.ui.util.collectEntries
@@ -38,7 +37,6 @@ fun BackstackRenderer(
         CompositionLocalProvider(
             LocalOnScreenBackstack provides onScreenBackstack,
             LocalScreenTransitionTracker provides onScreenBackstack,
-            LocalTransparencyState provides onScreenBackstack,
             LocalBackstackEntriesResultsStore provides onScreenBackstack,
         ) {
             val onScreenEntries by onScreenBackstack.collectEntries()

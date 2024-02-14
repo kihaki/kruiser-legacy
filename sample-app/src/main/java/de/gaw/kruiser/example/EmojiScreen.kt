@@ -38,7 +38,6 @@ import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.transition.AnimatedTransition
 import de.gaw.kruiser.backstack.ui.transition.CardTransition
 import de.gaw.kruiser.backstack.ui.transition.rememberIsVisible
-import de.gaw.kruiser.backstack.ui.transparency.TransparentScreen
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
@@ -147,7 +146,7 @@ object BottomSheetDestination : AndroidDestination {
 
     override fun build(): Screen = object : Screen {
         @Composable
-        override fun Content() = TransparentScreen {
+        override fun Content() {
             val animDurationMs = 4_000
             val isBackgroundScrimmed by rememberIsVisible()
 

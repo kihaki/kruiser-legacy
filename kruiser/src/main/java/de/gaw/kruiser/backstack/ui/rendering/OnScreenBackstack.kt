@@ -16,8 +16,7 @@ import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransiti
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransitionRunning
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionTracker
 import de.gaw.kruiser.backstack.ui.transition.transitionState
-import de.gaw.kruiser.backstack.ui.transparency.BackstackEntriesTransparencyState
-import de.gaw.kruiser.backstack.ui.transparency.DefaultBackstackEntriesTransparencyState
+import de.gaw.kruiser.backstack.ui.transparency.Transparent
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import kotlinx.collections.immutable.toPersistentList
@@ -36,12 +35,11 @@ val LocalOnScreenBackstack = compositionLocalOf<OnScreenBackstack?> { null }
 /**
  * Backstack that reflects the state of [BackstackEntry]s that are visible on screen.
  * Also stores the [ScreenTransitionState] of [BackstackEntry]s that are on the [Backstack] and
- * manages transparency via [BackstackEntriesTransparencyState].
+ * manages transparency.
  */
 interface OnScreenBackstack :
     Backstack,
     ScreenTransitionTracker,
-    BackstackEntriesTransparencyState,
     BackstackResultsStore
 
 class DefaultOnScreenBackstack(
@@ -49,11 +47,14 @@ class DefaultOnScreenBackstack(
     current: Backstack,
     override val id: String = "${current.id}::${Backstack.generateId()}",
 ) : OnScreenBackstack,
-    BackstackEntriesTransparencyState by DefaultBackstackEntriesTransparencyState(),
     BackstackResultsStore by BackstackResultsStoreImpl() {
 
     private var previousEntries = current.entries.value
     private val exiting = MutableStateFlow<BackstackEntries>(emptyList())
+    private val transparent
+        get() = (previousEntries + entries.value)
+            .toSet()
+            .filter { it.destination is Transparent }
 
     override val transitionStates = MutableStateFlow(
         current.entries.value.associateWith { EntryTransitionDone }
@@ -70,11 +71,8 @@ class DefaultOnScreenBackstack(
                 entries
                     .dropLastWhile { it != lastVisible } // Now we have all entries that are not animating in
                     .takeLastWhile { currentEntry ->
-                        (currentEntry == lastVisible || transparentEntries.value.contains(
-                            previousEntry
-                        )).also {
-                            previousEntry = currentEntry
-                        }
+                        (currentEntry == lastVisible || transparent.contains(previousEntry))
+                            .also { previousEntry = currentEntry }
                     }
             }
 
@@ -87,9 +85,6 @@ class DefaultOnScreenBackstack(
         }.stateIn(scope, Eagerly, current.entries.value)
 
     init {
-        // Cache the topmost removed entry to show it while it is running exit animations
-
-
         scope.launch {
             combine(current.entries, transitionStates) { entries, transitions ->
                 entries to transitions
@@ -101,7 +96,7 @@ class DefaultOnScreenBackstack(
                         didShrink -> cur + getOutanimatingEntries(
                             entries = entries,
                             previousEntries = previousEntries,
-                            transparentEntries = transparentEntries.value,
+                            transparentEntries = transparent,
                         )
 
                         else -> cur

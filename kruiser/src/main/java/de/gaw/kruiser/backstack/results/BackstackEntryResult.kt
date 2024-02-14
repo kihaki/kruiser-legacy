@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlin.reflect.KClass
@@ -60,13 +61,18 @@ inline fun <reified T : Any> rememberResult(
     marker: String? = null,
     store: BackstackResultsStore = LocalBackstackEntriesResultsStore.currentOrThrow,
 ): State<T?> {
-    val state = remember { mutableStateOf<T?>(null) }
+    val state = remember { mutableStateOf(store.results.value.findMine<T>(marker)?.result) }
     LaunchedEffect(store, marker) {
         store.results.map { results ->
-            results.firstOrNull { entry ->
-                entry.resultType == T::class && entry.marker == marker
-            }
+            results.findMine<T>(marker)
+        }.collectLatest {
+            state.value = it?.result
         }
     }
     return state
 }
+
+inline fun <reified T : Any> Set<BackstackEntryResult<*>>.findMine(marker: String? = null) =
+    firstOrNull { entry ->
+        entry.resultType == T::class && entry.marker == marker
+    } as BackstackEntryResult<T>?

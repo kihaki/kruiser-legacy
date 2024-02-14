@@ -13,7 +13,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -21,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.pop
+import de.gaw.kruiser.backstack.results.LocalBackstackEntriesResultsStore
+import de.gaw.kruiser.backstack.results.setResult
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.transition.CardTransition
-import de.gaw.kruiser.backstack.ui.transparency.TransparentScreen
+import de.gaw.kruiser.backstack.ui.transparency.Transparent
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
@@ -72,13 +73,15 @@ data class WizardPageDestination(val page: Int) : AndroidDestination {
 data class WarningDialogDestination(
     val title: String? = null,
     val message: String? = null,
-) : AndroidDestination {
+) : AndroidDestination,
+    Transparent {
     override fun build(): Screen = object : Screen {
         @Composable
-        override fun Content() = TransparentScreen {
+        override fun Content() {
             val backstack = LocalMutableBackstack.currentOrThrow
             val backstackEntry = LocalBackstackEntry.currentOrThrow
             fun BackstackEntries.removeDialog() = filterNot { it == backstackEntry }
+            val results = LocalBackstackEntriesResultsStore.currentOrThrow
 
             AlertDialog(
                 title = {
@@ -110,6 +113,7 @@ data class WarningDialogDestination(
                                 backstack.mutate {
                                     popWizard()
                                 }
+                                results.setResult(WizardExampleDestination.Result("This is some test text hihi"))
                             }
                         }
                     ) {

@@ -49,6 +49,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 object WizardExampleDestination : AndroidDestination {
+    data class Result(
+        val test: String,
+    )
+
     private fun readResolve(): Any = WizardExampleDestination
 
     override fun build(): Screen = object : Screen {
