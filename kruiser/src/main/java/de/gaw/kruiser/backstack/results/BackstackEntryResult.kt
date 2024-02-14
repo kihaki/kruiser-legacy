@@ -67,6 +67,7 @@ inline fun <reified T : Any> rememberResult(
             results.findMine<T>(marker)
         }.collectLatest {
             state.value = it?.result
+            it?.let { store.clearResult(it) }
         }
     }
     return state
