@@ -8,6 +8,8 @@ import de.gaw.kruiser.backstack.core.Backstack
 import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.core.generateId
+import de.gaw.kruiser.backstack.results.BackstackResultsStore
+import de.gaw.kruiser.backstack.results.BackstackResultsStoreImpl
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.EntryTransitionDone
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransitionDone
@@ -39,14 +41,17 @@ val LocalOnScreenBackstack = compositionLocalOf<OnScreenBackstack?> { null }
 interface OnScreenBackstack :
     Backstack,
     ScreenTransitionTracker,
-    BackstackEntriesTransparencyState
+    BackstackEntriesTransparencyState,
+    BackstackResultsStore
 
 class DefaultOnScreenBackstack(
     scope: CoroutineScope,
     current: Backstack,
     override val id: String = "${current.id}::${Backstack.generateId()}",
 ) : OnScreenBackstack,
-    BackstackEntriesTransparencyState by DefaultBackstackEntriesTransparencyState() {
+    BackstackEntriesTransparencyState by DefaultBackstackEntriesTransparencyState(),
+    BackstackResultsStore by BackstackResultsStoreImpl() {
+
     private var previousEntries = current.entries.value
     private val exiting = MutableStateFlow<BackstackEntries>(emptyList())
 

@@ -1,7 +1,6 @@
 package de.gaw.kruiser
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,7 +14,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
 import de.gaw.kruiser.backstack.core.MutableBackstack
@@ -25,8 +23,6 @@ import de.gaw.kruiser.backstack.ui.Backstack
 import de.gaw.kruiser.destination.Destination
 import de.gaw.kruiser.example.ExampleListDestination
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 interface MutableBackstackProvider {
     val backstack: MutableBackstack
@@ -52,16 +48,7 @@ class MasterNavigationStateViewModel(savedState: SavedStateHandle) :
 //        BackstackInScaffoldExampleDestination,
         savedState = savedState,
         key = "nav:master",
-    ) {
-
-    init {
-        viewModelScope.launch {
-            backstack.entries.collectLatest {
-                Log.v("Backstack Update", "Backstack Update: $it")
-            }
-        }
-    }
-}
+    )
 
 @Composable
 fun activityViewModelStoreOwner() =
@@ -103,4 +90,3 @@ class MasterActivity : ComponentActivity() {
         }
     }
 }
-
