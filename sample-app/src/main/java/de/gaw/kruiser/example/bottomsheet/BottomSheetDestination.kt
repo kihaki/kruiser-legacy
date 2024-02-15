@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -85,6 +86,7 @@ fun BackstackRendererWithBottomSheet(
                     val sheetEntries by sheetStack.collectEntries()
                     // Render bottom sheet content
                     AnimatedContent(
+                        modifier = Modifier.navigationBarsPadding(),
                         targetState = sheetEntries.lastOrNull(),
                         transitionSpec = {
                             slideInHorizontally { it } togetherWith slideOutHorizontally { -it / 2 }

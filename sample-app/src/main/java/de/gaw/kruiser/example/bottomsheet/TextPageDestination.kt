@@ -97,5 +97,4 @@ data class BottomSheetPageDestination(
         get() = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(bottom = 16.dp)
 }
