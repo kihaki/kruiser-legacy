@@ -11,7 +11,6 @@ import androidx.compose.ui.util.fastForEach
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import de.gaw.kruiser.backstack.core.Backstack
 import de.gaw.kruiser.backstack.core.BackstackEntry
-import de.gaw.kruiser.backstack.results.LocalBackstackEntriesResultsStore
 import de.gaw.kruiser.backstack.ui.transition.LocalScreenTransitionTracker
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
@@ -25,8 +24,8 @@ import de.gaw.kruiser.viewmodel.viewModelStoreOwner
  */
 @Composable
 fun BackstackRenderer(
-    modifier: Modifier = Modifier,
     backstack: Backstack,
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
         /**
@@ -37,7 +36,6 @@ fun BackstackRenderer(
         CompositionLocalProvider(
             LocalOnScreenBackstack provides onScreenBackstack,
             LocalScreenTransitionTracker provides onScreenBackstack,
-            LocalBackstackEntriesResultsStore provides onScreenBackstack,
         ) {
             val onScreenEntries by onScreenBackstack.collectEntries()
 

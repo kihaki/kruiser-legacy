@@ -1,5 +1,6 @@
 package de.gaw.kruiser.example.wizard
 
+import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInVertically
@@ -46,12 +47,22 @@ import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
 import kotlinx.parcelize.Parcelize
+import java.io.Serializable
+
+private val wizardDestinations = listOf(
+    WizardNameDestination,
+    WizardNicknameDestination,
+    WizardCompletionDestination,
+)
 
 @Parcelize
 object WizardExampleDestination : AndroidDestination {
-    data class Result(
-        val test: String,
-    )
+
+    @Parcelize
+    data class WizardResult(
+        val name: String? = null,
+        val nickname: String? = null,
+    ) : Parcelable, Serializable
 
     private fun readResolve(): Any = WizardExampleDestination
 
@@ -61,9 +72,9 @@ object WizardExampleDestination : AndroidDestination {
         @Composable
         override fun Content() = BottomCardTransition {
             val parentBackstack = LocalMutableBackstack.currentOrThrow
-            val wizardBackstack = rememberSaveableBackstack(WizardPageDestination(1))
+            val wizardBackstack = rememberSaveableBackstack(wizardDestinations.first())
             val backstackEntry = LocalBackstackEntry.currentOrThrow
-            val pageCount = 5
+            val pageCount = wizardDestinations.size
             val wizardEntries by wizardBackstack.collectEntries()
             Scaffold(
                 topBar = {
@@ -136,7 +147,7 @@ object WizardExampleDestination : AndroidDestination {
                                         onClick = {
                                             when {
                                                 wizardEntries.size < pageCount -> wizardBackstack.push(
-                                                    WizardPageDestination(wizardEntries.size + 1)
+                                                    wizardDestinations[wizardEntries.size]
                                                 )
 
                                                 else -> parentBackstack.popWizard()

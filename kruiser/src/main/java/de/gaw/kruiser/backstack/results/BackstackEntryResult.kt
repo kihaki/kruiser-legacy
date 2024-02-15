@@ -1,29 +1,33 @@
 package de.gaw.kruiser.backstack.results
 
+import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlin.reflect.KClass
 
-inline fun <reified T : Any> BackstackEntryResult(
+typealias BackstackResult = Any
+
+inline fun <reified T : BackstackResult> BackstackEntryResult(
     result: T,
     marker: String? = null,
-) = BackstackEntryResult(
+): BackstackEntryResult<T> = BackstackEntryResult(
     marker = marker,
     result = result,
     resultType = result::class,
 )
 
-data class BackstackEntryResult<T : Any>(
+data class BackstackEntryResult<T : BackstackResult>(
     val resultType: KClass<out T>,
     val result: T,
     val marker: String?,
@@ -32,48 +36,104 @@ data class BackstackEntryResult<T : Any>(
 interface BackstackResultsStore {
     val results: StateFlow<Set<BackstackEntryResult<*>>>
 
-    fun <T : Any> setResult(result: BackstackEntryResult<T>)
-    fun <T : Any> clearResult(result: BackstackEntryResult<T>)
+    fun mutate(block: Set<BackstackEntryResult<*>>.() -> Set<BackstackEntryResult<*>>)
 }
 
-inline fun <reified T : Any> BackstackResultsStore.setResult(result: T, marker: String? = null) =
-    setResult(BackstackEntryResult(marker = marker, result = result))
+inline fun <reified T : BackstackResult> BackstackResultsStore.setOrMutateResult(
+    default: T,
+    marker: String? = null,
+    crossinline block: T.() -> T,
+) = mutate {
+    var mutated = false
+    map {
+        if (it.resultType == T::class && it.marker == marker) {
+            mutated = true
+            Log.v("ScreenResult", "Mutate! ${T::class}")
+            (it as BackstackEntryResult<T>).copy(result = block(it.result))
+        } else {
+            it
+        }
+    }.run {
+        if (!mutated) {
+            this + BackstackEntryResult(default, marker)
+        } else {
+            this
+        }
+    }.toSet().also {
+        Log.v("ScreenResult", "New results: $it")
+    }
+}
 
-inline fun <reified T : Any> BackstackResultsStore.clearResult(result: T, marker: String? = null) =
-    clearResult(BackstackEntryResult(marker = marker, result = result))
+inline fun <reified T : BackstackResult> BackstackResultsStore.setResult(
+    result: T,
+    marker: String? = null,
+) = mutate { this + BackstackEntryResult(marker = marker, result = result) }
+
+inline fun <reified T : BackstackResult> BackstackResultsStore.clearResult(
+    result: BackstackEntryResult<T>,
+) = clearResult(clazz = T::class, marker = result.marker)
+
+inline fun <reified T : BackstackResult> BackstackResultsStore.clearResult(
+    clazz: KClass<T>,
+    marker: String? = null,
+) = mutate { filter { it.resultType == clazz && it.marker == marker }.toSet() }
 
 val LocalBackstackEntriesResultsStore = compositionLocalOf<BackstackResultsStore?> { null }
 
-internal class BackstackResultsStoreImpl : BackstackResultsStore {
-    override val results = MutableStateFlow(emptySet<BackstackEntryResult<*>>())
-
-    override fun <T : Any> setResult(result: BackstackEntryResult<T>) = results.update {
-        it + result
+@Composable
+fun rememberSaveableBackstackResultsStore(): BackstackResultsStore = rememberSaveable(
+    saver = backstackResultsStoreSaver,
+) {
+    BackstackResultsStoreImpl().also {
+        Log.v("ScreenResult", "Creating: $it")
     }
+}
 
-    override fun <T : Any> clearResult(result: BackstackEntryResult<T>) = results.update {
-        it - result
+// Assumes the results are at least serializable
+private val backstackResultsStoreSaver = Saver<BackstackResultsStore, Set<BackstackEntryResult<*>>>(
+    save = { it.results.value },
+    restore = { BackstackResultsStoreImpl(initialResults = it) }
+)
+
+internal class BackstackResultsStoreImpl(
+    initialResults: Set<BackstackEntryResult<*>> = emptySet(),
+) : BackstackResultsStore {
+    override val results = MutableStateFlow(initialResults)
+
+    override fun mutate(block: Set<BackstackEntryResult<*>>.() -> Set<BackstackEntryResult<*>>) {
+        results.update {
+            it.block().also { new ->
+                Log.v("ScreenResult", "Updated from $it to $new")
+            }
+        }
     }
 }
 
 @Composable
-inline fun <reified T : Any> rememberResult(
+inline fun <reified T : BackstackResult> rememberResult(
     marker: String? = null,
     store: BackstackResultsStore = LocalBackstackEntriesResultsStore.currentOrThrow,
-): State<T?> {
-    val state = remember { mutableStateOf(store.results.value.findMine<T>(marker)?.result) }
-    LaunchedEffect(store, marker) {
-        store.results.map { results ->
-            results.findMine<T>(marker)
+): State<T?> = produceState(
+    key1 = store,
+    key2 = marker,
+    initialValue = store.results.value.findMine<T>(marker)?.result,
+) {
+    store.results
+        .onEach { Log.v("ScreenResult", "New set: $it") }
+        .map { results ->
+            Log.v("ScreenResult", "Finding...")
+            results.findMine<T>(marker).also {
+                Log.v("ScreenResult", "Found $it in $results")
+            }
         }.collectLatest {
-            state.value = it?.result
-            it?.let { store.clearResult(it) }
+            value = it?.result.also {
+                Log.v("ScreenResult", "Setting Result to $it")
+            }
+//            it?.let { result -> store.clearResult(result) }
         }
-    }
-    return state
 }
 
-inline fun <reified T : Any> Set<BackstackEntryResult<*>>.findMine(marker: String? = null) =
+inline fun <reified T : BackstackResult> Set<BackstackEntryResult<*>>.findMine(marker: String? = null) =
     firstOrNull { entry ->
         entry.resultType == T::class && entry.marker == marker
     } as BackstackEntryResult<T>?

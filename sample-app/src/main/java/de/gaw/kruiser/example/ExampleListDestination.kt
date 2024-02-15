@@ -1,16 +1,17 @@
 package de.gaw.kruiser.example
 
-import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.results.rememberResult
@@ -19,7 +20,9 @@ import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
+import de.gaw.kruiser.example.bottomsheet.BottomSheetRendererDestination
 import de.gaw.kruiser.example.wizard.WizardExampleDestination
+import de.gaw.kruiser.example.wizard.WizardExampleDestination.WizardResult
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -37,14 +40,24 @@ object ExampleListDestination : AndroidDestination {
                 val backstack = LocalMutableBackstack.currentOrThrow
                 LazyColumn(contentPadding = it) {
                     item {
-                        val result: WizardExampleDestination.Result? by rememberResult()
-                        LaunchedEffect(result) {
-                            Log.v("ScreenResult", "WizardResult is $result")
-                        }
                         ListItem(
                             modifier = Modifier
                                 .clickable { backstack.push(WizardExampleDestination) },
                             headlineContent = { Text("Wizard") },
+                            supportingContent = {
+                                val result by rememberResult<WizardResult>()
+                                result?.let { wizardResult ->
+                                    Text(
+                                        text = "${wizardResult.name?.takeUnless { it.isBlank() } ?: "(No Name)"} aka. ${wizardResult.nickname?.takeUnless { it.isBlank() } ?: "(No Nickname)"}",
+                                        style = MaterialTheme.typography.labelMedium,
+                                    )
+                                }
+                            }
+                        )
+                        ListItem(
+                            modifier = Modifier
+                                .clickable { backstack.push(BottomSheetRendererDestination) },
+                            headlineContent = { Text("Custom Renderer with BottomSheet") },
                         )
                     }
                 }

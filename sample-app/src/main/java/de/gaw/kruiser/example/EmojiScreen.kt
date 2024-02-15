@@ -1,43 +1,27 @@
 package de.gaw.kruiser.example
 
 import android.util.Log
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
-import de.gaw.kruiser.backstack.ui.transition.AnimatedTransition
 import de.gaw.kruiser.backstack.ui.transition.CardTransition
-import de.gaw.kruiser.backstack.ui.transition.rememberIsVisible
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
@@ -121,9 +105,7 @@ private fun EmojiCard(emoji: String) {
                 }
                 Spacer(modifier = Modifier.size(16.dp))
                 ElevatedButton(
-                    onClick = {
-                        backstack.push(BottomSheetDestination)
-                    },
+                    onClick = { },
                 ) {
                     Text("Show Bottom Sheet")
                 }
@@ -134,50 +116,6 @@ private fun EmojiCard(emoji: String) {
                     },
                 ) {
                     Text("Push Stack")
-                }
-            }
-        }
-    }
-}
-
-@Parcelize
-object BottomSheetDestination : AndroidDestination {
-    private fun readResolve(): Any = BottomSheetDestination
-
-    override fun build(): Screen = object : Screen {
-        @Composable
-        override fun Content() {
-            val animDurationMs = 4_000
-            val isBackgroundScrimmed by rememberIsVisible()
-
-            val backgroundTransparency by animateFloatAsState(
-                animationSpec = tween(animDurationMs),
-                targetValue = if (isBackgroundScrimmed) .3f else .0f,
-                label = "bottom-sheet-background-scrim",
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = backgroundTransparency)),
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-                AnimatedTransition(
-                    enter = fadeIn(tween(animDurationMs)) + slideInVertically(tween(animDurationMs)) { it },
-                    exit = fadeOut(tween(animDurationMs)) + slideOutVertically(tween(animDurationMs)) { it },
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .navigationBarsPadding()
-                                .padding(16.dp)
-                        ) {
-                            Text(text = "Yes, hello, this is BottomSheet")
-                        }
-                    }
                 }
             }
         }
