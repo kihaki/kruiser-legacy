@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,6 +27,7 @@ import java.util.UUID
 
 interface TextPageDestination : AndroidDestination {
     val title: String
+    val contentModifier: Modifier get() = Modifier.fillMaxSize()
 
     @Composable
     fun Decoration(content: @Composable () -> Unit) = content()
@@ -37,8 +40,7 @@ interface TextPageDestination : AndroidDestination {
                 shadowElevation = 4.dp,
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = contentModifier
                         .padding(16.dp),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -90,4 +92,10 @@ data class RegularPageDestination(
 data class BottomSheetPageDestination(
     override val title: String,
 ) : TextPageDestination,
-    BottomSheetDestination
+    BottomSheetDestination {
+    override val contentModifier
+        get() = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(bottom = 16.dp)
+}

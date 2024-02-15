@@ -2,6 +2,7 @@ package de.gaw.kruiser.example.bottomsheet
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
@@ -12,8 +13,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -68,14 +69,14 @@ fun BackstackRendererWithBottomSheet(
             visible = isBottomSheetVisible,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .heightIn(min = 0.dp, max = 320.dp)
-                .fillMaxWidth(),
+                .wrapContentHeight()
+                .fillMaxWidth()
+                .animateContentSize(),
             enter = slideInVertically { it },
             exit = slideOutVertically { it },
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
+            Surface(
+                shadowElevation = 4.dp,
             ) {
                 BackstackContext(
                     mutableBackstack = mutableBackstack,
