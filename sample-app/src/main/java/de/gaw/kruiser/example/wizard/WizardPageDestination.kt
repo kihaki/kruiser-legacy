@@ -39,7 +39,9 @@ interface WizardPageDestination : AndroidDestination {
                 shadowElevation = 4.dp,
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(
@@ -100,7 +102,9 @@ object WizardCompletionDestination : AndroidDestination {
                 shadowElevation = 4.dp,
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(

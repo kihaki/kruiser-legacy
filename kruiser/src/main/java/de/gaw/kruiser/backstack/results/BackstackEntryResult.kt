@@ -1,6 +1,5 @@
 package de.gaw.kruiser.backstack.results
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlin.reflect.KClass
 
@@ -48,7 +46,6 @@ inline fun <reified T : BackstackResult> BackstackResultsStore.setOrMutateResult
     map {
         if (it.resultType == T::class && it.marker == marker) {
             mutated = true
-            Log.v("ScreenResult", "Mutate! ${T::class}")
             (it as BackstackEntryResult<T>).copy(result = block(it.result))
         } else {
             it
@@ -59,9 +56,7 @@ inline fun <reified T : BackstackResult> BackstackResultsStore.setOrMutateResult
         } else {
             this
         }
-    }.toSet().also {
-        Log.v("ScreenResult", "New results: $it")
-    }
+    }.toSet()
 }
 
 inline fun <reified T : BackstackResult> BackstackResultsStore.setResult(
@@ -84,9 +79,7 @@ val LocalBackstackEntriesResultsStore = compositionLocalOf<BackstackResultsStore
 fun rememberSaveableBackstackResultsStore(): BackstackResultsStore = rememberSaveable(
     saver = backstackResultsStoreSaver,
 ) {
-    BackstackResultsStoreImpl().also {
-        Log.v("ScreenResult", "Creating: $it")
-    }
+    BackstackResultsStoreImpl()
 }
 
 // Assumes the results are at least serializable
@@ -101,11 +94,7 @@ internal class BackstackResultsStoreImpl(
     override val results = MutableStateFlow(initialResults)
 
     override fun mutate(block: Set<BackstackEntryResult<*>>.() -> Set<BackstackEntryResult<*>>) {
-        results.update {
-            it.block().also { new ->
-                Log.v("ScreenResult", "Updated from $it to $new")
-            }
-        }
+        results.update(block)
     }
 }
 
@@ -119,16 +108,10 @@ inline fun <reified T : BackstackResult> rememberResult(
     initialValue = store.results.value.findMine<T>(marker)?.result,
 ) {
     store.results
-        .onEach { Log.v("ScreenResult", "New set: $it") }
         .map { results ->
-            Log.v("ScreenResult", "Finding...")
-            results.findMine<T>(marker).also {
-                Log.v("ScreenResult", "Found $it in $results")
-            }
+            results.findMine<T>(marker)
         }.collectLatest {
-            value = it?.result.also {
-                Log.v("ScreenResult", "Setting Result to $it")
-            }
+            value = it?.result
 //            it?.let { result -> store.clearResult(result) }
         }
 }
