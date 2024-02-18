@@ -18,15 +18,15 @@ import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.backstack.ui.util.collectEntries
-import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
 
 @Composable
 fun Backstack(
+    backstack: MutableBackstack,
     modifier: Modifier = Modifier,
-    backstack: MutableBackstack = rememberSaveableBackstack(),
     stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
-    backstackResultsStore: BackstackResultsStore = LocalBackstackEntriesResultsStore.current ?: rememberSaveableBackstackResultsStore(),
+    backstackResultsStore: BackstackResultsStore = LocalBackstackEntriesResultsStore.current
+        ?: rememberSaveableBackstackResultsStore(),
 ) {
     BackstackContext(
         mutableBackstack = backstack,
@@ -48,7 +48,8 @@ fun BackstackContext(
     mutableBackstack: MutableBackstack = rememberSaveableBackstack(),
     backstack: Backstack = mutableBackstack,
     stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
-    backstackResultsStore: BackstackResultsStore = LocalBackstackEntriesResultsStore.current ?: rememberSaveableBackstackResultsStore(),
+    backstackResultsStore: BackstackResultsStore = LocalBackstackEntriesResultsStore.current
+        ?: rememberSaveableBackstackResultsStore(),
     content: @Composable (Backstack) -> Unit,
 ) {
     CompositionLocalProvider(
