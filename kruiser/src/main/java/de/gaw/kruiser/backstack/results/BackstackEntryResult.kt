@@ -1,5 +1,6 @@
 package de.gaw.kruiser.backstack.results
 
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
@@ -12,9 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
+import java.io.Serializable
 import kotlin.reflect.KClass
 
-typealias BackstackResult = Any
+typealias BackstackResult = Serializable
 
 inline fun <reified T : BackstackResult> BackstackEntryResult(
     result: T,
@@ -25,11 +29,12 @@ inline fun <reified T : BackstackResult> BackstackEntryResult(
     resultType = result::class,
 )
 
+@Parcelize
 data class BackstackEntryResult<T : BackstackResult>(
-    val resultType: KClass<out T>,
+    val resultType: @RawValue KClass<out T>,
     val result: T,
     val marker: String?,
-)
+) : Parcelable
 
 interface BackstackResultsStore {
     val results: StateFlow<Set<BackstackEntryResult<*>>>
@@ -83,10 +88,11 @@ fun rememberSaveableBackstackResultsStore(): BackstackResultsStore = rememberSav
 }
 
 // Assumes the results are at least serializable
-private val backstackResultsStoreSaver = Saver<BackstackResultsStore, Set<BackstackEntryResult<*>>>(
-    save = { it.results.value },
-    restore = { BackstackResultsStoreImpl(initialResults = it) }
-)
+private val backstackResultsStoreSaver =
+    Saver<BackstackResultsStore, List<BackstackEntryResult<*>>>(
+        save = { it.results.value.toList() },
+        restore = { BackstackResultsStoreImpl(initialResults = it.toSet()) }
+    )
 
 internal class BackstackResultsStoreImpl(
     initialResults: Set<BackstackEntryResult<*>> = emptySet(),
