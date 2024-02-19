@@ -1,11 +1,13 @@
 package de.gaw.kruiser.backstack.util
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import de.gaw.kruiser.backstack.core.Backstack
 import de.gaw.kruiser.backstack.core.BackstackEntries
@@ -22,7 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 private class DerivedBackstack(
     scope: CoroutineScope,
     parent: Backstack,
-    override val id: String = "${parent.id}::${Backstack.generateId()}",
+    override val id: String,
     mapping: BackstackEntries.() -> BackstackEntries,
 ) : Backstack {
     override val entries: StateFlow<ImmutableEntries> =
@@ -49,9 +51,14 @@ fun rememberDerivedBackstackOf(
 ): Backstack {
     val scope = rememberCoroutineScope()
     val currentMapping by rememberUpdatedState(mapping)
+    val derivedBackstackId = rememberSaveable(backstack.id) {
+        "${backstack.id}::${Backstack.generateId()}"
+    }
     return remember(scope, backstack.id) {
+        Log.v("Kruiser", "Deriving new Backstack for ${backstack.id} with id $derivedBackstackId")
         DerivedBackstack(
             scope = scope,
+            id = derivedBackstackId,
             parent = backstack,
             mapping = currentMapping,
         )

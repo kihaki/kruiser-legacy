@@ -24,7 +24,8 @@ import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
 fun Backstack(
     backstack: MutableBackstack,
     modifier: Modifier = Modifier,
-    stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
+    stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current
+        ?: rememberSaveableStateHolder(),
     backstackResultsStore: BackstackResultsStore = LocalBackstackEntriesResultsStore.current
         ?: rememberSaveableBackstackResultsStore(),
 ) {
@@ -45,9 +46,11 @@ fun Backstack(
  */
 @Composable
 fun BackstackContext(
-    mutableBackstack: MutableBackstack = rememberSaveableBackstack(),
+    mutableBackstack: MutableBackstack = LocalMutableBackstack.current
+        ?: rememberSaveableBackstack(),
     backstack: Backstack = mutableBackstack,
-    stateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
+    stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current
+        ?: rememberSaveableStateHolder(),
     backstackResultsStore: BackstackResultsStore = LocalBackstackEntriesResultsStore.current
         ?: rememberSaveableBackstackResultsStore(),
     content: @Composable (Backstack) -> Unit,
