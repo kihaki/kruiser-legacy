@@ -10,15 +10,12 @@ import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.core.Backstack
 import de.gaw.kruiser.backstack.core.MutableBackstack
 import de.gaw.kruiser.backstack.pop
-import de.gaw.kruiser.backstack.results.BackstackResultsStore
-import de.gaw.kruiser.backstack.results.LocalBackstackEntriesResultsStore
-import de.gaw.kruiser.backstack.results.rememberSaveableBackstackResultsStore
 import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
 import de.gaw.kruiser.backstack.ui.util.LocalBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.backstack.ui.util.collectEntries
-import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
+import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 
 @Composable
 fun Backstack(
@@ -26,13 +23,10 @@ fun Backstack(
     modifier: Modifier = Modifier,
     stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current
         ?: rememberSaveableStateHolder(),
-    backstackResultsStore: BackstackResultsStore = LocalBackstackEntriesResultsStore.current
-        ?: rememberSaveableBackstackResultsStore(),
 ) {
     BackstackContext(
         mutableBackstack = backstack,
         stateHolder = stateHolder,
-        backstackResultsStore = backstackResultsStore,
     ) {
         BackstackRenderer(
             modifier = modifier,
@@ -46,20 +40,16 @@ fun Backstack(
  */
 @Composable
 fun BackstackContext(
-    mutableBackstack: MutableBackstack = LocalMutableBackstack.current
-        ?: rememberSaveableBackstack(),
+    mutableBackstack: MutableBackstack = LocalMutableBackstack.currentOrThrow,
     backstack: Backstack = mutableBackstack,
     stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current
         ?: rememberSaveableStateHolder(),
-    backstackResultsStore: BackstackResultsStore = LocalBackstackEntriesResultsStore.current
-        ?: rememberSaveableBackstackResultsStore(),
     content: @Composable (Backstack) -> Unit,
 ) {
     CompositionLocalProvider(
         LocalMutableBackstack provides mutableBackstack,
         LocalBackstack provides backstack,
         LocalSaveableStateHolder provides stateHolder,
-        LocalBackstackEntriesResultsStore provides backstackResultsStore,
     ) {
         stateHolder.SaveableStateProvider(key = "bs:${backstack.id}") {
             val entries by mutableBackstack.collectEntries()

@@ -27,7 +27,7 @@ private class DerivedBackstack(
     override val id: String,
     mapping: BackstackEntries.() -> BackstackEntries,
 ) : Backstack {
-    override val entries: StateFlow<ImmutableEntries> =
+    override val entries: StateFlow<BackstackEntries> =
         parent.entries
             .map(mapping)
             .map(BackstackEntries::toPersistentList)

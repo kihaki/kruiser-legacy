@@ -16,53 +16,32 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
-import de.gaw.kruiser.backstack.core.MutableBackstack
-import de.gaw.kruiser.backstack.core.SavedStateMutableBackstack
 import de.gaw.kruiser.backstack.debug.DebugBackstackLoggerEffect
+import de.gaw.kruiser.backstack.savedstate.PersistedMutableBackstack
 import de.gaw.kruiser.backstack.ui.Backstack
-import de.gaw.kruiser.destination.Destination
-import de.gaw.kruiser.example.ExampleListDestination
+import de.gaw.kruiser.example.ExamplesListDestination
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 
-interface MutableBackstackProvider {
-    val backstack: MutableBackstack
-}
-
-class SavedStateMutableBackstackProvider(
-    vararg initial: Destination,
-    savedState: SavedStateHandle,
-    key: String,
-) : MutableBackstackProvider {
-    override val backstack = SavedStateMutableBackstack(
-        initial = initial.toList(),
-        savedStateHandle = savedState,
-        stateKey = key,
+class MasterNavigationViewModel(savedState: SavedStateHandle) : ViewModel() {
+    val backstack = savedState.PersistedMutableBackstack(
+        id = "nav:master",
+        initial = listOf(
+            ExamplesListDestination,
+        ),
     )
 }
-
-class MasterNavigationStateViewModel(savedState: SavedStateHandle) :
-    ViewModel(),
-    MutableBackstackProvider by SavedStateMutableBackstackProvider(
-        ExampleListDestination,
-//        EmojiDestination(emojis.random()),
-//        BackstackInScaffoldExampleDestination,
-        savedState = savedState,
-        key = "nav:master",
-    )
 
 @Composable
 fun activityViewModelStoreOwner() =
     LocalContext.current as ViewModelStoreOwner
 
 @Composable
-fun masterNavigationStateViewModel(): MasterNavigationStateViewModel =
+fun masterNavigationStateViewModel(): MasterNavigationViewModel =
     viewModel(
         viewModelStoreOwner = activityViewModelStoreOwner(),
         factory = viewModelFactory {
-            addInitializer(MasterNavigationStateViewModel::class) {
-                MasterNavigationStateViewModel(
-                    savedState = createSavedStateHandle(),
-                )
+            addInitializer(MasterNavigationViewModel::class) {
+                MasterNavigationViewModel(createSavedStateHandle())
             }
         },
     )
@@ -71,6 +50,7 @@ class MasterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
         setContent {
             KruiserSampleTheme {
                 Surface(
