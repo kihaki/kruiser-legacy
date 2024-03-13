@@ -29,7 +29,8 @@ import de.gaw.kruiser.backstack.ui.BackstackContext
 import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
 import de.gaw.kruiser.backstack.ui.rendering.Render
 import de.gaw.kruiser.backstack.ui.util.collectEntries
-import de.gaw.kruiser.backstack.util.rememberDerivedBackstackOf
+import de.gaw.kruiser.backstack.util.filterDestinations
+import de.gaw.kruiser.backstack.util.rememberDerivedBackstack
 import de.gaw.kruiser.destination.Destination
 
 interface BottomSheetDestination : Destination
@@ -37,24 +38,23 @@ interface BottomSheetDestination : Destination
 @Composable
 fun BackstackRendererWithBottomSheet(
     modifier: Modifier = Modifier,
-    mutableBackstack: MutableBackstack,
+    backstack: MutableBackstack,
 ) {
-    val entries by mutableBackstack.collectEntries()
+    val entries by backstack.collectEntries()
     Box(modifier = modifier) {
         // Regular screens
-        val nonBottomSheetBackstack = rememberDerivedBackstackOf(mutableBackstack) {
-            filter { it.destination !is BottomSheetDestination }
-        }
         BackstackContext(
-            mutableBackstack = mutableBackstack,
-            backstack = nonBottomSheetBackstack,
+            mutableBackstack = backstack,
+            backstack = rememberDerivedBackstack(backstack) {
+                filterDestinations { it !is BottomSheetDestination }
+            }
         ) {
             BackstackRenderer(backstack = it)
         }
 
         // Bottomsheet Screens
-        val bottomSheetBackstack = rememberDerivedBackstackOf(mutableBackstack) {
-            filter { it.destination is BottomSheetDestination }
+        val bottomSheetBackstack = rememberDerivedBackstack(backstack) {
+            filterDestinations { it is BottomSheetDestination }
         }
         val isBottomSheetVisible by remember { derivedStateOf { entries.lastOrNull()?.destination is BottomSheetDestination } }
         val backgroundScrim by animateFloatAsState(
@@ -80,7 +80,7 @@ fun BackstackRendererWithBottomSheet(
                 shadowElevation = 4.dp,
             ) {
                 BackstackContext(
-                    mutableBackstack = mutableBackstack,
+                    mutableBackstack = backstack,
                     backstack = bottomSheetBackstack,
                 ) { sheetStack ->
                     val sheetEntries by sheetStack.collectEntries()

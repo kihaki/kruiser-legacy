@@ -17,11 +17,12 @@ object BottomSheetRendererDestination : AndroidDestination {
         @Composable
         override fun Content() = BottomCardTransition {
             val backstack = rememberSaveableBackstack(
-                listOf(
+                backstackId = "bottom-sheet-renderer-backstack",
+                initial = listOf(
                     RegularPageDestination("First Page"),
                 )
             )
-            BackstackRendererWithBottomSheet(mutableBackstack = backstack)
+            BackstackRendererWithBottomSheet(backstack = backstack)
         }
     }
 }
