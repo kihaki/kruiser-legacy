@@ -37,8 +37,10 @@ import de.gaw.kruiser.backstack.pop
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
+import de.gaw.kruiser.backstack.ui.util.collectDerivedEntries
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
+import de.gaw.kruiser.backstack.util.filterDestinations
 import de.gaw.kruiser.destination.AndroidDestination
 
 val wizardDestinations = listOf<AndroidDestination>(
@@ -92,7 +94,10 @@ fun Wizard(content: @Composable (PaddingValues) -> Unit) {
             ) {
                 BottomAppBar {
                     val entries by backstackState.collectEntries()
-                    val backEnabled = entries.size > 1
+                    val wizardPages by backstackState.collectDerivedEntries {
+                        filterDestinations { it in wizardDestinations }
+                    }
+                    val backEnabled = wizardPages.size > 1
                     val pageCount = wizardDestinations.size
                     ListItem(
                         modifier = Modifier
