@@ -39,7 +39,7 @@ import de.gaw.kruiser.backstack.savedstate.PersistedMutableBackstack
 import de.gaw.kruiser.backstack.ui.BackstackContext
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.rendering.Render
-import de.gaw.kruiser.backstack.ui.transparency.Transparent
+import de.gaw.kruiser.backstack.ui.transparency.Overlay
 import de.gaw.kruiser.backstack.ui.util.collectDerivedEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
 import de.gaw.kruiser.example.ExamplesListDestination
@@ -98,10 +98,10 @@ class MasterActivity : ComponentActivity() {
                         mutableBackstack = masterBackstack,
                     ) { backstack ->
                         val regular by backstack.collectDerivedEntries {
-                            filterDestinations { it !is Transparent && it !is WizardDestination }
+                            filterDestinations { it !is Overlay && it !is WizardDestination }
                         }
-                        val transparent by backstack.collectDerivedEntries {
-                            filterDestinations { it is Transparent }
+                        val overlay by backstack.collectDerivedEntries {
+                            filterDestinations { it is Overlay }
                         }
                         val onWizard by backstack.collectDerivedEntries {
                             filterDestinations { it is WizardDestination }
@@ -153,8 +153,8 @@ class MasterActivity : ComponentActivity() {
                                 }
                             }
                             AnimatedContent(
-                                targetState = transparent.lastOrNull(),
-                                label = "transparent-transitions",
+                                targetState = overlay.lastOrNull(),
+                                label = "overlay-transitions",
                             ) { entry ->
                                 entry?.Render()
                             }

@@ -7,14 +7,13 @@ import androidx.compose.runtime.Composable
 import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.pop
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
-import de.gaw.kruiser.backstack.ui.transparency.Transparent
+import de.gaw.kruiser.backstack.ui.transparency.Overlay
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
@@ -23,7 +22,7 @@ data class WarningDialogDestination(
     val title: String? = null,
     val message: String? = null,
 ) : AndroidDestination,
-    Transparent {
+    Overlay {
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() {

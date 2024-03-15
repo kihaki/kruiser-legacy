@@ -13,7 +13,7 @@ import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransiti
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransitionRunning
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionTracker
 import de.gaw.kruiser.backstack.ui.transition.transitionState
-import de.gaw.kruiser.backstack.ui.transparency.Transparent
+import de.gaw.kruiser.backstack.ui.transparency.Overlay
 import de.gaw.kruiser.backstack.ui.util.LocalBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import kotlinx.collections.immutable.toPersistentList
@@ -50,7 +50,7 @@ class DefaultOnScreenBackstack(
     private val transparent
         get() = (previousEntries + entries.value)
             .toSet()
-            .filter { it.destination is Transparent }
+            .filter { it.destination is Overlay }
 
     override val transitionStates = MutableStateFlow(
         current.entries.value.associateWith { EntryTransitionDone }
