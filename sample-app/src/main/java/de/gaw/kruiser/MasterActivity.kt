@@ -154,7 +154,7 @@ class MasterActivity : ComponentActivity() {
                             }
                             AnimatedContent(
                                 targetState = transparent.lastOrNull(),
-                                label = "overlay-transitions",
+                                label = "transparent-transitions",
                             ) { entry ->
                                 entry?.Render()
                             }
