@@ -167,4 +167,4 @@ fun MutableBackstackState.popWizard() = mutate {
 }
 
 fun BackstackEntries.popWizard() =
-    dropLastWhile { it.destination is WizardDestination }
+    filterNot { wizardDestinations.contains(it.destination) }
