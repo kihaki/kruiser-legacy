@@ -154,7 +154,7 @@ class MasterActivity : ComponentActivity() {
                             }
                             AnimatedContent(
                                 targetState = transparent.lastOrNull(),
-                                label = "main-screen-animations",
+                                label = "overlay-transitions",
                             ) { entry ->
                                 entry?.Render()
                             }
