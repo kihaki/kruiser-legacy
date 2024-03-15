@@ -38,7 +38,6 @@ import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.collectDerivedEntries
-import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.backstack.util.filterDestinations
 import de.gaw.kruiser.destination.AndroidDestination
@@ -93,7 +92,6 @@ fun Wizard(content: @Composable (PaddingValues) -> Unit) {
                 shadowElevation = 2.dp,
             ) {
                 BottomAppBar {
-                    val entries by backstackState.collectEntries()
                     val wizardPages by backstackState.collectDerivedEntries {
                         filterDestinations { it in wizardDestinations }
                     }
@@ -120,7 +118,7 @@ fun Wizard(content: @Composable (PaddingValues) -> Unit) {
                             .clickable(
                                 onClick = {
                                     when {
-                                        entries.size < pageCount -> backstackState.push(
+                                        wizardPages.size < pageCount -> backstackState.push(
                                             wizardDestinations[wizardDestinations.indexOf(entry.destination) + 1]
                                         )
 
@@ -130,7 +128,7 @@ fun Wizard(content: @Composable (PaddingValues) -> Unit) {
                             ),
                         headlineContent = {
                             AnimatedContent(
-                                entries.size < pageCount,
+                                wizardPages.size < pageCount,
                                 transitionSpec = {
                                     slideInVertically { it } togetherWith
                                             slideOutVertically { -it }
