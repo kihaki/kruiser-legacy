@@ -30,6 +30,8 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
+import de.gaw.kruiser.PageStyle.Regular
+import de.gaw.kruiser.PageStyle.Wizard
 import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.debug.DebugBackstackLoggerEffect
@@ -95,21 +97,20 @@ class MasterActivity : ComponentActivity() {
                     BackstackContext(
                         mutableBackstack = masterBackstack,
                     ) { backstack ->
-                        val nonTransparent by backstack.collectDerivedEntries {
+                        val regular by backstack.collectDerivedEntries {
                             filterDestinations { it !is Transparent && it !is WizardDestination }
                         }
                         val transparent by backstack.collectDerivedEntries {
                             filterDestinations { it is Transparent }
                         }
-                        val wizardDestinations by backstack.collectDerivedEntries {
+                        val onWizard by backstack.collectDerivedEntries {
                             filterDestinations { it is WizardDestination }
                         }
                         val style by remember {
                             derivedStateOf {
-                                val entry = nonTransparent.lastOrNull()
                                 when {
-                                    wizardDestinations.isNotEmpty() -> PageStyle.Wizard
-                                    else -> PageStyle.Regular(entry)
+                                    onWizard.isNotEmpty() -> Wizard
+                                    else -> Regular(regular.lastOrNull())
                                 }
                             }
                         }
@@ -120,9 +121,9 @@ class MasterActivity : ComponentActivity() {
                                 transitionSpec = backstack.slideTransition(),
                             ) { currentStyle ->
                                 when (currentStyle) {
-                                    PageStyle.Wizard -> {
-                                        val destination by produceState(wizardDestinations.lastOrNull()) {
-                                            snapshotFlow { wizardDestinations }
+                                    Wizard -> {
+                                        val destination by produceState(onWizard.lastOrNull()) {
+                                            snapshotFlow { onWizard }
                                                 .map { it.lastOrNull() }
                                                 .filterNotNull()
                                                 .collectLatest {
@@ -146,7 +147,7 @@ class MasterActivity : ComponentActivity() {
 
                                     else -> {
                                         val entry =
-                                            (currentStyle as PageStyle.Regular).backstackEntry
+                                            (currentStyle as Regular).backstackEntry
                                         entry?.Render()
                                     }
                                 }
