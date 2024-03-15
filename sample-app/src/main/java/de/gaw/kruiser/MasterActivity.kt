@@ -7,6 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -24,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStoreOwner
@@ -41,6 +45,7 @@ import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.rendering.Render
 import de.gaw.kruiser.backstack.ui.transparency.Overlay
 import de.gaw.kruiser.backstack.ui.util.collectDerivedEntries
+import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
 import de.gaw.kruiser.example.ExamplesListDestination
 import de.gaw.kruiser.example.wizard.Wizard
@@ -176,25 +181,31 @@ fun <S> BackstackState.slideTransition(): AnimatedContentTransitionScope<S>.() -
     val hasPushed by produceState(false) {
         var previousEntries = emptyList<BackstackEntry>()
         entries.collectLatest {
-            value = it.size > previousEntries.size
+            value = it.size >= previousEntries.size
             previousEntries = it
         }
     }
-    return if (hasPushed) {
-        {
-            (slideInHorizontally { it } togetherWith
-                    slideOutHorizontally { -it / 2 })
-                .apply {
-                    targetContentZIndex = entries.value.size.toFloat()
-                }
-        }
-    } else {
-        {
-            (slideInHorizontally { -it / 2 } togetherWith
-                    slideOutHorizontally { it })
-                .apply {
-                    targetContentZIndex = entries.value.size.toFloat() - 1f
-                }
+//    val transitionTween = tween<IntOffset>(3000)
+    val transitionTween = spring(
+        stiffness = Spring.StiffnessMediumLow,
+        visibilityThreshold = IntOffset.VisibilityThreshold
+    )
+    val entries by collectEntries()
+    val stackSize = entries.size
+    return {
+        if (hasPushed) {
+            slideInHorizontally(transitionTween) { it } togetherWith
+                    slideOutHorizontally(transitionTween) { -it / 2 }
+        } else {
+            slideInHorizontally(transitionTween) { -it / 2 } togetherWith
+                    slideOutHorizontally(transitionTween) { it }
+        }.apply {
+            targetContentZIndex = when {
+                // Make sure that content that's pushed is rendered on top
+                hasPushed -> stackSize
+                // Make sure that content that's popped is rendered on top
+                else -> (stackSize - 1)
+            }.toFloat()
         }
     }
 }
