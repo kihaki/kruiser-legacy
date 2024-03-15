@@ -101,7 +101,7 @@ class MasterActivity : ComponentActivity() {
                             filterDestinations { it !is Overlay && it !is WizardDestination }
                         }
                         val overlay by backstack.collectDerivedEntries {
-                            filterDestinations { it is Overlay }
+                            listOfNotNull(lastOrNull()?.takeIf { it.destination is Overlay })
                         }
                         val onWizard by backstack.collectDerivedEntries {
                             filterDestinations { it is WizardDestination }
