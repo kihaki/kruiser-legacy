@@ -7,10 +7,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
-import de.gaw.kruiser.backstack.ui.util.LocalBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalBackstackState
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 
@@ -21,7 +21,7 @@ import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 @Composable
 fun rememberIsVisible(
     entry: BackstackEntry = LocalBackstackEntry.currentOrThrow,
-    backstack: Backstack = LocalBackstack.currentOrThrow,
+    backstack: BackstackState = LocalBackstackState.currentOrThrow,
     transitionTracker: ScreenTransitionTracker = LocalScreenTransitionTracker.currentOrThrow,
 ): MutableState<Boolean> {
     val isVisible = remember {

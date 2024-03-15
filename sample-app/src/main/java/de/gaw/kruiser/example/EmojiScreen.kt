@@ -22,7 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.transition.CardTransition
-import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
@@ -67,7 +67,7 @@ class EmojiViewModel(private val emoji: String) : ViewModel() {
 
 @Composable
 private fun EmojiCard(emoji: String) {
-    val backstack = LocalMutableBackstack.currentOrThrow
+    val backstack = LocalMutableBackstackState.currentOrThrow
 
     @Suppress("UNUSED_VARIABLE")
     val viewModel =

@@ -5,7 +5,7 @@ import de.gaw.kruiser.backstack.core.BackstackEntries
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ParceledBackstack(
+data class ParcelableBackstackState(
     val id: String,
     val entries: BackstackEntries,
 ) : Parcelable

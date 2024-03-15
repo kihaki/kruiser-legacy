@@ -7,19 +7,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.backstack.core.Backstack
-import de.gaw.kruiser.backstack.core.MutableBackstack
+import de.gaw.kruiser.backstack.core.BackstackState
+import de.gaw.kruiser.backstack.core.MutableBackstackState
 import de.gaw.kruiser.backstack.pop
 import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
-import de.gaw.kruiser.backstack.ui.util.LocalBackstack
-import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalBackstackState
+import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 
 @Composable
 fun Backstack(
-    backstack: MutableBackstack,
+    backstack: MutableBackstackState,
     modifier: Modifier = Modifier,
     stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current
         ?: rememberSaveableStateHolder(),
@@ -36,19 +36,19 @@ fun Backstack(
 }
 
 /**
- * Handles back presses and sets the [LocalMutableBackstack] defers rendering to the [content] composable.
+ * Handles back presses and sets the [LocalMutableBackstackState] defers rendering to the [content] composable.
  */
 @Composable
 fun BackstackContext(
-    mutableBackstack: MutableBackstack = LocalMutableBackstack.currentOrThrow,
-    backstack: Backstack = mutableBackstack,
+    mutableBackstack: MutableBackstackState = LocalMutableBackstackState.currentOrThrow,
+    backstack: BackstackState = mutableBackstack,
     stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current
         ?: rememberSaveableStateHolder(),
-    content: @Composable (Backstack) -> Unit,
+    content: @Composable (BackstackState) -> Unit,
 ) {
     CompositionLocalProvider(
-        LocalMutableBackstack provides mutableBackstack,
-        LocalBackstack provides backstack,
+        LocalMutableBackstackState provides mutableBackstack,
+        LocalBackstackState provides backstack,
         LocalSaveableStateHolder provides stateHolder,
     ) {
         stateHolder.SaveableStateProvider(key = "bs:${backstack.id}") {

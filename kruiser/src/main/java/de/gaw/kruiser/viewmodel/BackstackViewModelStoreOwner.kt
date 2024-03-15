@@ -5,9 +5,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
-import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.core.BackstackEntry
-import de.gaw.kruiser.backstack.currentEntries
+import de.gaw.kruiser.backstack.util.currentEntries
 import de.gaw.kruiser.destination.Destination
 
 /**
@@ -33,7 +33,7 @@ private object BackstackViewModelStoreOwner {
  *
  * @param entry: The [BackstackEntry] to scope the [ViewModelStoreOwner] to.
  * @param disposeWhen: Checks whether the [ViewModel]s should be disposed, can be called whenever the system requires it.
- * This enables arbitrary scoping of [ViewModel]s, for Android Default behavior see the implementation of [Backstack.viewModelStoreOwner].
+ * This enables arbitrary scoping of [ViewModel]s, for Android Default behavior see the implementation of [BackstackState.viewModelStoreOwner].
  */
 @Composable
 fun backstackEntryViewModelStoreOwner(
@@ -56,12 +56,12 @@ fun backstackEntryViewModelStoreOwner(
 
 /**
  * Creates a [ViewModelStoreOwner] for the current [BackstackEntry] using Android Default behavior
- * of keeping the [ViewModel] around for as long as the [entry] is on the [Backstack].
+ * of keeping the [ViewModel] around for as long as the [entry] is on the [BackstackState].
  *
  * @param entry: The [BackstackEntry] to scope the [ViewModelStoreOwner] to.
  */
 @Composable
-fun Backstack.viewModelStoreOwner(entry: BackstackEntry): ViewModelStoreOwner {
+fun BackstackState.viewModelStoreOwner(entry: BackstackEntry): ViewModelStoreOwner {
     return backstackEntryViewModelStoreOwner(
         entry = entry,
         disposeWhen = { !currentEntries().contains(it) },

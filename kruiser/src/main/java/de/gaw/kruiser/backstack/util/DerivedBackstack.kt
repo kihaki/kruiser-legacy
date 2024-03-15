@@ -6,7 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
-import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.core.BackstackEntries
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
@@ -17,16 +17,16 @@ import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
 
 /**
- * Returns a [Backstack] that was mapped via [mapping]
+ * Returns a [BackstackState] that was mapped via [mapping]
  *
- * @param backstack: [Backstack] to map.
- * @param mapping: the mapping to apply to all emissions of [Backstack]
+ * @param backstack: [BackstackState] to map.
+ * @param mapping: the mapping to apply to all emissions of [BackstackState]
  */
 @Composable
 fun rememberDerivedBackstack(
-    backstack: Backstack,
+    backstack: BackstackState,
     mapping: BackstackEntries.() -> BackstackEntries,
-): Backstack {
+): BackstackState {
     val scope = rememberCoroutineScope()
     val currentMapping by rememberUpdatedState(mapping)
     val derivedBackstackId = rememberSaveable(backstack.id) {
@@ -44,10 +44,10 @@ fun rememberDerivedBackstack(
 
 private class DerivedBackstack(
     scope: CoroutineScope,
-    parent: Backstack,
+    parent: BackstackState,
     override val id: String,
     mapping: BackstackEntries.() -> BackstackEntries,
-) : Backstack {
+) : BackstackState {
     override val entries: StateFlow<BackstackEntries> =
         parent.entries
             .map(mapping)

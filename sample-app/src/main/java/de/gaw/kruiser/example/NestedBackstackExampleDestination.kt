@@ -16,7 +16,7 @@ object NestedBackstackExampleDestination : AndroidDestination {
         private val initialDestination = EmojiDestination(emojis.first())
         @Composable
         override fun Content() = CardTransition {
-            Backstack(backstack = rememberSaveableBackstack(listOf(initialDestination)))
+            Backstack(backstack = rememberSaveableBackstack("nested", listOf(initialDestination)))
         }
     }
 }

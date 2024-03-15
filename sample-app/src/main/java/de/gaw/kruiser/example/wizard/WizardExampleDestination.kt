@@ -1,6 +1,5 @@
 package de.gaw.kruiser.example.wizard
 
-import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInVertically
@@ -8,10 +7,10 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -33,170 +32,136 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.backstack.core.BackstackEntries
-import de.gaw.kruiser.backstack.core.MutableBackstack
-import de.gaw.kruiser.backstack.debug.DebugBackstackLoggerEffect
+import de.gaw.kruiser.backstack.core.MutableBackstackState
 import de.gaw.kruiser.backstack.pop
 import de.gaw.kruiser.backstack.push
-import de.gaw.kruiser.backstack.ui.Backstack
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
-import de.gaw.kruiser.backstack.ui.transition.BottomCardTransition
-import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
-import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
 import de.gaw.kruiser.destination.AndroidDestination
-import de.gaw.kruiser.destination.Screen
-import kotlinx.parcelize.Parcelize
-import java.io.Serializable
 
-private val wizardDestinations = listOf(
+val wizardDestinations = listOf<AndroidDestination>(
     WizardNameDestination,
     WizardNicknameDestination,
     WizardCompletionDestination,
 )
 
-@Parcelize
-object WizardExampleDestination : AndroidDestination {
-
-    @Parcelize
-    data class WizardResult(
-        val name: String? = null,
-        val nickname: String? = null,
-    ) : Parcelable, Serializable
-
-    private fun readResolve(): Any = WizardExampleDestination
-
-    override fun build(): Screen = object : Screen {
-
-        @OptIn(ExperimentalMaterial3Api::class)
-        @Composable
-        override fun Content() = BottomCardTransition {
-            val parentBackstack = LocalMutableBackstack.currentOrThrow
-            val wizardBackstack = rememberSaveableBackstack(wizardDestinations.first())
-            val backstackEntry = LocalBackstackEntry.currentOrThrow
-            val pageCount = wizardDestinations.size
-            val wizardEntries by wizardBackstack.collectEntries()
-            Scaffold(
-                topBar = {
-                    Surface(shadowElevation = 2.dp) {
-                        TopAppBar(
-                            title = {
-                                Column {
-                                    Text("Wizard")
-                                    val progress by animateFloatAsState(
-                                        targetValue = (wizardEntries.size - 1).toFloat() / (pageCount - 1),
-                                        label = "wizard-progress",
-                                    )
-                                    LinearProgressIndicator(progress = { progress })
-                                }
-                            },
-                            actions = {
-                                IconButton(onClick = {
-                                    parentBackstack.push(
-                                        WarningDialogDestination(
-                                            title = "Warning",
-                                            message = "Nah, all good actually."
-                                        )
-                                    )
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Close,
-                                        contentDescription = "Close Wizard"
-                                    )
-                                }
-                            },
-                        )
-                    }
-                },
-                content = {
-                    Backstack(
-                        modifier = Modifier.padding(it),
-                        backstack = wizardBackstack,
-                    )
-                    DebugBackstackLoggerEffect(
-                        tag = "Wizard ${backstackEntry.id} backstack",
-                        backstack = wizardBackstack,
-                    )
-                },
-                bottomBar = {
-                    Surface(
-                        modifier = Modifier.imePadding(),
-                        shadowElevation = 2.dp,
-                    ) {
-                        BottomAppBar {
-                            val backEnabled = wizardEntries.size > 1
-                            ListItem(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable(
-                                        enabled = backEnabled,
-                                        onClick = wizardBackstack::pop,
-                                    ),
-                                headlineContent = {
-                                    val textAlpha by animateFloatAsState(
-                                        targetValue = if (backEnabled) 1f else .5f,
-                                        label = "back-alpha",
-                                    )
-                                    Text(modifier = Modifier.alpha(textAlpha), text = "Back")
-                                },
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Wizard(content: @Composable (PaddingValues) -> Unit) {
+    val backstackState = LocalMutableBackstackState.currentOrThrow
+    val entry = LocalBackstackEntry.currentOrThrow
+    Scaffold(
+        topBar = {
+            Surface(shadowElevation = 2.dp) {
+                TopAppBar(
+                    title = {
+                        Column {
+                            Text("Wizard")
+                            val progress by animateFloatAsState(
+                                targetValue = .3f,
+                                label = "wizard-progress",
                             )
-                            ListItem(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable(
-                                        onClick = {
-                                            when {
-                                                wizardEntries.size < pageCount -> wizardBackstack.push(
-                                                    wizardDestinations[wizardEntries.size]
-                                                )
-
-                                                else -> parentBackstack.popWizard()
-                                            }
-                                        },
-                                    ),
-                                headlineContent = {
-                                    AnimatedContent(
-                                        wizardEntries.size < pageCount,
-                                        transitionSpec = {
-                                            slideInVertically { it } togetherWith
-                                                    slideOutVertically { -it }
-                                        },
-                                        label = "next-button-label-transition",
-                                    ) { isFinish ->
-                                        Row {
-                                            when (isFinish) {
-                                                true -> {
-                                                    Text("Next")
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    Icon(
-                                                        Icons.AutoMirrored.Filled.ArrowForward,
-                                                        "next-icon"
-                                                    )
-                                                }
-
-                                                else -> {
-                                                    Text("Finish")
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    Icon(Icons.Filled.Done, "done-icon")
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
+                            LinearProgressIndicator(progress = { progress })
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            backstackState.push(
+                                WarningDialogDestination(
+                                    title = "Warning",
+                                    message = "Nah, all good actually."
+                                )
+                            )
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Close Wizard"
                             )
                         }
-                    }
+                    },
+                )
+            }
+        },
+        content = content,
+        bottomBar = {
+            Surface(
+                modifier = Modifier.imePadding(),
+                shadowElevation = 2.dp,
+            ) {
+                BottomAppBar {
+                    val entries by backstackState.collectEntries()
+                    val backEnabled = entries.size > 1
+                    val pageCount = wizardDestinations.size
+                    ListItem(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable(
+                                enabled = backEnabled,
+                                onClick = backstackState::pop,
+                            ),
+                        headlineContent = {
+                            val textAlpha by animateFloatAsState(
+                                targetValue = if (backEnabled) 1f else .5f,
+                                label = "back-alpha",
+                            )
+                            Text(modifier = Modifier.alpha(textAlpha), text = "Back")
+                        },
+                    )
+                    ListItem(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable(
+                                onClick = {
+                                    when {
+                                        entries.size < pageCount -> backstackState.push(
+                                            wizardDestinations[wizardDestinations.indexOf(entry.destination) + 1]
+                                        )
+
+                                        else -> backstackState.popWizard()
+                                    }
+                                },
+                            ),
+                        headlineContent = {
+                            AnimatedContent(
+                                entries.size < pageCount,
+                                transitionSpec = {
+                                    slideInVertically { it } togetherWith
+                                            slideOutVertically { -it }
+                                },
+                                label = "next-button-label-transition",
+                            ) { isFinish ->
+                                Row {
+                                    when (isFinish) {
+                                        true -> {
+                                            Text("Next")
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Icon(
+                                                Icons.AutoMirrored.Filled.ArrowForward,
+                                                "next-icon"
+                                            )
+                                        }
+
+                                        else -> {
+                                            Text("Finish")
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Icon(Icons.Filled.Done, "done-icon")
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    )
                 }
-            )
+            }
         }
-    }
+    )
 }
 
-fun MutableBackstack.popWizard() = mutate {
+fun MutableBackstackState.popWizard() = mutate {
     popWizard()
 }
 
 fun BackstackEntries.popWizard() =
-    findLast { it.destination is WizardExampleDestination }?.let { wizard ->
-        this - wizard
-    } ?: this
+    dropLastWhile { it.destination is WizardDestination }

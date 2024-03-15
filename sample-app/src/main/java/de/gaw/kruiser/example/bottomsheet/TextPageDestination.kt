@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.transition.CardTransition
-import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
@@ -35,7 +35,7 @@ interface TextPageDestination : AndroidDestination {
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() = Decoration {
-            val backstack = LocalMutableBackstack.currentOrThrow
+            val backstack = LocalMutableBackstackState.currentOrThrow
             Surface(
                 shadowElevation = 4.dp,
             ) {

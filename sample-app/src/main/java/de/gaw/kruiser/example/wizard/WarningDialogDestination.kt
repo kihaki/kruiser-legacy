@@ -6,11 +6,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.pop
-import de.gaw.kruiser.backstack.results.LocalBackstackEntriesResultsStore
-import de.gaw.kruiser.backstack.results.setResult
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.transparency.Transparent
-import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
@@ -29,7 +27,7 @@ data class WarningDialogDestination(
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() {
-            val backstack = LocalMutableBackstack.currentOrThrow
+            val backstack = LocalMutableBackstackState.currentOrThrow
             val backstackEntry = LocalBackstackEntry.currentOrThrow
             fun BackstackEntries.removeDialog() = filterNot { it == backstackEntry }
 
@@ -58,10 +56,7 @@ data class WarningDialogDestination(
                             MainScope().launch(Dispatchers.IO) {
                                 backstack.mutate {
                                     removeDialog()
-                                }
-                                delay(90)
-                                backstack.mutate {
-                                    popWizard()
+                                        .popWizard()
                                 }
                             }
                         }

@@ -24,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import de.gaw.kruiser.backstack.core.MutableBackstack
+import de.gaw.kruiser.backstack.core.MutableBackstackState
 import de.gaw.kruiser.backstack.ui.BackstackContext
 import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
 import de.gaw.kruiser.backstack.ui.rendering.Render
@@ -38,7 +38,7 @@ interface BottomSheetDestination : Destination
 @Composable
 fun BackstackRendererWithBottomSheet(
     modifier: Modifier = Modifier,
-    backstack: MutableBackstack,
+    backstack: MutableBackstackState,
 ) {
     val entries by backstack.collectEntries()
     Box(modifier = modifier) {

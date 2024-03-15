@@ -4,10 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.core.BackstackEntry
-import de.gaw.kruiser.backstack.core.generateId
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.EntryTransitionDone
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransitionDone
@@ -15,7 +14,7 @@ import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionState.ExitTransiti
 import de.gaw.kruiser.backstack.ui.transition.ScreenTransitionTracker
 import de.gaw.kruiser.backstack.ui.transition.transitionState
 import de.gaw.kruiser.backstack.ui.transparency.Transparent
-import de.gaw.kruiser.backstack.ui.util.LocalBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
@@ -27,22 +26,23 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 val LocalOnScreenBackstack = compositionLocalOf<OnScreenBackstack?> { null }
 
 /**
  * Backstack that reflects the state of [BackstackEntry]s that are visible on screen.
- * Also stores the [ScreenTransitionState] of [BackstackEntry]s that are on the [Backstack] and
+ * Also stores the [ScreenTransitionState] of [BackstackEntry]s that are on the [BackstackState] and
  * manages transparency.
  */
 interface OnScreenBackstack :
-    Backstack,
+    BackstackState,
     ScreenTransitionTracker
 
 class DefaultOnScreenBackstack(
     scope: CoroutineScope,
-    current: Backstack,
-    override val id: String = "${current.id}::${Backstack.generateId()}",
+    current: BackstackState,
+    override val id: String = "${current.id}-${UUID.randomUUID()}",
 ) : OnScreenBackstack {
 
     private var previousEntries = current.entries.value
@@ -164,7 +164,7 @@ class DefaultOnScreenBackstack(
 
 @Composable
 fun rememberOnScreenBackstack(
-    backstack: Backstack = LocalBackstack.currentOrThrow,
+    backstack: BackstackState = LocalBackstackState.currentOrThrow,
 ): OnScreenBackstack {
     val scope = rememberCoroutineScope()
     return remember(backstack.id) {

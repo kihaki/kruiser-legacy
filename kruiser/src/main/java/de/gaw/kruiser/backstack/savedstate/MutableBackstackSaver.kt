@@ -1,22 +1,23 @@
 package de.gaw.kruiser.backstack.savedstate
 
 import androidx.compose.runtime.saveable.Saver
-import de.gaw.kruiser.backstack.core.MutableBackstack
+import de.gaw.kruiser.backstack.core.BackstackState
+import de.gaw.kruiser.backstack.core.MutableBackstackState
 
-fun mutableBackstackSaver(): Saver<MutableBackstack, ParceledBackstack> =
-    MutableBackstackSaver
+fun mutableBackstackStateSaver(): Saver<MutableBackstackState, ParcelableBackstackState> =
+    MutableBackstackStateSaver
 
-private val MutableBackstackSaver = Saver<MutableBackstack, ParceledBackstack>(
+private val MutableBackstackStateSaver = Saver<MutableBackstackState, ParcelableBackstackState>(
     save = { original -> original.asSaveable() },
-    restore = { saved -> saved.asMutableBackstack() }
+    restore = { saved -> saved.asMutableBackstackState() }
 )
 
-internal fun MutableBackstack.asSaveable() = ParceledBackstack(
+internal fun BackstackState.asSaveable() = ParcelableBackstackState(
     id = id,
     entries = entries.value.toList(),
 )
 
-internal fun ParceledBackstack.asMutableBackstack() = MutableBackstack(
+internal fun ParcelableBackstackState.asMutableBackstackState() = MutableBackstackState(
     id = id,
-    initial = entries,
+    content = entries,
 )

@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import de.gaw.kruiser.backstack.core.Backstack
-import de.gaw.kruiser.backstack.ui.util.LocalBackstack
+import de.gaw.kruiser.backstack.core.BackstackState
+import de.gaw.kruiser.backstack.ui.util.LocalBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -16,7 +16,7 @@ import java.time.LocalTime
 @Composable
 fun DebugBackstackLoggerEffect(
     tag: String? = null,
-    backstack: Backstack = LocalBackstack.currentOrThrow,
+    backstack: BackstackState = LocalBackstackState.currentOrThrow,
 ) {
     val currentTag by rememberUpdatedState(tag)
     LaunchedEffect(tag, backstack) {

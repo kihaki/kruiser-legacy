@@ -6,10 +6,10 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import de.gaw.kruiser.backstack.core.Backstack
+import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
-import de.gaw.kruiser.backstack.ui.util.LocalBackstack
+import de.gaw.kruiser.backstack.ui.util.LocalBackstackState
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 
@@ -19,7 +19,7 @@ import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 @Composable
 fun rememberIsOnBackstack(
     entry: BackstackEntry = LocalBackstackEntry.currentOrThrow,
-    backstack: Backstack = LocalBackstack.currentOrThrow,
+    backstack: BackstackState = LocalBackstackState.currentOrThrow,
 ): State<Boolean> {
     val currentEntry by rememberUpdatedState(entry)
     val entries by backstack.collectEntries()

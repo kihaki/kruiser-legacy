@@ -4,17 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.core.BackstackEntry
-import de.gaw.kruiser.backstack.core.BackstackId
-import de.gaw.kruiser.backstack.core.MutableBackstack
-import de.gaw.kruiser.backstack.savedstate.mutableBackstackSaver
+import de.gaw.kruiser.backstack.core.BackstackStateId
+import de.gaw.kruiser.backstack.core.MutableBackstackState
+import de.gaw.kruiser.backstack.savedstate.mutableBackstackStateSaver
 import de.gaw.kruiser.destination.Destination
 
 @Composable
 @JvmName("rememberSaveableBackstackFromDestinations")
 fun rememberSaveableBackstack(
-    backstackId: BackstackId,
+    backstackId: BackstackStateId,
     initial: List<Destination>,
-): MutableBackstack =
+): MutableBackstackState =
     rememberSaveableBackstack(
         backstackId,
         initial.map { BackstackEntry(it) },
@@ -22,24 +22,24 @@ fun rememberSaveableBackstack(
 
 @Composable
 fun rememberSaveableBackstack(
-    backstackId: BackstackId,
+    backstackId: BackstackStateId,
     initial: BackstackEntries = emptyList(),
-): MutableBackstack =
+): MutableBackstackState =
     rememberSaveable(
-        saver = mutableBackstackSaver(),
+        saver = mutableBackstackStateSaver(),
     ) {
-        MutableBackstack(
+        MutableBackstackState(
             id = backstackId,
-            initial = initial,
+            content = initial,
         )
     }
 
 @Composable
 @JvmName("rememberSaveableBackstackFromDestination")
 fun rememberSaveableBackstack(
-    backstackId: BackstackId,
+    backstackId: BackstackStateId,
     initial: Destination,
-): MutableBackstack =
+): MutableBackstackState =
     rememberSaveableBackstack(
         backstackId,
         listOf(BackstackEntry(initial)),
