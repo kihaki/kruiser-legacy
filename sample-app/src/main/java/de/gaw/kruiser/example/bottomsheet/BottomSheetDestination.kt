@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.backstack.core.MutableBackstackState
 import de.gaw.kruiser.backstack.ui.BackstackContext
-import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
 import de.gaw.kruiser.backstack.ui.rendering.Render
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
@@ -44,46 +43,51 @@ fun BackstackRendererWithBottomSheet(
     Box(modifier = modifier) {
         // Regular screens
         BackstackContext(
-            mutableBackstack = backstack,
-            backstack = rememberDerivedBackstack(backstack) {
+            backstackState = backstack,
+        ) {
+            val regularBackstack = rememberDerivedBackstack(backstack) {
                 filterDestinations { it !is BottomSheetDestination }
             }
-        ) {
-            BackstackRenderer(backstack = it)
-        }
+            val regularEntries by regularBackstack.collectEntries()
+            AnimatedContent(
+                modifier = Modifier.navigationBarsPadding(),
+                targetState = regularEntries.lastOrNull(),
+                transitionSpec = {
+                    slideInHorizontally { it } togetherWith slideOutHorizontally { -it / 2 }
+                },
+                label = "bottom-sheet-screen-transition",
+            ) { entry ->
+                entry?.Render()
+            }
 
-        // Bottomsheet Screens
-        val bottomSheetBackstack = rememberDerivedBackstack(backstack) {
-            filterDestinations { it is BottomSheetDestination }
-        }
-        val isBottomSheetVisible by remember { derivedStateOf { entries.lastOrNull()?.destination is BottomSheetDestination } }
-        val backgroundScrim by animateFloatAsState(
-            if (isBottomSheetVisible) .5f else 0f,
-            label = "sheet-background-scrim-anim"
-        )
-        Box(
-            modifier = Modifier
-                .background(color = Color.Black.copy(alpha = backgroundScrim))
-                .fillMaxSize(),
-        )
-        AnimatedVisibility(
-            visible = isBottomSheetVisible,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .animateContentSize(),
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-        ) {
-            Surface(
-                shadowElevation = 4.dp,
+            // Bottomsheet Screens
+            val bottomSheetBackstack = rememberDerivedBackstack(backstack) {
+                filterDestinations { it is BottomSheetDestination }
+            }
+            val isBottomSheetVisible by remember { derivedStateOf { entries.lastOrNull()?.destination is BottomSheetDestination } }
+            val backgroundScrim by animateFloatAsState(
+                if (isBottomSheetVisible) .5f else 0f,
+                label = "sheet-background-scrim-anim"
+            )
+            Box(
+                modifier = Modifier
+                    .background(color = Color.Black.copy(alpha = backgroundScrim))
+                    .fillMaxSize(),
+            )
+            AnimatedVisibility(
+                visible = isBottomSheetVisible,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .animateContentSize(),
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it },
             ) {
-                BackstackContext(
-                    mutableBackstack = backstack,
-                    backstack = bottomSheetBackstack,
-                ) { sheetStack ->
-                    val sheetEntries by sheetStack.collectEntries()
+                Surface(
+                    shadowElevation = 4.dp,
+                ) {
+                    val sheetEntries by bottomSheetBackstack.collectEntries()
                     // Render bottom sheet content
                     AnimatedContent(
                         modifier = Modifier.navigationBarsPadding(),

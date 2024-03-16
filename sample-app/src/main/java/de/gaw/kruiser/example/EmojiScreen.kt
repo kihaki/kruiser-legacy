@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.gaw.kruiser.backstack.push
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
-import de.gaw.kruiser.backstack.ui.transition.CardTransition
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
@@ -41,9 +40,7 @@ val emojis = persistentListOf(
 data class EmojiDestination(val emoji: String) : AndroidDestination {
     override fun build(): Screen = object : Screen {
         @Composable
-        override fun Content() = CardTransition {
-            EmojiCard(emoji)
-        }
+        override fun Content() = EmojiCard(emoji)
     }
 }
 

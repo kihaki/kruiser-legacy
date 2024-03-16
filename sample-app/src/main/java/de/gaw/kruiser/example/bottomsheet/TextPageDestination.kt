@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.backstack.push
-import de.gaw.kruiser.backstack.ui.transition.CardTransition
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
@@ -29,12 +28,9 @@ interface TextPageDestination : AndroidDestination {
     val title: String
     val contentModifier: Modifier get() = Modifier.fillMaxSize()
 
-    @Composable
-    fun Decoration(content: @Composable () -> Unit) = content()
-
     override fun build(): Screen = object : Screen {
         @Composable
-        override fun Content() = Decoration {
+        override fun Content() {
             val backstack = LocalMutableBackstackState.currentOrThrow
             Surface(
                 shadowElevation = 4.dp,
@@ -81,12 +77,7 @@ interface TextPageDestination : AndroidDestination {
 @Parcelize
 data class RegularPageDestination(
     override val title: String,
-) : TextPageDestination {
-    @Composable
-    override fun Decoration(content: @Composable () -> Unit) = CardTransition {
-        content()
-    }
-}
+) : TextPageDestination
 
 @Parcelize
 data class BottomSheetPageDestination(

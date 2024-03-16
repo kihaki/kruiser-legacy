@@ -106,7 +106,7 @@ class MasterActivity : ComponentActivity() {
                 ) {
                     val masterBackstack = masterNavigationStateViewModel().backstack
                     BackstackContext(
-                        mutableBackstack = masterBackstack,
+                        backstackState = masterBackstack,
                     ) { backstack ->
                         val regular by backstack.collectDerivedEntries {
                             filterDestinations { it !is Overlay && it !is WizardDestination }
