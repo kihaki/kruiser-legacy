@@ -18,67 +18,80 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.destination.AndroidDestination
-import de.gaw.kruiser.destination.Screen
 import kotlinx.parcelize.Parcelize
 
-interface WizardPageDestination :
+@Parcelize
+object WizardNameDestination :
     AndroidDestination,
     WizardDestination,
     ModalTransition {
+    private fun readResolve(): Any = WizardNameDestination
 
-    override fun build(): Screen = object : Screen {
+    override fun build(): WizardScreen = object : WizardScreen {
+
+        override val wizardState: WizardState get() = DefaultWizardState(
+            title = "Your Name",
+            progress = (wizardDestinations.indexOf(this@WizardNameDestination) + 1) / wizardDestinations.size.toFloat(),
+        )
+
         @Composable
         override fun Content() {
-            Surface(
-                shadowElevation = 16.dp,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = wizardState.title,
-                            style = MaterialTheme.typography.displayLarge,
-                        )
-                        var textContent by rememberSaveable {
-                            mutableStateOf("")
-                        }
-
-                        OutlinedTextField(
-                            value = textContent,
-                            onValueChange = { textContent = it },
-                        )
-                    }
-                }
-            }
+            WizardEntryPageContent()
         }
     }
 }
 
 @Parcelize
-object WizardNameDestination : WizardPageDestination {
-    private fun readResolve(): Any = WizardNameDestination
-    // TODO: Put this on the screen level
-    override val wizardState: WizardState get() = DefaultWizardState(
-        title = "Your Name",
-        progress = (wizardDestinations.indexOf(this) + 1) / wizardDestinations.size.toFloat(),
-    )
+object WizardNicknameDestination :
+    AndroidDestination,
+    WizardDestination,
+    ModalTransition {
+    private fun readResolve(): Any = WizardNicknameDestination
+
+    override fun build(): WizardScreen = object : WizardScreen {
+
+        override val wizardState: WizardState get() = DefaultWizardState(
+            title = "Your Nickname",
+            progress = (wizardDestinations.indexOf(this@WizardNicknameDestination) + 1) / wizardDestinations.size.toFloat(),
+        )
+
+        @Composable
+        override fun Content() {
+            WizardEntryPageContent()
+        }
+    }
 }
 
-@Parcelize
-object WizardNicknameDestination : WizardPageDestination {
-    private fun readResolve(): Any = WizardNameDestination
-    // TODO: Put this on the screen level
-    override val wizardState: WizardState get() = DefaultWizardState(
-        title = "Your Nickname",
-        progress = (wizardDestinations.indexOf(this) + 1) / wizardDestinations.size.toFloat(),
-    )
+@Composable
+private fun WizardScreen.WizardEntryPageContent() {
+    Surface(
+        shadowElevation = 16.dp,
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = wizardState.title,
+                    style = MaterialTheme.typography.displayLarge,
+                )
+                var textContent by rememberSaveable {
+                    mutableStateOf("")
+                }
+
+                OutlinedTextField(
+                    value = textContent,
+                    onValueChange = { textContent = it },
+                )
+            }
+        }
+    }
 }
 
 @Parcelize
@@ -88,13 +101,12 @@ object WizardCompletionDestination :
     ModalTransition {
     private fun readResolve(): Any = WizardCompletionDestination
 
-    // TODO: Put this on the screen level
-    override val wizardState: WizardState get() = DefaultWizardState(
-        title = "Completed?",
-        progress = (wizardDestinations.indexOf(this) + 1) / wizardDestinations.size.toFloat(),
-    )
+    override fun build(): WizardScreen = object : WizardScreen {
+        override val wizardState: WizardState get() = DefaultWizardState(
+            title = "Completed?",
+            progress = (wizardDestinations.indexOf(this@WizardCompletionDestination) + 1) / wizardDestinations.size.toFloat(),
+        )
 
-    override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() {
             Surface(

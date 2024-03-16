@@ -51,10 +51,13 @@ import de.gaw.kruiser.backstack.ui.transparency.Overlay
 import de.gaw.kruiser.backstack.ui.util.collectDerivedEntries
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
+import de.gaw.kruiser.backstack.util.rememberScreen
 import de.gaw.kruiser.example.ExamplesListDestination
+import de.gaw.kruiser.example.wizard.DefaultWizardState
 import de.gaw.kruiser.example.wizard.ModalTransition
 import de.gaw.kruiser.example.wizard.Wizard
 import de.gaw.kruiser.example.wizard.WizardDestination
+import de.gaw.kruiser.example.wizard.WizardScreen
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -133,7 +136,7 @@ class MasterActivity : ComponentActivity() {
                             ) { currentStyle ->
                                 when (currentStyle) {
                                     Wizard -> {
-                                        val destination by produceState(onWizard.lastOrNull()) {
+                                        val wizardEntry by produceState(onWizard.lastOrNull()) {
                                             snapshotFlow { onWizard }
                                                 .map { it.lastOrNull() }
                                                 .filterNotNull()
@@ -141,15 +144,23 @@ class MasterActivity : ComponentActivity() {
                                                     value = it
                                                 }
                                         }
-                                        CompositionLocalProvider(LocalBackstackEntry provides destination) {
-                                            Wizard {
+                                        CompositionLocalProvider(LocalBackstackEntry provides wizardEntry) {
+                                            val screen = (wizardEntry?.rememberScreen() as? WizardScreen)
+                                            Wizard(
+                                                wizardState = screen?.wizardState ?: remember {
+                                                    DefaultWizardState(
+                                                        title = "Wizard",
+                                                        progress = 0f,
+                                                    )
+                                                }
+                                            ) {
                                                 Box(modifier = Modifier.padding(it)) {
                                                     AnimatedContent(
-                                                        targetState = destination,
+                                                        targetState = wizardEntry,
                                                         label = "wizard-animator",
                                                         transitionSpec = backstack.slideTransition(),
-                                                    ) { currentDestination ->
-                                                        currentDestination?.Render()
+                                                    ) { currentEntry ->
+                                                        screen?.let { currentEntry?.Render(screen = it) } ?: currentEntry?.Render()
                                                     }
                                                 }
                                             }

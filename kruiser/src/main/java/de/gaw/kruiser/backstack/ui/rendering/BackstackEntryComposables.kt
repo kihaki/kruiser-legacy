@@ -17,6 +17,7 @@ val LocalBackstackEntry = compositionLocalOf<BackstackEntry?> { null }
 
 @Composable
 fun BackstackEntry.Render(
+    screen: Screen = rememberScreen(),
     stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow,
     content: @Composable (Screen) -> Unit = { it.Content() },
 ) {
@@ -25,7 +26,6 @@ fun BackstackEntry.Render(
             val backstack = LocalBackstackState.currentOrThrow
             val entryViewModelStoreOwner = backstack.viewModelStoreOwner(this)
             CompositionLocalProvider(LocalViewModelStoreOwner provides entryViewModelStoreOwner) {
-                val screen = rememberScreen()
                 content(screen)
             }
         }

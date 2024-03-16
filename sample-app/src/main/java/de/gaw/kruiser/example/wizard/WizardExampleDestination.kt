@@ -50,10 +50,9 @@ val wizardDestinations = listOf<AndroidDestination>(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Wizard(content: @Composable (PaddingValues) -> Unit) {
+fun Wizard(wizardState: WizardState, content: @Composable (PaddingValues) -> Unit) {
     val backstackState = LocalMutableBackstackState.currentOrThrow
     val entry = LocalBackstackEntry.currentOrThrow
-    val wizardState = (entry.destination as WizardDestination).wizardState
     Scaffold(
         topBar = {
             Surface(shadowElevation = 2.dp) {

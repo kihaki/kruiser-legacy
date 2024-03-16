@@ -11,10 +11,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
+import de.gaw.kruiser.destination.Destination
+import de.gaw.kruiser.destination.Screen
 
-interface WizardDestination {
+interface WizardDestination : Destination {
+    override fun build(): WizardScreen
+}
+interface WizardScreen : Screen {
     val wizardState: WizardState
 }
+
 interface ModalTransition
 
 interface WizardState {
