@@ -1,4 +1,4 @@
-package de.gaw.kruiser.backstack.ui.transparency
+package de.gaw.kruiser.example
 
 import de.gaw.kruiser.destination.Destination
 

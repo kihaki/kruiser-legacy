@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import de.gaw.kruiser.backstack.core.MutableBackstackState
-import de.gaw.kruiser.backstack.ui.BackstackContext
+import de.gaw.kruiser.backstack.ui.Backstack
 import de.gaw.kruiser.backstack.ui.rendering.Render
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
@@ -42,8 +42,8 @@ fun BackstackRendererWithBottomSheet(
     val entries by backstack.collectEntries()
     Box(modifier = modifier) {
         // Regular screens
-        BackstackContext(
-            backstackState = backstack,
+        Backstack(
+            state = backstack,
         ) {
             val regularBackstack = rememberDerivedBackstack(backstack) {
                 filterDestinations { it !is BottomSheetDestination }

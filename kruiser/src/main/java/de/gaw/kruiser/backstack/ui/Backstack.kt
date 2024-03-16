@@ -15,8 +15,7 @@ import de.gaw.kruiser.backstack.ui.util.LocalBackstackState
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.backstack.ui.util.collectEntries
-import de.gaw.kruiser.backstack.ui.util.currentOrThrow
-import de.gaw.kruiser.viewmodel.BackstackEntryViewModelStoreOwners
+import de.gaw.kruiser.viewmodel.BackstackViewModelStoreOwners
 import de.gaw.kruiser.viewmodel.ClearViewModelsForAbandonedEntriesEffect
 import de.gaw.kruiser.viewmodel.LocalBackstackEntryViewModelStoreOwners
 import de.gaw.kruiser.viewmodel.backstackStateViewModelStoreOwners
@@ -25,35 +24,34 @@ import de.gaw.kruiser.viewmodel.backstackStateViewModelStoreOwners
  * Handles back presses and sets the [LocalMutableBackstackState] defers rendering to the [content] composable.
  */
 @Composable
-fun BackstackContext(
-    backstackState: MutableBackstackState = LocalMutableBackstackState.currentOrThrow,
-    stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current
-        ?: rememberSaveableStateHolder(),
+fun Backstack(
+    state: MutableBackstackState,
+    saveableStateHolder: SaveableStateHolder = LocalSaveableStateHolder.current ?: rememberSaveableStateHolder(),
     content: @Composable (BackstackState) -> Unit,
 ) {
-    val entries by backstackState.collectEntries()
+    val entries by state.collectEntries()
     val currentEntry = entries.lastOrNull()
 
-    val backstackViewModelStoreOwners = remember {
-        backstackStateViewModelStoreOwners.getOrPut(backstackState.id) { BackstackEntryViewModelStoreOwners() }
+    val backstackViewModelStoreOwners = remember(state.id) {
+        backstackStateViewModelStoreOwners.getOrPut(state.id) { BackstackViewModelStoreOwners() }
     }
 
     CompositionLocalProvider(
-        LocalMutableBackstackState provides backstackState,
-        LocalBackstackState provides backstackState,
-        LocalSaveableStateHolder provides stateHolder,
+        LocalMutableBackstackState provides state,
+        LocalBackstackState provides state,
+        LocalSaveableStateHolder provides saveableStateHolder,
         LocalBackstackEntry provides currentEntry,
         LocalBackstackEntryViewModelStoreOwners provides backstackViewModelStoreOwners,
     ) {
-        ClearViewModelsForAbandonedEntriesEffect(backstackState)
+        ClearViewModelsForAbandonedEntriesEffect(state)
 
-        stateHolder.SaveableStateProvider(key = "bs:${backstackState.id}") {
+        saveableStateHolder.SaveableStateProvider(key = "bs:${state.id}") {
             BackHandler(
                 enabled = entries.size > 1,
-                onBack = backstackState::pop,
+                onBack = state::pop,
             )
 
-            content(backstackState)
+            content(state)
         }
     }
 }

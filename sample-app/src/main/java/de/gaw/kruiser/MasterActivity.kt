@@ -44,10 +44,10 @@ import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.debug.DebugBackstackLoggerEffect
 import de.gaw.kruiser.backstack.savedstate.PersistedMutableBackstack
-import de.gaw.kruiser.backstack.ui.BackstackContext
+import de.gaw.kruiser.backstack.ui.Backstack
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.rendering.Render
-import de.gaw.kruiser.backstack.ui.transparency.Overlay
+import de.gaw.kruiser.example.Overlay
 import de.gaw.kruiser.backstack.ui.util.collectDerivedEntries
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
@@ -108,8 +108,8 @@ class MasterActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val masterBackstack = masterNavigationStateViewModel().backstack
-                    BackstackContext(
-                        backstackState = masterBackstack,
+                    Backstack(
+                        state = masterBackstack,
                     ) { backstack ->
                         val regular by backstack.collectDerivedEntries {
                             filterDestinations { it !is Overlay && it !is WizardDestination }
