@@ -10,8 +10,12 @@ import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,12 +52,14 @@ import de.gaw.kruiser.backstack.ui.util.collectDerivedEntries
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
 import de.gaw.kruiser.example.ExamplesListDestination
+import de.gaw.kruiser.example.wizard.ModalTransition
 import de.gaw.kruiser.example.wizard.Wizard
 import de.gaw.kruiser.example.wizard.WizardDestination
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlin.math.roundToInt
 
 class MasterNavigationViewModel(savedState: SavedStateHandle) : ViewModel() {
     val backstack = savedState.PersistedMutableBackstack(
@@ -178,15 +184,22 @@ class MasterActivity : ComponentActivity() {
 
 @Composable
 fun <S> BackstackState.slideTransition(): AnimatedContentTransitionScope<S>.() -> ContentTransform {
-    val hasPushed by produceState(false) {
+    val animData by produceState(false to false) {
         var previousEntries = emptyList<BackstackEntry>()
         entries.collectLatest {
-            value = it.size >= previousEntries.size
+            val withoutOverlays = it.filterDestinations { it !is Overlay }
+            val previousWithoutOverlays = previousEntries.filterDestinations { it !is Overlay }
+            val isWizard = ((previousWithoutOverlays.lastOrNull()?.destination is ModalTransition) xor (withoutOverlays.lastOrNull()?.destination is ModalTransition))
+            value = (it.size >= previousEntries.size) to isWizard
             previousEntries = it
         }
     }
-//    val transitionTween = tween<IntOffset>(3000)
-    val transitionTween = spring(
+    val (hasPushed, isWizard) = animData
+    val inTween = spring(
+        stiffness = Spring.StiffnessMediumLow,
+        visibilityThreshold = IntOffset.VisibilityThreshold
+    )
+    val outTween = spring(
         stiffness = Spring.StiffnessMediumLow,
         visibilityThreshold = IntOffset.VisibilityThreshold
     )
@@ -194,11 +207,22 @@ fun <S> BackstackState.slideTransition(): AnimatedContentTransitionScope<S>.() -
     val stackSize = entries.size
     return {
         if (hasPushed) {
-            slideInHorizontally(transitionTween) { it } togetherWith
-                    slideOutHorizontally(transitionTween) { -it / 2 }
+            if(isWizard) {
+                slideInVertically(inTween) { it } togetherWith
+                        slideOutVertically(outTween) { (it * .05f).roundToInt() } +
+                        scaleOut(targetScale = .94f)
+            } else {
+                slideInHorizontally(inTween) { it } togetherWith
+                        slideOutHorizontally(outTween) { -it / 2 }
+            }
         } else {
-            slideInHorizontally(transitionTween) { -it / 2 } togetherWith
-                    slideOutHorizontally(transitionTween) { it }
+            if(isWizard) {
+                (slideInVertically(inTween) { (it * .05f).roundToInt() } + scaleIn(initialScale = .94f)) togetherWith
+                        slideOutVertically(outTween) { it }
+            } else {
+                slideInHorizontally(inTween) { -it / 2 } togetherWith
+                        slideOutHorizontally(outTween) { it }
+            }
         }.apply {
             targetContentZIndex = when {
                 // Make sure that content that's pushed is rendered on top

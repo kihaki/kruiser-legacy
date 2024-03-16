@@ -11,6 +11,7 @@ import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.core.MutableBackstackState
 import de.gaw.kruiser.backstack.pop
 import de.gaw.kruiser.backstack.ui.rendering.BackstackRenderer
+import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.util.LocalBackstackState
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
@@ -46,14 +47,15 @@ fun BackstackContext(
         ?: rememberSaveableStateHolder(),
     content: @Composable (BackstackState) -> Unit,
 ) {
+    val entries by backstack.collectEntries()
+    val currentEntry = entries.lastOrNull()
     CompositionLocalProvider(
         LocalMutableBackstackState provides mutableBackstack,
         LocalBackstackState provides backstack,
         LocalSaveableStateHolder provides stateHolder,
+        LocalBackstackEntry provides currentEntry,
     ) {
         stateHolder.SaveableStateProvider(key = "bs:${backstack.id}") {
-            val entries by mutableBackstack.collectEntries()
-
             BackHandler(
                 enabled = entries.size > 1,
                 onBack = mutableBackstack::pop,

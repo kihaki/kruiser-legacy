@@ -23,14 +23,15 @@ import kotlinx.parcelize.Parcelize
 
 interface WizardPageDestination :
     AndroidDestination,
-    WizardDestination {
+    WizardDestination,
+    ModalTransition {
     val label: String
 
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() {
             Surface(
-                shadowElevation = 4.dp,
+                shadowElevation = 16.dp,
             ) {
                 Box(
                     modifier = Modifier
@@ -76,7 +77,8 @@ object WizardNicknameDestination : WizardPageDestination {
 @Parcelize
 object WizardCompletionDestination :
     AndroidDestination,
-    WizardDestination {
+    WizardDestination,
+    ModalTransition {
     private fun readResolve(): Any = WizardCompletionDestination
 
     override fun build(): Screen = object : Screen {
