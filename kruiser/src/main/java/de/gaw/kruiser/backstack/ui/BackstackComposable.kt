@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
@@ -17,6 +18,10 @@ import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.LocalSaveableStateHolder
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
+import de.gaw.kruiser.viewmodel.BackstackEntryViewModelStoreOwners
+import de.gaw.kruiser.viewmodel.ClearViewModelsForAbandonedEntriesEffect
+import de.gaw.kruiser.viewmodel.LocalBackstackEntryViewModelStoreOwners
+import de.gaw.kruiser.viewmodel.backstackStateViewModelStoreOwners
 
 @Composable
 fun Backstack(
@@ -49,12 +54,20 @@ fun BackstackContext(
 ) {
     val entries by backstack.collectEntries()
     val currentEntry = entries.lastOrNull()
+
+    val backstackViewModelStoreOwners = remember {
+        backstackStateViewModelStoreOwners.getOrPut(backstack.id) { BackstackEntryViewModelStoreOwners() }
+    }
+
     CompositionLocalProvider(
         LocalMutableBackstackState provides mutableBackstack,
         LocalBackstackState provides backstack,
         LocalSaveableStateHolder provides stateHolder,
         LocalBackstackEntry provides currentEntry,
+        LocalBackstackEntryViewModelStoreOwners provides backstackViewModelStoreOwners,
     ) {
+        ClearViewModelsForAbandonedEntriesEffect(backstack)
+
         stateHolder.SaveableStateProvider(key = "bs:${backstack.id}") {
             BackHandler(
                 enabled = entries.size > 1,
