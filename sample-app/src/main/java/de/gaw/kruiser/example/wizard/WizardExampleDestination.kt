@@ -53,15 +53,16 @@ val wizardDestinations = listOf<AndroidDestination>(
 fun Wizard(content: @Composable (PaddingValues) -> Unit) {
     val backstackState = LocalMutableBackstackState.currentOrThrow
     val entry = LocalBackstackEntry.currentOrThrow
+    val wizardState = (entry.destination as WizardDestination).wizardState
     Scaffold(
         topBar = {
             Surface(shadowElevation = 2.dp) {
                 TopAppBar(
                     title = {
                         Column {
-                            Text("Wizard")
+                            Text(wizardState.title)
                             val progress by animateFloatAsState(
-                                targetValue = .3f,
+                                targetValue = wizardState.progress,
                                 label = "wizard-progress",
                             )
                             LinearProgressIndicator(progress = { progress })

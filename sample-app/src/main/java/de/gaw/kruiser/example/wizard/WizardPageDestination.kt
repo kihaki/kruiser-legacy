@@ -25,7 +25,6 @@ interface WizardPageDestination :
     AndroidDestination,
     WizardDestination,
     ModalTransition {
-    val label: String
 
     override fun build(): Screen = object : Screen {
         @Composable
@@ -44,7 +43,7 @@ interface WizardPageDestination :
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            text = label,
+                            text = wizardState.title,
                             style = MaterialTheme.typography.displayLarge,
                         )
                         var textContent by rememberSaveable {
@@ -65,13 +64,21 @@ interface WizardPageDestination :
 @Parcelize
 object WizardNameDestination : WizardPageDestination {
     private fun readResolve(): Any = WizardNameDestination
-    override val label: String get() = "Your Name"
+    // TODO: Put this on the screen level
+    override val wizardState: WizardState get() = DefaultWizardState(
+        title = "Your Name",
+        progress = (wizardDestinations.indexOf(this) + 1) / wizardDestinations.size.toFloat(),
+    )
 }
 
 @Parcelize
 object WizardNicknameDestination : WizardPageDestination {
     private fun readResolve(): Any = WizardNameDestination
-    override val label: String get() = "Your Nickname"
+    // TODO: Put this on the screen level
+    override val wizardState: WizardState get() = DefaultWizardState(
+        title = "Your Nickname",
+        progress = (wizardDestinations.indexOf(this) + 1) / wizardDestinations.size.toFloat(),
+    )
 }
 
 @Parcelize
@@ -80,6 +87,12 @@ object WizardCompletionDestination :
     WizardDestination,
     ModalTransition {
     private fun readResolve(): Any = WizardCompletionDestination
+
+    // TODO: Put this on the screen level
+    override val wizardState: WizardState get() = DefaultWizardState(
+        title = "Completed?",
+        progress = (wizardDestinations.indexOf(this) + 1) / wizardDestinations.size.toFloat(),
+    )
 
     override fun build(): Screen = object : Screen {
         @Composable
