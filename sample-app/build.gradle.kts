@@ -1,6 +1,4 @@
 import org.gradle.api.JavaVersion.VERSION_17
-import java.io.FileInputStream
-import java.util.Properties
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
@@ -13,12 +11,6 @@ plugins {
 android {
     namespace = "de.gaw.kruiser"
     compileSdk = 34
-
-    val localProps = Properties().apply {
-        File(projectDir, "local.properties").takeIf { it.exists() }?.let {
-            load(FileInputStream(it))
-        }
-    }
 
     defaultConfig {
         applicationId = "de.gaw.kruiser"
@@ -34,9 +26,6 @@ android {
     }
 
     buildTypes {
-        all {
-            buildConfigField("String", "UNSPLASH_KEY", localProps.getProperty("UNSPLASH_KEY") ?: "")
-        }
         release {
             isMinifyEnabled = false
             proguardFiles(
