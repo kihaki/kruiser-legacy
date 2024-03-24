@@ -1,3 +1,4 @@
+import org.gradle.api.JavaVersion.VERSION_17
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -21,7 +22,7 @@ android {
 
     defaultConfig {
         applicationId = "de.gaw.kruiser"
-        minSdk = 31
+        minSdk = 23
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -45,8 +46,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = VERSION_17
+        targetCompatibility = VERSION_17
     }
     kotlinOptions {
         jvmTarget = "17"
