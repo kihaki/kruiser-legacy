@@ -47,17 +47,15 @@ import de.gaw.kruiser.backstack.savedstate.PersistedMutableBackstack
 import de.gaw.kruiser.backstack.ui.Backstack
 import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.rendering.Render
-import de.gaw.kruiser.example.Overlay
 import de.gaw.kruiser.backstack.ui.util.collectDerivedEntries
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
-import de.gaw.kruiser.backstack.util.rememberScreen
 import de.gaw.kruiser.example.ExamplesListDestination
+import de.gaw.kruiser.example.Overlay
 import de.gaw.kruiser.example.wizard.DefaultWizardState
 import de.gaw.kruiser.example.wizard.ModalTransition
 import de.gaw.kruiser.example.wizard.Wizard
 import de.gaw.kruiser.example.wizard.WizardDestination
-import de.gaw.kruiser.example.wizard.WizardScreen
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -144,10 +142,11 @@ class MasterActivity : ComponentActivity() {
                                                     value = it
                                                 }
                                         }
+                                        val wizardState =
+                                            remember(wizardEntry) { (wizardEntry?.destination as? WizardDestination)?.wizardState }
                                         CompositionLocalProvider(LocalBackstackEntry provides wizardEntry) {
-                                            val screen = (wizardEntry?.rememberScreen() as? WizardScreen)
                                             Wizard(
-                                                wizardState = screen?.wizardState ?: remember {
+                                                wizardState = wizardState ?: remember {
                                                     DefaultWizardState(
                                                         title = "Wizard",
                                                         progress = 0f,
@@ -160,7 +159,7 @@ class MasterActivity : ComponentActivity() {
                                                         label = "wizard-animator",
                                                         transitionSpec = backstack.slideTransition(),
                                                     ) { currentEntry ->
-                                                        screen?.let { currentEntry?.Render(screen = it) } ?: currentEntry?.Render()
+                                                        currentEntry?.Render()
                                                     }
                                                 }
                                             }
@@ -200,7 +199,8 @@ fun <S> BackstackState.slideTransition(): AnimatedContentTransitionScope<S>.() -
         entries.collectLatest {
             val withoutOverlays = it.filterDestinations { it !is Overlay }
             val previousWithoutOverlays = previousEntries.filterDestinations { it !is Overlay }
-            val isWizard = ((previousWithoutOverlays.lastOrNull()?.destination is ModalTransition) xor (withoutOverlays.lastOrNull()?.destination is ModalTransition))
+            val isWizard =
+                ((previousWithoutOverlays.lastOrNull()?.destination is ModalTransition) xor (withoutOverlays.lastOrNull()?.destination is ModalTransition))
             value = (it.size >= previousEntries.size) to isWizard
             previousEntries = it
         }
@@ -218,7 +218,7 @@ fun <S> BackstackState.slideTransition(): AnimatedContentTransitionScope<S>.() -
     val stackSize = entries.size
     return {
         if (hasPushed) {
-            if(isWizard) {
+            if (isWizard) {
                 slideInVertically(inTween) { it } togetherWith
                         slideOutVertically(outTween) { (it * .05f).roundToInt() } +
                         scaleOut(targetScale = .94f)
@@ -227,7 +227,7 @@ fun <S> BackstackState.slideTransition(): AnimatedContentTransitionScope<S>.() -
                         slideOutHorizontally(outTween) { -it / 2 }
             }
         } else {
-            if(isWizard) {
+            if (isWizard) {
                 (slideInVertically(inTween) { (it * .05f).roundToInt() } + scaleIn(initialScale = .94f)) togetherWith
                         slideOutVertically(outTween) { it }
             } else {
