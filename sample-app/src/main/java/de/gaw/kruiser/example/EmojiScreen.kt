@@ -25,11 +25,10 @@ import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
-val emojis = persistentListOf(
+val emojis = listOf(
     "\uD83D\uDE0E", // Sunglasses
     "\uD83D\uDD25", // Fire
     "\uD83E\uDD23", // Rofl

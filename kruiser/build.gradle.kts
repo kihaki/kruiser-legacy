@@ -64,8 +64,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
 
-    implementation(libs.kotlinx.collections.immutable)
-
     // Extract ViewModel support into a separate library module
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 

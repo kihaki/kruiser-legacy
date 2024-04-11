@@ -8,7 +8,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import de.gaw.kruiser.backstack.core.BackstackState
 import de.gaw.kruiser.backstack.core.BackstackEntries
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -54,6 +53,6 @@ private class DerivedBackstack(
             .stateIn(
                 scope = scope,
                 started = SharingStarted.Eagerly,
-                initialValue = parent.entries.value.mapping().toPersistentList()
+                initialValue = parent.entries.value.mapping()
             )
 }
