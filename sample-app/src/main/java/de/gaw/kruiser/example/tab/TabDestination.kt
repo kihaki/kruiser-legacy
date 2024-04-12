@@ -12,7 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.core.BackstackEntry
@@ -34,7 +34,7 @@ object TabDestination : AndroidDestination {
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() {
-            var currentTab: BackstackEntry by remember { mutableStateOf(tabs.first()) }
+            var currentTab: BackstackEntry by rememberSaveable { mutableStateOf(tabs.first()) }
             Scaffold(
                 modifier = Modifier
                     .navigationBarsPadding(),
