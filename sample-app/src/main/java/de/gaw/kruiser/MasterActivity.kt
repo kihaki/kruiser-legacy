@@ -52,9 +52,8 @@ import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.util.filterDestinations
 import de.gaw.kruiser.example.ExamplesListDestination
 import de.gaw.kruiser.example.Overlay
-import de.gaw.kruiser.example.wizard.DefaultWizardState
-import de.gaw.kruiser.example.wizard.ModalTransition
-import de.gaw.kruiser.example.wizard.Wizard
+import de.gaw.kruiser.example.transition.ModalTransition
+import de.gaw.kruiser.example.wizard.ui.Wizard
 import de.gaw.kruiser.example.wizard.WizardDestination
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -142,17 +141,8 @@ class MasterActivity : ComponentActivity() {
                                                     value = it
                                                 }
                                         }
-                                        val wizardState =
-                                            remember(wizardEntry) { (wizardEntry?.destination as? WizardDestination)?.wizardState }
                                         CompositionLocalProvider(LocalBackstackEntry provides wizardEntry) {
-                                            Wizard(
-                                                wizardState = wizardState ?: remember {
-                                                    DefaultWizardState(
-                                                        title = "Wizard",
-                                                        progress = 0f,
-                                                    )
-                                                }
-                                            ) {
+                                            Wizard {
                                                 Box(modifier = Modifier.padding(it)) {
                                                     AnimatedContent(
                                                         targetState = wizardEntry,

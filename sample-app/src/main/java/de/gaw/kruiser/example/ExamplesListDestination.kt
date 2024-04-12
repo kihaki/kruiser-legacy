@@ -15,7 +15,7 @@ import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
 import de.gaw.kruiser.example.bottomsheet.BottomSheetRendererDestination
-import de.gaw.kruiser.example.wizard.wizardDestinations
+import de.gaw.kruiser.example.wizard.destination.exampleWizardDestinations
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -35,7 +35,7 @@ object ExamplesListDestination : AndroidDestination {
                     item {
                         ListItem(
                             modifier = Modifier
-                                .clickable { backstack.push(wizardDestinations.first()) },
+                                .clickable { backstack.push(exampleWizardDestinations.first()) },
                             headlineContent = { Text("Wizard") },
                         )
                         ListItem(
