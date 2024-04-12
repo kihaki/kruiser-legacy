@@ -15,6 +15,7 @@ import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Screen
 import de.gaw.kruiser.example.bottomsheet.BottomSheetRendererDestination
+import de.gaw.kruiser.example.tab.TabDestination
 import de.gaw.kruiser.example.wizard.destination.exampleWizardDestinations
 import kotlinx.parcelize.Parcelize
 
@@ -38,10 +39,19 @@ object ExamplesListDestination : AndroidDestination {
                                 .clickable { backstack.push(exampleWizardDestinations.first()) },
                             headlineContent = { Text("Wizard") },
                         )
+                    }
+                    item {
                         ListItem(
                             modifier = Modifier
                                 .clickable { backstack.push(BottomSheetRendererDestination) },
                             headlineContent = { Text("Custom Renderer with BottomSheet") },
+                        )
+                    }
+                    item {
+                        ListItem(
+                            modifier = Modifier
+                                .clickable { backstack.push(TabDestination) },
+                            headlineContent = { Text("Tabs with nested Navigation") },
                         )
                     }
                 }

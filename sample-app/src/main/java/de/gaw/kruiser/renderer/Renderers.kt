@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 sealed class RenderStyle {
-    data object Regular : RenderStyle()
+    data class Regular(val destination: BackstackEntry?) : RenderStyle()
     data object Wizard : RenderStyle()
 }
 
@@ -60,10 +60,11 @@ fun RenderDestinations(backstack: BackstackState) {
     val wizardEntries = backstack.rememberWizardBackstackEntries()
 
     val currentWizardEntries by wizardEntries
+    val currentRegularEntries by regularEntries
 
     val style = when {
         currentWizardEntries.isNotEmpty() -> Wizard
-        else -> Regular
+        else -> Regular(currentRegularEntries.lastOrNull())
     }
 
     AnimatedContent(
@@ -71,16 +72,14 @@ fun RenderDestinations(backstack: BackstackState) {
         label = "main-screen-animations",
         transitionSpec = backstack.slideTransition(),
     ) { currentStyle ->
-        val currentRegularEntries by regularEntries
-
         when (currentStyle) {
             Wizard -> RenderWizard(
                 transitionSpec = backstack.slideTransition(),
                 wizardEntries = wizardEntries,
             )
 
-            Regular -> {
-                currentRegularEntries.lastOrNull()?.Render()
+            is Regular -> {
+                currentStyle.destination?.Render()
             }
         }
     }
