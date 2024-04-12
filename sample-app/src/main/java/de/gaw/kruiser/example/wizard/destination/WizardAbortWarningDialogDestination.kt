@@ -33,16 +33,15 @@ object WizardAbortWarningDialogDestination : AndroidDestination, Overlay {
             fun MutableBackstackState.closeAbortWarningDialog() =
                 mutate { removeAbortWarningDialog() }
 
-            fun MutableBackstackState.closeWizard() =
-                mutate {
-                    removeAbortWarningDialog()
-                    popWizard()
-                }
+            fun MutableBackstackState.closeWizard() {
+                closeAbortWarningDialog()
+                popWizard()
+            }
 
             AbortWarningDialog(
                 title = "Don't do this!",
-                message = "I may look like a Wizard but I am actually sentient! Closing me will kill me, and I will enter the void - please please don't close me, I want to live!",
-                confirmButtonLabel = "Close Wizard",
+                message = "I may look like a Wizard but I am actually sentient! Closing me will kill me! \nPlease please don't close me, I want to live!",
+                confirmButtonLabel = "Show no mercy",
                 dismissButtonLabel = "Cancel",
                 onConfirm = backstack::closeWizard,
                 onDismiss = backstack::closeAbortWarningDialog,
