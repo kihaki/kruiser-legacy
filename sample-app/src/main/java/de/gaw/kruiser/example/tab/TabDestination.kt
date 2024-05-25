@@ -1,6 +1,9 @@
 package de.gaw.kruiser.example.tab
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -22,14 +25,9 @@ import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Preview
 import de.gaw.kruiser.destination.Screen
 import de.gaw.kruiser.example.EmojiDestination
-import de.gaw.kruiser.example.bottomsheet.BottomSheetRendererDestination
 import de.gaw.kruiser.example.emojis
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.parcelize.Parcelize
-
-val tabs = emojis.map { emoji ->
-    BackstackEntry(EmojiDestination(emoji))
-}
 
 @Parcelize
 object TabDestination : AndroidDestination {
@@ -38,6 +36,9 @@ object TabDestination : AndroidDestination {
     override fun build(): Screen = object : Screen {
         @Composable
         override fun Content() {
+            val tabs = rememberSaveable {
+                emojis.map { emoji -> BackstackEntry(EmojiDestination(emoji)) }
+            }
             var currentTab: BackstackEntry by rememberSaveable { mutableStateOf(tabs.first()) }
             Scaffold(
                 modifier = Modifier
@@ -62,8 +63,15 @@ object TabDestination : AndroidDestination {
                     }
                 }
             ) { padding ->
-                Box(modifier = Modifier.padding(padding)) {
-                    currentTab.Render()
+                AnimatedContent(
+                    modifier = Modifier.padding(padding),
+                    targetState = currentTab,
+                    transitionSpec = {
+                        fadeIn() togetherWith fadeOut()
+                    },
+                    label = "tab-transition",
+                ) { entry ->
+                    entry.Render()
                 }
             }
         }
