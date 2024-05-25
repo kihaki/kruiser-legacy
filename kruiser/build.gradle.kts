@@ -1,11 +1,12 @@
 import org.gradle.api.JavaVersion.VERSION_17
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     `maven-publish`
+    alias(libs.plugins.kotlinComposeCompiler)
     id("kotlin-parcelize")
 }
 
@@ -38,14 +39,13 @@ android {
         sourceCompatibility = VERSION_17
         targetCompatibility = VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
         resources {
@@ -73,9 +73,9 @@ dependencies {
 }
 
 allprojects {
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = VERSION_17.toString()
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 }

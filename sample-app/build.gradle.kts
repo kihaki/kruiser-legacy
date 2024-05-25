@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlinComposeCompiler)
     id("kotlin-parcelize")
 }
 
@@ -38,15 +39,9 @@ android {
         sourceCompatibility = VERSION_17
         targetCompatibility = VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         buildConfig = true
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
         resources {
