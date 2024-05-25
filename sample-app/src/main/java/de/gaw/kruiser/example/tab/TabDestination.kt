@@ -15,12 +15,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.ui.rendering.Render
 import de.gaw.kruiser.destination.AndroidDestination
+import de.gaw.kruiser.destination.Preview
 import de.gaw.kruiser.destination.Screen
 import de.gaw.kruiser.example.EmojiDestination
+import de.gaw.kruiser.example.bottomsheet.BottomSheetRendererDestination
 import de.gaw.kruiser.example.emojis
+import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.parcelize.Parcelize
 
 val tabs = emojis.map { emoji ->
@@ -64,5 +68,11 @@ object TabDestination : AndroidDestination {
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun TabDestinationPreview() = KruiserSampleTheme {
+    TabDestination.Preview()
 }
 

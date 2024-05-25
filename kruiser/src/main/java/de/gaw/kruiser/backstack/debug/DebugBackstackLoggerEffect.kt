@@ -18,15 +18,15 @@ import kotlinx.coroutines.withContext
 @Composable
 fun DebugBackstackLoggerEffect(
     tag: String? = null,
-    backstack: BackstackState = LocalBackstackState.currentOrThrow,
+    backstackState: BackstackState = LocalBackstackState.currentOrThrow,
 ) {
     val currentTag by rememberUpdatedState(tag)
-    LaunchedEffect(tag, backstack) {
+    LaunchedEffect(tag, backstackState) {
         withContext(Dispatchers.IO) {
-            backstack.entries.collectLatest {
+            backstackState.entries.collectLatest {
                 Log.v(
                     "BackstackUpdate",
-                    "\n--- ${currentTag ?: "Backstack"} ${backstack.id} has changed: ---",
+                    "\n--- ${currentTag ?: "Backstack"} ${backstackState.id} has changed: ---",
                 )
                 it.forEachIndexed { index, backstackEntry ->
                     Log.v("BackstackUpdate", "   [$index]: $backstackEntry")

@@ -12,36 +12,46 @@ import de.gaw.kruiser.destination.Destination
  * after every mutation.
  */
 @Suppress("FunctionName")
-fun SavedStateHandle.PersistedMutableBackstack(
+fun SavedStateMutableBackstack(
+    handle: SavedStateHandle,
     id: BackstackStateId,
-    initial: List<Destination>,
+    initial: List<Destination> = emptyList(),
 ): MutableBackstackState = SavedStateMutableBackstack(
-    handle = this,
-    wrapped = restoreBackstackState(id) ?: MutableBackstackState(id = id, content = initial),
+    handle = handle,
+    wrapped = handle.restoreBackstackState(id)
+        ?: MutableBackstackState(id = id, content = initial),
 )
 
 /**
  * Restores a [MutableBackstackState] from the [SavedStateHandle].
  */
 fun SavedStateHandle.restoreBackstackState(id: BackstackStateId) =
-    get<ParcelableBackstackState>(backstackSavedStateId(id))?.asMutableBackstackState()
+    get<ParcelableBackstackState>(id.toSavedStateId())?.asMutableBackstackState()
 
 /**
  * Saves the given [state] to the [SavedStateHandle].
  */
 fun SavedStateHandle.save(state: BackstackState) {
-    this[backstackSavedStateId(state.id)] = state.asSaveable()
+    this[state.id.toSavedStateId()] = state.asSaveable()
 }
 
 private class SavedStateMutableBackstack(
     private val handle: SavedStateHandle,
     private val wrapped: MutableBackstackState,
+) : MutableBackstackState by SavedMutableBackstack(
+    wrapped = wrapped,
+    saver = { state -> handle.save(state) },
+)
+
+class SavedMutableBackstack(
+    private val wrapped: MutableBackstackState,
+    private val saver: (MutableBackstackState) -> Unit,
 ) : MutableBackstackState by wrapped {
     override fun mutate(block: BackstackEntries.() -> BackstackEntries) {
         wrapped.mutate(block)
-        handle.save(wrapped)
+        saver(wrapped)
     }
 }
 
-private fun backstackSavedStateId(id: BackstackStateId) = "backstack:$id"
+private fun BackstackStateId.toSavedStateId() = "backstack:$this"
 

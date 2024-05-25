@@ -55,9 +55,9 @@ private fun List<BackstackEntry>.filterWizardDestinations() = filterDestinations
  * supporting both regular and wizard destinations.
  */
 @Composable
-fun RenderDestinations(backstack: BackstackState) {
-    val regularEntries = backstack.rememberRegularBackstackEntries()
-    val wizardEntries = backstack.rememberWizardBackstackEntries()
+fun RenderDestinations(backstackState: BackstackState) {
+    val regularEntries = backstackState.rememberRegularBackstackEntries()
+    val wizardEntries = backstackState.rememberWizardBackstackEntries()
 
     val currentWizardEntries by wizardEntries
     val currentRegularEntries by regularEntries
@@ -70,11 +70,11 @@ fun RenderDestinations(backstack: BackstackState) {
     AnimatedContent(
         targetState = style,
         label = "main-screen-animations",
-        transitionSpec = backstack.slideTransition(),
+        transitionSpec = backstackState.slideTransition(),
     ) { currentStyle ->
         when (currentStyle) {
             Wizard -> RenderWizard(
-                transitionSpec = backstack.slideTransition(),
+                transitionSpec = backstackState.slideTransition(),
                 wizardEntries = wizardEntries,
             )
 
@@ -86,8 +86,8 @@ fun RenderDestinations(backstack: BackstackState) {
 }
 
 @Composable
-fun RenderOverlays(backstack: BackstackState) {
-    val overlays by backstack.collectMostRecentOverlayBackstackEntry()
+fun RenderOverlays(backstackState: BackstackState) {
+    val overlays by backstackState.collectMostRecentOverlayBackstackEntry()
     AnimatedContent(
         targetState = overlays.lastOrNull(),
         label = "overlay-transitions",

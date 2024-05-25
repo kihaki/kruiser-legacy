@@ -11,7 +11,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import de.gaw.kruiser.backstack.ui.Backstack
+import de.gaw.kruiser.backstack.ui.BackstackContext
 import de.gaw.kruiser.backstack.ui.rendering.Render
 import de.gaw.kruiser.backstack.ui.util.collectEntries
 import de.gaw.kruiser.backstack.ui.util.rememberSaveableBackstack
@@ -36,8 +36,8 @@ object BackstackInScaffoldExampleDestination : AndroidDestination {
                 Box(
                     modifier = Modifier.padding(it),
                 ) {
-                    Backstack(
-                        state = backstack,
+                    BackstackContext(
+                        backstackState = backstack,
                     ) {
                         val entries by it.collectEntries()
                         AnimatedContent(

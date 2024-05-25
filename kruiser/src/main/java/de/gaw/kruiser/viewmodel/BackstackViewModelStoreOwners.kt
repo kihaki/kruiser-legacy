@@ -76,7 +76,7 @@ val LocalBackstackEntryViewModelStoreOwners =
     compositionLocalOf<BackstackViewModelStoreOwners?> { null }
 
 @Composable
-fun ClearViewModelsForAbandonedEntriesEffect(backstackState: BackstackState) {
+fun DisposeViewModelsEffect(backstackState: BackstackState) {
     val storeOwner = LocalBackstackEntryViewModelStoreOwners.currentOrThrow
 
     // This will dispose of the ViewModels if the matching backstackEntry was removed while not being rendered itself

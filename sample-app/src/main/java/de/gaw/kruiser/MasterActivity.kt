@@ -10,7 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import de.gaw.kruiser.backstack.debug.DebugBackstackLoggerEffect
-import de.gaw.kruiser.backstack.ui.Backstack
+import de.gaw.kruiser.backstack.ui.BackstackContext
 import de.gaw.kruiser.renderer.RenderDestinations
 import de.gaw.kruiser.renderer.RenderOverlays
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
@@ -26,21 +26,23 @@ class MasterActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val masterBackstack = masterNavigationStateViewModel().backstack
+                    /* Add the context for rendering the backstack. */
+                    BackstackContext(
+                        backstackState = navigationSavedStateHolderViewModel().backstack,
+                    ) { backstackState ->
 
-                    Backstack(
-                        state = masterBackstack,
-                    ) { backstack ->
+                        /* Render the backstack. */
                         Box {
-                            RenderDestinations(backstack = backstack)
-                            RenderOverlays(backstack = backstack)
+                            RenderDestinations(backstackState = backstackState)
+                            RenderOverlays(backstackState = backstackState)
                         }
-                    }
 
-                    DebugBackstackLoggerEffect(
-                        tag = "MasterBackstack",
-                        backstack = masterBackstack,
-                    )
+                        /* Log changes to the backstack to logcat. */
+                        DebugBackstackLoggerEffect(
+                            tag = "MasterBackstack",
+                            backstackState = backstackState,
+                        )
+                    }
                 }
             }
         }

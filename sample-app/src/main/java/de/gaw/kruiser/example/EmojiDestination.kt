@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.gaw.kruiser.backstack.push
@@ -20,8 +21,11 @@ import de.gaw.kruiser.backstack.ui.rendering.LocalBackstackEntry
 import de.gaw.kruiser.backstack.ui.util.LocalMutableBackstackState
 import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
+import de.gaw.kruiser.destination.Preview
 import de.gaw.kruiser.destination.Screen
+import de.gaw.kruiser.example.tab.TabDestination
 import de.gaw.kruiser.example.viewmodel.LifecycleLoggingViewModel
+import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
@@ -98,4 +102,10 @@ private fun EmojiCard(emoji: String) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun EmojiDestinationPreview() = KruiserSampleTheme {
+    EmojiDestination(emojis.first()).Preview()
 }
