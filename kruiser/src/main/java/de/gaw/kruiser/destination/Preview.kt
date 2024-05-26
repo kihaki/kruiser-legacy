@@ -2,6 +2,7 @@ package de.gaw.kruiser.destination
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import de.gaw.kruiser.backstack.core.BackstackEntries
 import de.gaw.kruiser.backstack.core.BackstackEntry
 import de.gaw.kruiser.backstack.core.MutableBackstackState
 import de.gaw.kruiser.backstack.ui.BackstackContext
@@ -13,16 +14,16 @@ import de.gaw.kruiser.backstack.ui.util.currentOrThrow
  * Renders a preview of a destination, intended for Editor previews.
  */
 @Composable
-fun Destination.Preview() {
+fun Destination.Preview(
+    entriesBefore: BackstackEntries = emptyList(),
+) {
     val previewBackstackState = remember(this) {
         MutableBackstackState(
             "preview-backstack-state",
-            listOf(
-                BackstackEntry(
-                    destination = this,
-                    id = "preview-backstack-entry-id", // stable id for previews
-                ),
-            )
+            entriesBefore + BackstackEntry(
+                destination = this,
+                id = "preview-current-backstack-entry-id", // stable id for previews
+            ),
         )
     }
     BackstackContext(

@@ -23,7 +23,6 @@ import de.gaw.kruiser.backstack.ui.util.currentOrThrow
 import de.gaw.kruiser.destination.AndroidDestination
 import de.gaw.kruiser.destination.Preview
 import de.gaw.kruiser.destination.Screen
-import de.gaw.kruiser.example.tab.TabDestination
 import de.gaw.kruiser.example.viewmodel.LifecycleLoggingViewModel
 import de.gaw.kruiser.ui.theme.KruiserSampleTheme
 import kotlinx.parcelize.Parcelize
@@ -94,7 +93,7 @@ private fun EmojiCard(emoji: String) {
                 Spacer(modifier = Modifier.size(16.dp))
                 ElevatedButton(
                     onClick = {
-                        backstack.push(BackstackInScaffoldExampleDestination)
+                        backstack.push(NestedBackstackExampleDestination)
                     },
                 ) {
                     Text("Push Stack")
